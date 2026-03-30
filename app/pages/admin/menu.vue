@@ -127,19 +127,28 @@
           </div>
         </div>
 
-        <div class="flex gap-2">
-          <button
-            @click="openEditModal(item)"
-            class="w-10 h-10 flex items-center justify-center rounded-xl bg-orange-50 text-orange-500 md:opacity-0 group-hover:opacity-100 transition-all hover:bg-orange-500 hover:text-white"
+        <div class="flex flex-col gap-2">
+          <div class="flex gap-2">
+            <button
+              @click="openEditModal(item)"
+              class="w-10 h-10 flex items-center justify-center rounded-xl bg-orange-50 text-orange-500 md:opacity-0 group-hover:opacity-100 transition-all hover:bg-orange-500 hover:text-white"
+            >
+              ✏️
+            </button>
+            <button
+              @click="initiateDelete(item.id)"
+              class="w-10 h-10 flex items-center justify-center rounded-xl bg-red-50 text-red-500 md:opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white shrink-0"
+            >
+              🗑️
+            </button>
+          </div>
+          <!-- Availability Badge -->
+          <span
+            v-if="item.available === false"
+            class="text-[10px] bg-gray-100 text-gray-400 px-2 py-1 rounded-lg font-bold text-center"
           >
-            ✏️
-          </button>
-          <button
-            @click="initiateDelete(item.id)"
-            class="w-10 h-10 flex items-center justify-center rounded-xl bg-red-50 text-red-500 md:opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white shrink-0"
-          >
-            🗑️
-          </button>
+            {{ $t("admin.hidden") }}
+          </span>
         </div>
       </div>
     </div>
@@ -178,6 +187,29 @@
             :placeholder="$t('admin.item_price')"
             class="w-full p-4 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-orange-500 shadow-inner"
           />
+
+          <!-- Availability Toggle -->
+          <div
+            class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl"
+          >
+            <span class="text-sm font-bold text-gray-700">{{
+              $t("admin.available") || "متوفر للطلب"
+            }}</span>
+            <button
+              @click="newItem.available = !newItem.available"
+              :class="[
+                'w-12 h-6 rounded-full transition-colors relative',
+                newItem.available ? 'bg-orange-500' : 'bg-gray-300',
+              ]"
+            >
+              <div
+                :class="[
+                  'absolute top-1 w-4 h-4 bg-white rounded-full transition-all',
+                  newItem.available ? 'right-7' : 'right-1',
+                ]"
+              ></div>
+            </button>
+          </div>
 
           <div class="space-y-1">
             <label class="text-xs font-bold text-gray-500 px-1">{{
@@ -254,7 +286,7 @@ const editingId = ref(null);
 const loading = ref(false);
 const uploadLoading = ref(false);
 const imageUrl = ref("");
-const newItem = ref({ name: "", price: "", category: "" });
+const newItem = ref({ name: "", price: "", category: "", available: true });
 
 // متغيرات الفلترة
 const searchQuery = ref("");
@@ -368,7 +400,7 @@ const openAddModal = () => {
   newItem.value = {
     name: "",
     price: "",
-    category: availableCategories.value[0],
+    available: true,
   };
   imageUrl.value = "";
   isModalOpen.value = true;
@@ -380,6 +412,7 @@ const openEditModal = (item) => {
     name: item.name,
     price: item.price,
     category: item.category,
+    available: item.available !== false, // Default to true if null/undefined
   };
   imageUrl.value = item.image || "";
   isModalOpen.value = true;
@@ -401,6 +434,7 @@ const addItem = async () => {
       category: newItem.value.category,
       user_id: uId,
       image: imageUrl.value || null,
+      available: newItem.value.available,
     };
 
     let error;

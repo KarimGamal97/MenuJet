@@ -77,6 +77,8 @@
     "settings_subtitle": "Manage your restaurant data and menu sections",
     "restaurant_name_placeholder": "e.g. Al-Hamd Restaurant",
     "whatsapp_placeholder": "e.g. 201234567890",
-    "sections_count": "sections"
+    "sections_count": "sections",
+    "hidden": "Hidden",
+    "available": "Available for order"
   }
 }

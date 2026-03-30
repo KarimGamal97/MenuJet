@@ -77,6 +77,8 @@
     "settings_subtitle": "إدارة بيانات مطعمك وأقسام المنيو",
     "restaurant_name_placeholder": "مثال: مطعم الحمد",
     "whatsapp_placeholder": "مثال: 201234567890",
-    "sections_count": "أقسام"
+    "sections_count": "أقسام",
+    "hidden": "مخفي",
+    "available": "متوفر للطلب"
   }
 }

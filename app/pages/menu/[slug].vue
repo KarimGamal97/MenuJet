@@ -3,28 +3,31 @@
     <template v-if="restaurant">
       <MenuHeader :restaurant="restaurant" :locale="locale" />
 
-      <MenuCategories :categories="categories" v-slot="{ activeCategory }">
-        <div class="flex gap-2 overflow-x-auto p-4 bg-white shadow-sm">
+      <!-- Category Tabs (Sticky) -->
+      <nav 
+        class="sticky top-[72px] z-40 bg-white/90 backdrop-blur-md border-b border-gray-100 flex items-center justify-center py-2 px-4 shadow-sm overflow-x-auto no-scrollbar"
+      >
+        <div class="flex gap-2 max-w-7xl w-full">
           <button
             v-for="cat in categories"
             :key="cat"
             @click="activeCategory = cat"
             :class="[
-              'px-6 py-2 rounded-full font-bold whitespace-nowrap',
+              'px-6 py-2.5 rounded-2xl font-bold whitespace-nowrap text-sm transition-all duration-300',
               activeCategory === cat
-                ? 'bg-orange-600 text-white'
-                : 'bg-gray-100 text-gray-600',
+                ? 'bg-orange-600 text-white shadow-lg shadow-orange-100 scale-105'
+                : 'bg-gray-50 text-gray-400 hover:bg-gray-100',
             ]"
           >
             {{ cat === "all" ? "الكل" : cat }}
           </button>
         </div>
-      </MenuCategories>
+      </nav>
 
-      <main class="flex-grow max-w-7xl mx-auto w-full p-6">
+      <main class="flex-grow max-w-3xl mx-auto w-full p-4 lg:p-6">
         <div
           v-if="filteredItems.length > 0"
-          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+          class="flex flex-col gap-3"
         >
           <MenuItemCard
             v-for="item in filteredItems"
@@ -93,16 +96,17 @@ const { data: restaurant, error } = await useAsyncData(
 
 const activeCategory = ref("all");
 
-// 2. استخراج التصنيفات من الوجبات المتاحة
+// 2. استخراج التصنيفات من الوجبات المتاحة حالياً
 const categories = computed(() => {
-  const items = restaurant.value?.menu_items || [];
+  // Only show categories that have at least one AVAILABLE item
+  const items = (restaurant.value?.menu_items || []).filter(i => i.available !== false);
   const cats = items.map((i) => i.category).filter(Boolean);
   return ["all", ...new Set(cats)];
 });
 
 // 3. فلترة الوجبات
 const filteredItems = computed(() => {
-  const items = restaurant.value?.menu_items || [];
+  const items = (restaurant.value?.menu_items || []).filter(i => i.available !== false);
   if (activeCategory.value === "all") return items;
   return items.filter((i) => i.category === activeCategory.value);
 });

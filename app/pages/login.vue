@@ -118,6 +118,18 @@ const onSubmit = handleSubmit(async (values) => {
     loading.value = false;
   } else {
     $toast.success(t("login.success"));
+    const user = useSupabaseUser();
+    if (!user.value) {
+      await new Promise((resolve) => {
+        const stop = watch(user, (val) => {
+          if (val) {
+            stop();
+            resolve();
+          }
+        });
+        setTimeout(resolve, 3000);
+      });
+    }
     navigateTo("/admin");
   }
 });

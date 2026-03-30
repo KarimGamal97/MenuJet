@@ -34,6 +34,37 @@
           </div>
         </div>
 
+        <!-- Logo Upload Section -->
+        <div class="md:col-span-2 mb-4">
+          <label class="block text-sm font-bold mb-3 text-gray-700 px-1"
+            >شعار المطعم</label
+          >
+          <div class="flex items-center gap-4">
+            <div
+              class="w-20 h-20 bg-gray-100 rounded-[2rem] flex items-center justify-center overflow-hidden border-2 border-dashed border-gray-200"
+            >
+              <img
+                v-if="form.logo"
+                :src="form.logo"
+                class="w-full h-full object-cover"
+              />
+              <span v-else class="text-2xl opacity-30">🖼️</span>
+            </div>
+            <label
+              class="cursor-pointer bg-white border border-gray-200 px-6 py-3 rounded-2xl text-xs font-bold hover:bg-gray-50 transition-all"
+            >
+              {{ uploading ? "جاري الرفع..." : "اختر صورة الشعار" }}
+              <input
+                type="file"
+                class="hidden"
+                @change="uploadLogo"
+                accept="image/*"
+                :disabled="uploading"
+              />
+            </label>
+          </div>
+        </div>
+
         <!-- رابط المنيو -->
         <div class="md:col-span-2">
           <label class="block text-sm font-bold mb-3 text-gray-700 px-1">{{
@@ -153,6 +184,7 @@ definePageMeta({ layout: "admin", middleware: "auth" });
 const client = useSupabaseClient();
 const user = useSupabaseUser();
 const { $toast } = useNuxtApp();
+const uploading = ref(false);
 
 const loading = ref(false);
 const newCategory = ref("");
@@ -162,6 +194,7 @@ const form = ref({
   slug: "",
   whatsapp_number: "",
   categories: ["Main", "Drinks", "Dessert"],
+  logo: "",
 });
 
 // 1. جلب البيانات - الجدول يستخدم user_id كمعرف المستخدم الحقيقي
@@ -192,6 +225,7 @@ watch(
         slug: newData.slug || "",
         whatsapp_number: newData.whatsapp_number || "",
         categories: newData.categories || ["Main", "Drinks", "Dessert"],
+        logo: newData.logo || "",
       };
     }
   },
@@ -211,6 +245,35 @@ const addCategory = () => {
   newCategory.value = "";
 };
 
+const uploadLogo = async (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+  uploading.value = true;
+
+  const fileExt = file.name.split(".").pop();
+  // Safe ID access
+  const uId = user.value?.id || user.value?.sub || "anonymous";
+  const fileName = `${uId}-${Math.random()}.${fileExt}`;
+  const filePath = `logos/${fileName}`;
+  try {
+    // 1. Upload to Supabase Storage (Assumes you have a bucket named 'logos')
+    const { error: uploadError } = await client.storage
+      .from("logos")
+      .upload(filePath, file);
+    if (uploadError) throw uploadError;
+    // 2. Get Public URL
+    const { data } = client.storage.from("logos").getPublicUrl(filePath);
+
+    // 3. Update the form state
+    form.value.logo = data.publicUrl;
+    $toast.success("Logo uploaded!");
+  } catch (err) {
+    $toast.error("Error uploading logo");
+  } finally {
+    uploading.value = false;
+  }
+};
+
 const removeCategory = (index) => {
   if (form.value.categories.length <= 1) {
     return $toast.error($t("admin.at_least_one_category"));
@@ -226,13 +289,15 @@ const saveSettings = async () => {
   loading.value = true;
   try {
     const settingsData = {
-      business_name: form.value.business_name,
+      business_name: form.value.business_name, // If you have a single business_name column
+      business_name_ar: form.value.business_name, // Fallback if using localized columns
       slug: form.value.slug
         .toLowerCase()
         .replace(/[^a-z0-9]/g, "-")
         .replace(/-+/g, "-"),
       whatsapp_number: form.value.whatsapp_number,
       categories: form.value.categories,
+      logo: form.value.logo,
     };
 
     const { error } = await client

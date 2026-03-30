@@ -16,19 +16,20 @@ useHead({
     <NuxtPage />
   </NuxtLayout>
 
-  <Toaster
-    :dir="localeDir"
-    position="top-right"
-    richColors
-    closeButton
-    :toastOptions="{
-      style: {
-        borderRadius: '1rem',
-        padding: '0.875rem 1.25rem',
-        fontSize: '14px',
-        fontWeight: '600',
-        textAlign: localeDir === 'rtl' ? 'right' : 'left',
-      },
-    }"
-  />
+  <ClientOnly
+    ><Toaster
+      :dir="localeDir"
+      position="top-right"
+      richColors
+      closeButton
+      :toastOptions="{
+        style: {
+          borderRadius: '1rem',
+          padding: '0.875rem 1.25rem',
+          fontSize: '14px',
+          fontWeight: '600',
+          textAlign: localeDir === 'rtl' ? 'right' : 'left',
+        },
+      }"
+  /></ClientOnly>
 </template>
