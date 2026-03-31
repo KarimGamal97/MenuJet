@@ -1,10 +1,13 @@
 <template>
   <div class="min-h-screen bg-gray-50 flex flex-col font-sans" dir="rtl">
-    <template v-if="restaurant">
+    <template v-if="pending">
+      <MenuSkeleton />
+    </template>
+
+    <template v-else-if="restaurant">
       <MenuHeader :restaurant="restaurant" :locale="locale" />
 
-      <!-- Category Tabs (Sticky) -->
-      <nav 
+      <nav
         class="sticky top-[72px] z-40 bg-white/90 backdrop-blur-md border-b border-gray-100 flex items-center justify-center py-2 px-4 shadow-sm overflow-x-auto no-scrollbar"
       >
         <div class="flex gap-2 max-w-7xl w-full">
@@ -25,10 +28,7 @@
       </nav>
 
       <main class="flex-grow max-w-3xl mx-auto w-full p-4 lg:p-6">
-        <div
-          v-if="filteredItems.length > 0"
-          class="flex flex-col gap-3"
-        >
+        <div v-if="filteredItems.length > 0" class="flex flex-col gap-3 pb-10">
           <MenuItemCard
             v-for="item in filteredItems"
             :key="item.id"
@@ -48,6 +48,7 @@
       />
     </template>
 
+    <!-- 3. Error or Not Found -->
     <template v-else>
       <div
         class="flex-grow flex flex-col items-center justify-center p-6 text-center"
@@ -57,7 +58,7 @@
         <p class="text-gray-500 mt-2">تأكد من الرابط الصحيح للمنيو</p>
         <NuxtLink
           to="/"
-          class="mt-6 bg-orange-600 text-white px-8 py-3 rounded-2xl font-bold"
+          class="mt-6 bg-orange-600 text-white px-8 py-3 rounded-2xl font-bold transition-transform active:scale-95 shadow-lg shadow-orange-100"
           >العودة للرئيسية</NuxtLink
         >
       </div>
@@ -66,16 +67,17 @@
 </template>
 
 <script setup>
-// المكونات بيتم استيرادها تلقائياً في Nuxt 3 لو موجودة في folder components
 const { locale } = useI18n();
 const route = useRoute();
 const client = useSupabaseClient();
 
-// 1. جلب بيانات المطعم مع الوجبات المرتبطة به
-const { data: restaurant, error } = await useAsyncData(
+const {
+  data: restaurant,
+  error,
+  pending,
+} = useAsyncData(
   `menu-${route.params.slug}`,
   async () => {
-    // جلب البروفايل أولاً بناءً على الـ slug
     const { data: profile, error: pError } = await client
       .from("profiles")
       .select("*")
@@ -84,29 +86,30 @@ const { data: restaurant, error } = await useAsyncData(
 
     if (pError) throw pError;
 
-    // جلب الوجبات اللي ليها نفس الـ user_id بتاع صاحب المطعم
     const { data: items } = await client
       .from("menu_items")
       .select("*")
-      .eq("user_id", profile.user_id); // الربط هنا بالـ user_id
+      .eq("user_id", profile.user_id);
 
     return { ...profile, menu_items: items || [] };
   },
+  { lazy: true },
 );
 
 const activeCategory = ref("all");
 
-// 2. استخراج التصنيفات من الوجبات المتاحة حالياً
 const categories = computed(() => {
-  // Only show categories that have at least one AVAILABLE item
-  const items = (restaurant.value?.menu_items || []).filter(i => i.available !== false);
+  const items = (restaurant.value?.menu_items || []).filter(
+    (i) => i.available !== false,
+  );
   const cats = items.map((i) => i.category).filter(Boolean);
   return ["all", ...new Set(cats)];
 });
 
-// 3. فلترة الوجبات
 const filteredItems = computed(() => {
-  const items = (restaurant.value?.menu_items || []).filter(i => i.available !== false);
+  const items = (restaurant.value?.menu_items || []).filter(
+    (i) => i.available !== false,
+  );
   if (activeCategory.value === "all") return items;
   return items.filter((i) => i.category === activeCategory.value);
 });

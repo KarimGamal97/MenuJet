@@ -156,6 +156,20 @@
             }}</span>
           </NuxtLink>
 
+          <NuxtLink
+            to="/admin/orders"
+            class="flex items-center gap-3 p-4 rounded-2xl transition-all font-bold hover:bg-orange-50 text-gray-500 overflow-hidden group"
+            active-class="bg-orange-50 text-orange-600 shadow-sm shadow-orange-50"
+          >
+            <span
+              class="text-xl shrink-0 group-hover:scale-110 transition-transform"
+              >📦</span
+            >
+            <span v-show="!isCollapsed" class="whitespace-nowrap">{{
+              $t("admin.orders")
+            }}</span>
+          </NuxtLink>
+
           <!-- Language Switcher Dropdown -->
           <div class="relative">
             <button

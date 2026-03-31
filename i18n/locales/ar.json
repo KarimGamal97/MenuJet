@@ -80,5 +80,17 @@
     "sections_count": "أقسام",
     "hidden": "مخفي",
     "available": "متوفر للطلب"
+  },
+  "cart": {
+    "title": "طلبك",
+    "empty": "سلة الطلبات فارغة",
+    "total": "الإجمالي",
+    "order_whatsapp": "اطلب عبر واتساب",
+    "order_cashier": "اطلب عند الكاشير",
+    "whatsapp_msg_header": "طلب جديد",
+    "cashier_title": "تم استلام طلبك",
+    "cashier_subtitle": "يرجى تقديم رقم الطلب للكاشير",
+    "items_count": "عدد العناصر",
+    "close": "تم ، شكراً"
   }
 }

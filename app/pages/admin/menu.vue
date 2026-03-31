@@ -1,165 +1,177 @@
 <template>
   <div class="space-y-6" dir="rtl">
-    <!-- Delete Confirmation Modal -->
-    <Teleport to="body">
-      <div
-        v-if="showDeleteModal"
-        class="fixed inset-0 z-[100] flex items-center justify-center p-6"
-      >
+    <!-- Skeleton -->
+    <template v-if="pending">
+      <AdminSkeleton />
+    </template>
+
+    <!-- Dashboard Content  -->
+    <template v-else>
+      <!-- Delete Confirmation Modal -->
+      <Teleport to="body">
         <div
-          class="absolute inset-0 bg-black/30 backdrop-blur-sm transition-opacity"
-          @click="showDeleteModal = false"
-        />
-        <div
-          class="bg-white rounded-[2.5rem] p-8 max-w-sm w-full relative z-[110] shadow-2xl border border-gray-100 animate-in zoom-in-95 duration-200"
+          v-if="showDeleteModal"
+          class="fixed inset-0 z-[100] flex items-center justify-center p-6"
         >
-          <div class="text-3xl mb-4 text-center">🗑️</div>
-          <h3 class="text-xl font-black text-gray-900 mb-2 text-center">
-            {{ $t("admin.delete_confirm_title") }}
-          </h3>
-          <p class="text-gray-500 text-sm mb-8 text-center leading-relaxed">
-            {{ $t("admin.delete_confirm_msg") }}
-          </p>
-
-          <div class="flex gap-3">
-            <button
-              @click="showDeleteModal = false"
-              class="flex-1 py-4 bg-gray-50 text-gray-400 rounded-2xl font-bold hover:bg-gray-100 transition-colors"
-            >
-              {{ $t("admin.cancel") }}
-            </button>
-            <button
-              @click="confirmDelete"
-              class="flex-1 py-4 bg-red-600 text-white rounded-2xl font-bold hover:bg-red-700 shadow-lg shadow-red-100 transition-transform active:scale-95"
-            >
-              {{ $t("admin.delete_confirm_btn") }}
-            </button>
-          </div>
-        </div>
-      </div>
-    </Teleport>
-
-    <div
-      class="flex flex-col sm:flex-row justify-between items-center bg-white p-4 md:p-6 rounded-[2rem] shadow-sm gap-4"
-    >
-      <h2 class="text-xl md:text-2xl font-black text-gray-800">
-        {{ $t("admin.menu_title") }}
-        <span
-          class="text-orange-600 bg-orange-50 px-3 py-1 rounded-xl text-sm md:text-base mr-2"
-        >
-          {{ items?.length || 0 }}
-        </span>
-      </h2>
-      <button
-        @click="openAddModal"
-        class="w-full sm:w-auto bg-orange-600 text-white px-6 py-3 md:py-4 rounded-2xl font-bold shadow-lg shadow-orange-200 transition-all hover:bg-orange-700 active:scale-95 flex items-center justify-center gap-2"
-      >
-        <span class="text-xl">+</span>
-        {{ $t("admin.add_item") }}
-      </button>
-    </div>
-
-    <!-- Filter Section (No Changes) -->
-    <div class="flex flex-col md:flex-row gap-4">
-      <div class="relative flex-1">
-        <input
-          v-model="searchQuery"
-          type="text"
-          :placeholder="$t('admin.search_placeholder')"
-          class="w-full p-4 pr-12 bg-white rounded-2xl border-none shadow-sm outline-none focus:ring-2 focus:ring-orange-500 transition-shadow"
-        />
-        <span
-          class="absolute right-4 top-1/2 -translate-y-1/2 text-xl opacity-40"
-          >🔍</span
-        >
-      </div>
-
-      <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1 px-1">
-        <button
-          v-for="cat in dynamicCategories"
-          :key="cat"
-          @click="selectedCategory = cat"
-          :class="[
-            'px-5 py-3 rounded-2xl font-bold transition-all whitespace-nowrap text-sm md:text-base',
-            selectedCategory === cat
-              ? 'bg-orange-600 text-white shadow-md shadow-orange-100'
-              : 'bg-white text-gray-400 hover:bg-orange-50 hover:text-orange-600',
-          ]"
-        >
-          {{ cat === "الكل" ? $t("admin.all_categories") : cat }}
-        </button>
-      </div>
-    </div>
-
-    <!-- Items Grid -->
-    <div
-      v-if="filteredItems.length > 0"
-      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-    >
-      <div
-        v-for="item in filteredItems"
-        :key="item.id"
-        class="bg-white p-5 rounded-[2rem] border border-gray-50 shadow-sm flex justify-between items-center group animate-in fade-in duration-300 transition-all hover:shadow-md"
-      >
-        <div class="flex items-center gap-4 text-right">
-          <img
-            v-if="item.image"
-            :src="item.image"
-            class="w-16 h-16 rounded-2xl object-cover bg-gray-100 shadow-sm transition-transform group-hover:scale-105"
+          <div
+            class="absolute inset-0 bg-black/30 backdrop-blur-sm transition-opacity"
+            @click="showDeleteModal = false"
           />
           <div
-            v-else
-            class="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center text-xl"
+            class="bg-white rounded-[2.5rem] p-8 max-w-sm w-full relative z-[110] shadow-2xl border border-gray-100 animate-in zoom-in-95 duration-200"
           >
-            🍴
-          </div>
-
-          <div>
-            <span
-              class="text-[10px] bg-orange-50 text-orange-600 px-2 py-1 rounded-lg font-bold"
-            >
-              {{ item.category }}
-            </span>
-            <h3 class="font-bold text-gray-800 mt-1">{{ item.name }}</h3>
-            <p class="text-orange-600 font-black text-sm">
-              {{ item.price }} {{ $t("admin.currency") }}
+            <div class="text-3xl mb-4 text-center">🗑️</div>
+            <h3 class="text-xl font-black text-gray-900 mb-2 text-center">
+              {{ $t("admin.delete_confirm_title") }}
+            </h3>
+            <p class="text-gray-500 text-sm mb-8 text-center leading-relaxed">
+              {{ $t("admin.delete_confirm_msg") }}
             </p>
+
+            <div class="flex gap-3">
+              <button
+                @click="showDeleteModal = false"
+                class="flex-1 py-4 bg-gray-50 text-gray-400 rounded-2xl font-bold hover:bg-gray-100 transition-colors"
+              >
+                {{ $t("admin.cancel") }}
+              </button>
+              <button
+                @click="confirmDelete"
+                class="flex-1 py-4 bg-red-600 text-white rounded-2xl font-bold hover:bg-red-700 shadow-lg shadow-red-100 transition-transform active:scale-95"
+              >
+                {{ $t("admin.delete_confirm_btn") }}
+              </button>
+            </div>
           </div>
         </div>
+      </Teleport>
 
-        <div class="flex flex-col gap-2">
-          <div class="flex gap-2">
-            <button
-              @click="openEditModal(item)"
-              class="w-10 h-10 flex items-center justify-center rounded-xl bg-orange-50 text-orange-500 md:opacity-0 group-hover:opacity-100 transition-all hover:bg-orange-500 hover:text-white"
-            >
-              ✏️
-            </button>
-            <button
-              @click="initiateDelete(item.id)"
-              class="w-10 h-10 flex items-center justify-center rounded-xl bg-red-50 text-red-500 md:opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white shrink-0"
-            >
-              🗑️
-            </button>
-          </div>
-          <!-- Availability Badge -->
+      <div
+        class="flex flex-col sm:flex-row justify-between items-center bg-white p-4 md:p-6 rounded-[2rem] shadow-sm gap-4"
+      >
+        <h2 class="text-xl md:text-2xl font-black text-gray-800">
+          {{ $t("admin.menu_title") }}
           <span
-            v-if="item.available === false"
-            class="text-[10px] bg-gray-100 text-gray-400 px-2 py-1 rounded-lg font-bold text-center"
+            class="text-orange-600 bg-orange-50 px-3 py-1 rounded-xl text-sm md:text-base mr-2"
           >
-            {{ $t("admin.hidden") }}
+            {{ items?.length || 0 }}
           </span>
+        </h2>
+        <button
+          @click="openAddModal"
+          class="w-full sm:w-auto bg-orange-600 text-white px-6 py-3 md:py-4 rounded-2xl font-bold shadow-lg shadow-orange-200 transition-all hover:bg-orange-700 active:scale-95 flex items-center justify-center gap-2"
+        >
+          <span class="text-xl">+</span>
+          {{ $t("admin.add_item") }}
+        </button>
+      </div>
+
+      <!-- Filter Section -->
+      <div class="flex flex-col md:flex-row gap-4">
+        <div class="relative flex-1">
+          <input
+            v-model="searchQuery"
+            type="text"
+            :placeholder="$t('admin.search_placeholder')"
+            class="w-full p-4 pr-12 bg-white rounded-2xl border-none shadow-sm outline-none focus:ring-2 focus:ring-orange-500 transition-shadow"
+          />
+          <span
+            class="absolute right-4 top-1/2 -translate-y-1/2 text-xl opacity-40"
+            >🔍</span
+          >
+        </div>
+
+        <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1 px-1">
+          <button
+            v-for="cat in dynamicCategories"
+            :key="cat"
+            @click="selectedCategory = cat"
+            :class="[
+              'px-5 py-3 rounded-2xl font-bold transition-all whitespace-nowrap text-sm md:text-base',
+              selectedCategory === cat
+                ? 'bg-orange-600 text-white shadow-md shadow-orange-100'
+                : 'bg-white text-gray-400 hover:bg-orange-50 hover:text-orange-600',
+            ]"
+          >
+            {{ cat === "الكل" ? $t("admin.all_categories") : cat }}
+          </button>
         </div>
       </div>
-    </div>
 
-    <!-- Empty State -->
-    <div
-      v-else
-      class="text-center py-20 bg-white rounded-[2rem] border border-dashed border-gray-100"
-    >
-      <p class="text-gray-400 font-bold">{{ $t("admin.no_results") }}</p>
-    </div>
+      <!-- Items Grid -->
+      <div
+        v-if="filteredItems.length > 0"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+      >
+        <div
+          v-for="item in filteredItems"
+          :key="item.id"
+          class="bg-white p-5 rounded-[2rem] border border-gray-50 shadow-sm flex justify-between items-center group animate-in fade-in duration-300 transition-all hover:shadow-md"
+        >
+          <div class="flex items-center gap-4 text-right">
+            <img
+              v-if="item.image"
+              :src="item.image"
+              class="w-16 h-16 rounded-2xl object-cover bg-gray-100 shadow-sm transition-transform group-hover:scale-105"
+            />
+            <div
+              v-else
+              class="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center text-xl"
+            >
+              🍴
+            </div>
+
+            <div>
+              <span
+                class="text-[10px] bg-orange-50 text-orange-600 px-2 py-1 rounded-lg font-bold"
+              >
+                {{ item.category }}
+              </span>
+              <h3
+                class="font-bold text-gray-800 mt-1 line-clamp-1 truncate min-w-0"
+              >
+                {{ item.name }}
+              </h3>
+              <p class="text-orange-600 font-black text-sm">
+                {{ item.price }} {{ $t("admin.currency") }}
+              </p>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <div class="flex gap-2">
+              <button
+                @click="openEditModal(item)"
+                class="w-10 h-10 flex items-center justify-center rounded-xl bg-orange-50 text-orange-500 md:opacity-0 group-hover:opacity-100 transition-all hover:bg-orange-500 hover:text-white"
+              >
+                ✏️
+              </button>
+              <button
+                @click="initiateDelete(item.id)"
+                class="w-10 h-10 flex items-center justify-center rounded-xl bg-red-50 text-red-500 md:opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white shrink-0"
+              >
+                🗑️
+              </button>
+            </div>
+            <!-- Availability Badge -->
+            <span
+              v-if="item.available === false"
+              class="text-[10px] bg-gray-100 text-gray-400 px-2 py-1 rounded-lg font-bold text-center"
+            >
+              {{ $t("admin.hidden") }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div
+        v-else
+        class="text-center py-20 bg-white rounded-[2rem] border border-dashed border-gray-100"
+      >
+        <p class="text-gray-400 font-bold">{{ $t("admin.no_results") }}</p>
+      </div>
+    </template>
 
     <!-- Add Item Modal -->
     <div
@@ -326,7 +338,11 @@ const dynamicCategories = computed(() => {
 });
 
 // 4. جلب الوجبات
-const { data: items, refresh } = await useAsyncData(
+const {
+  data: items,
+  refresh,
+  pending,
+} = useAsyncData(
   "menu-items",
   async () => {
     if (!user.value) return [];
@@ -350,7 +366,7 @@ const { data: items, refresh } = await useAsyncData(
       return [];
     }
   },
-  { server: false, watch: [user] },
+  { lazy: true, server: false, watch: [user] },
 );
 
 // 5. منطق الفلترة اللحظي

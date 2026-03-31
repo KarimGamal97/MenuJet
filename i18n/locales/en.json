@@ -80,5 +80,17 @@
     "sections_count": "sections",
     "hidden": "Hidden",
     "available": "Available for order"
+  },
+  "cart": {
+    "title": "Your Order",
+    "empty": "Your cart is empty",
+    "total": "Total",
+    "order_whatsapp": "Order via WhatsApp",
+    "order_cashier": "Order at Cashier",
+    "whatsapp_msg_header": "New Order",
+    "cashier_title": "Order Received!",
+    "cashier_subtitle": "Please show your order number to the cashier",
+    "items_count": "Total Items",
+    "close": "Done, Thank you!"
   }
 }
