@@ -28,7 +28,11 @@
       </nav>
 
       <main class="flex-grow max-w-3xl mx-auto w-full p-4 lg:p-6">
-        <div v-if="filteredItems.length > 0" class="flex flex-col gap-3 pb-10">
+        <div
+          v-if="filteredItems.length > 0"
+          class="flex flex-col gap-3"
+          :class="cartCount > 0 ? 'pb-36' : 'pb-10'"
+        >
           <MenuItemCard
             v-for="item in filteredItems"
             :key="item.id"

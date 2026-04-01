@@ -2,7 +2,7 @@
   <header
     class="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100/50 transition-all duration-300 h-20"
   >
-    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-center items-center">
       <!-- Brand Logo -->
       <div class="flex items-center gap-4">
         <div
@@ -27,29 +27,6 @@
           </h1>
         </div>
       </div>
-
-      <!-- Cart Button -->
-      <button
-        @click="showCart = true"
-        class="flex items-center gap-3 bg-orange-50 px-4 py-2.5 rounded-2xl border border-orange-100 shadow-sm transition-all hover:shadow-md hover:bg-orange-100 active:scale-95"
-        :class="cartCount > 0 ? 'opacity-100' : 'opacity-60'"
-      >
-        <div class="flex flex-col items-end">
-          <span
-            class="text-[10px] text-orange-400 font-bold uppercase tracking-tighter"
-          >
-            {{ cartCount > 0 ? $t("total") || "الإجمالي" : "السلة" }}
-          </span>
-          <span class="text-sm font-black text-orange-600 leading-none">
-            {{ cartCount > 0 ? `${totalPrice} ${$t("currency")}` : "فارغة" }}
-          </span>
-        </div>
-        <div
-          class="w-8 h-8 bg-orange-600 text-white rounded-xl flex items-center justify-center text-xs font-black shadow-md shadow-orange-200"
-        >
-          {{ cartCount > 0 ? cartCount : "🛒" }}
-        </div>
-      </button>
     </div>
   </header>
 
