@@ -47,7 +47,16 @@
       </main>
 
       <!-- Floating Cart Bar (Appears when cart is not empty) -->
-      <FloatingCartBar :whatsappNumber="restaurant.whatsapp_number" />
+      <FloatingCartBar
+        :whatsappNumber="restaurant.whatsapp_number"
+        @openCart="showCart = true"
+      />
+
+      <CartModal
+        :isOpen="showCart"
+        :whatsappNumber="restaurant.whatsapp_number"
+        @close="showCart = false"
+      />
 
       <MenuFooter
         v-if="restaurant.whatsapp_number && cartCount === 0"
@@ -78,6 +87,7 @@ const { locale } = useI18n();
 const route = useRoute();
 const client = useSupabaseClient();
 const { cartCount } = useCart();
+const showCart = ref(false);
 
 const {
   data: restaurant,

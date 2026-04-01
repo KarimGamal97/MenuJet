@@ -92,6 +92,8 @@
     "cashier_title": "Order Received!",
     "cashier_subtitle": "Please show your order number to the cashier",
     "items_count": "Total Items",
-    "close": "Done, Thank you!"
+    "close": "Done, Thank you!",
+    "order_success": "Order placed successfully ✅",
+    "order_error": "Error placing order ❌"
   }
 }

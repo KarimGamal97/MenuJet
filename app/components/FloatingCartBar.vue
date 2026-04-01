@@ -12,7 +12,7 @@
       class="fixed bottom-8 left-4 right-4 z-[100] md:max-w-md md:mx-auto"
     >
       <button
-        @click="showCart = true"
+        @click="emit('openCart')"
         class="w-full bg-orange-600 text-white p-4 rounded-[2rem] shadow-2xl flex items-center justify-between border-2 border-white/20 backdrop-blur-md transition-all hover:scale-105 active:scale-95 group overflow-hidden"
       >
         <!-- Item count and total -->
@@ -49,21 +49,15 @@
         <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
       </button>
 
-      <!-- Cart Modal Instance -->
-      <CartModal
-        :isOpen="showCart"
-        :whatsappNumber="whatsappNumber"
-        @close="showCart = false"
-      />
     </div>
   </Transition>
 </template>
 
 <script setup>
 const props = defineProps(["whatsappNumber"]);
+const emit = defineEmits(["openCart"]);
 const { totalPrice, cartCount } = useCart();
 const { locale } = useI18n();
-const showCart = ref(false);
 
 const isRTL = computed(() => locale.value === "ar");
 </script>
