@@ -1,6 +1,6 @@
 <template>
   <header
-    class="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100/50 transition-all duration-300"
+    class="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100/50 transition-all duration-300 h-20"
   >
     <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
       <!-- Brand Logo -->
@@ -67,10 +67,17 @@ const { setLocale } = useI18n();
 
 const { totalPrice, cartCount } = useCart();
 const showCart = ref(false);
+const { locale } = useI18n();
 
-const getLocaleTxt = (item, field) =>
-  item[`${field}_${useI18n().locale.value}`] ||
-  item[`${field}_ar`] ||
-  item[field] ||
-  "";
+const getLocaleTxt = (item, field) => {
+  if (!item) return "";
+  const currentLocale = locale.value;
+  return (
+    item[`${field}_${currentLocale}`] ||
+    item[`${field}_ar`] ||
+    item[field] ||
+    (field === "business_name" ? item.name : "") ||
+    ""
+  );
+};
 </script>

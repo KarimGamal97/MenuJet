@@ -79,7 +79,8 @@
     "whatsapp_placeholder": "e.g. 201234567890",
     "sections_count": "sections",
     "hidden": "Hidden",
-    "available": "Available for order"
+    "available": "Available for order",
+    "orders": "Orders"
   },
   "cart": {
     "title": "Your Order",

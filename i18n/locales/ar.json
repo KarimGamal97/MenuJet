@@ -79,7 +79,8 @@
     "whatsapp_placeholder": "مثال: 201234567890",
     "sections_count": "أقسام",
     "hidden": "مخفي",
-    "available": "متوفر للطلب"
+    "available": "متوفر للطلب",
+    "orders": "الطلبات"
   },
   "cart": {
     "title": "طلبك",

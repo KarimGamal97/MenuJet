@@ -1,7 +1,8 @@
 <!-- app/components/MenuItemCard.vue -->
 <template>
   <div
-    class="bg-white p-4 rounded-[2rem] shadow-sm border border-gray-50 flex items-center gap-4 transition-all active:scale-95 group hover:shadow-md relative overflow-hidden"
+    @click="addToCart(item)"
+    class="bg-white p-4 rounded-[2rem] shadow-sm border border-gray-50 flex items-center gap-4 transition-all active:scale-95 group hover:shadow-md relative overflow-hidden cursor-pointer"
   >
     <!-- 1. Right side (RTL): Circular Image -->
     <div
@@ -31,13 +32,12 @@
       </div>
     </div>
 
-    <!-- 3. Left side: Plus Action Button -->
-    <button
-      @click="addToCart(item)"
-      class="w-10 h-10 rounded-full bg-orange-50 text-orange-600 flex items-center justify-center text-2xl font-light shadow-sm transition-all hover:bg-orange-600 hover:text-white relative active:scale-90"
+    <!-- 3. Left side: Plus Action Button (Visual only now) -->
+    <div
+      class="w-10 h-10 rounded-full bg-orange-50 text-orange-600 flex items-center justify-center text-2xl font-light shadow-sm transition-all group-hover:bg-orange-600 group-hover:text-white relative active:scale-90 shrink-0"
     >
       +
-    </button>
+    </div>
     
     <!-- Background subtle pattern/decoration -->
     <div class="absolute -right-4 -bottom-4 w-12 h-12 bg-orange-50/30 rounded-full z-0 blur-xl"></div>

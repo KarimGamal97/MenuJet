@@ -8,15 +8,15 @@
       <MenuHeader :restaurant="restaurant" :locale="locale" />
 
       <nav
-        class="sticky top-[72px] z-40 bg-white/90 backdrop-blur-md border-b border-gray-100 flex items-center justify-center py-2 px-4 shadow-sm overflow-x-auto no-scrollbar"
+        class="sticky top-20 z-40 bg-white/90 backdrop-blur-md border-b border-gray-100 flex py-2 shadow-sm overflow-x-auto no-scrollbar"
       >
-        <div class="flex gap-2 max-w-7xl w-full">
+        <div class="flex gap-2 px-4 mx-auto w-max md:justify-center">
           <button
             v-for="cat in categories"
             :key="cat"
             @click="activeCategory = cat"
             :class="[
-              'px-6 py-2.5 rounded-2xl font-bold whitespace-nowrap text-sm transition-all duration-300',
+              'px-6 py-2.5 rounded-2xl font-bold whitespace-nowrap text-sm transition-all duration-300 shrink-0',
               activeCategory === cat
                 ? 'bg-orange-600 text-white shadow-lg shadow-orange-100 scale-105'
                 : 'bg-gray-50 text-gray-400 hover:bg-gray-100',
@@ -42,8 +42,11 @@
         </div>
       </main>
 
+      <!-- Floating Cart Bar (Appears when cart is not empty) -->
+      <FloatingCartBar :whatsappNumber="restaurant.whatsapp_number" />
+
       <MenuFooter
-        v-if="restaurant.whatsapp_number"
+        v-if="restaurant.whatsapp_number && cartCount === 0"
         :whatsappNumber="restaurant.whatsapp_number"
       />
     </template>
@@ -70,6 +73,7 @@
 const { locale } = useI18n();
 const route = useRoute();
 const client = useSupabaseClient();
+const { cartCount } = useCart();
 
 const {
   data: restaurant,
