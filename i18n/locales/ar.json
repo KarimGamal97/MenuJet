@@ -29,7 +29,7 @@
     "cancel": "إلغاء",
     "confirm": "نعم، خروج",
     "dashboard_label": "لوحة التحكم",
-    "dashboard_title": "لوحة التحكم 📊",
+    "dashboard_title": "لوحة التحكم",
     "dashboard_subtitle": "مرحباً بك، إليك نظرة سريعة على مطعمك اليوم.",
     "items_label": "عدد الأصناف",
     "items_unit": "صنف",
@@ -38,13 +38,13 @@
     "status_label": "حالة المنيو",
     "status_active": "نشط",
     "status_inactive": "غير نشط",
-    "logout_success": "تم تسجيل الخروج بنجاح 👋",
+    "logout_success": "تم تسجيل الخروج بنجاح",
     "menu_title": "قائمة الطعام",
     "add_item": "إضافة صنف",
     "search_placeholder": "ابحث عن صنف...",
     "all_categories": "الكل",
     "currency": "ج.م",
-    "no_results": "لا توجد نتائج مطابقة 😕",
+    "no_results": "لا توجد نتائج مطابقة",
     "add_modal_title": "إضافة صنف جديد للمنيو",
     "edit_modal_title": "تعديل بيانات الصنف",
     "item_name": "اسم الصنف",
@@ -52,7 +52,7 @@
     "choose_category": "اختر القسم",
     "item_image": "صورة الوجبة (اختياري)",
     "uploading_image": "جاري رفع الصورة...",
-    "upload_success": "تم رفع الصورة بنجاح ✅",
+    "upload_success": "تم رفع الصورة بنجاح",
     "save": "حفظ",
     "saving": "جاري الحفظ...",
     "error_auth": "يجب تسجيل الدخول أولاً",
@@ -80,7 +80,11 @@
     "sections_count": "أقسام",
     "hidden": "مخفي",
     "available": "متوفر للطلب",
-    "orders": "الطلبات"
+    "orders": "الطلبات",
+    "qr_code_title": "رمز المنيو (QR Code) الخاص بك",
+    "qr_code_subtitle": "امسح الكود لتجربة المنيو، أو قم بنسخ الرابط لمشاركته مع زبائنك.",
+    "copy_link": "نسخ الرابط",
+    "download_qr": "تحميل الكود"
   },
   "cart": {
     "title": "طلبك",
@@ -93,7 +97,7 @@
     "cashier_subtitle": "يرجى تقديم رقم الطلب للكاشير",
     "items_count": "عدد العناصر",
     "close": "تم ، شكراً",
-    "order_success": "تم إرسال طلبك بنجاح ✅",
-    "order_error": "حدث خطأ أثناء إرسال الطلب ❌"
+    "order_success": "تم إرسال طلبك بنجاح",
+    "order_error": "حدث خطأ أثناء إرسال الطلب"
   }
 }

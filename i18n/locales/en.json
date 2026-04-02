@@ -29,7 +29,7 @@
     "cancel": "Cancel",
     "confirm": "Yes, Logout",
     "dashboard_label": "Dashboard",
-    "dashboard_title": "Admin Dashboard 📊",
+    "dashboard_title": "Admin Dashboard",
     "dashboard_subtitle": "Welcome back! Here's a quick look at your restaurant today.",
     "items_label": "Total Items",
     "items_unit": "Items",
@@ -38,13 +38,13 @@
     "status_label": "Menu Status",
     "status_active": "Active",
     "status_inactive": "Inactive",
-    "logout_success": "Logged out successfully 👋",
+    "logout_success": "Logged out successfully",
     "menu_title": "Menu List",
     "add_item": "Add Item",
     "search_placeholder": "Search for item...",
     "all_categories": "All",
     "currency": "LE",
-    "no_results": "No matching results found 😕",
+    "no_results": "No matching results found",
     "add_modal_title": "Add New Menu Item",
     "edit_modal_title": "Edit Item Details",
     "item_name": "Item Name",
@@ -52,7 +52,7 @@
     "choose_category": "Choose Category",
     "item_image": "Item Image (Optional)",
     "uploading_image": "Uploading image...",
-    "upload_success": "Image uploaded successfully ✅",
+    "upload_success": "Image uploaded successfully",
     "save": "Save",
     "saving": "Saving...",
     "error_auth": "Please login first",
@@ -80,7 +80,11 @@
     "sections_count": "sections",
     "hidden": "Hidden",
     "available": "Available for order",
-    "orders": "Orders"
+    "orders": "Orders",
+    "qr_code_title": "Your Menu QR Code",
+    "qr_code_subtitle": "Scan the code to try the menu, or copy the link to share with your customers.",
+    "copy_link": "Copy Link",
+    "download_qr": "Download QR"
   },
   "cart": {
     "title": "Your Order",
@@ -93,7 +97,7 @@
     "cashier_subtitle": "Please show your order number to the cashier",
     "items_count": "Total Items",
     "close": "Done, Thank you!",
-    "order_success": "Order placed successfully ✅",
-    "order_error": "Error placing order ❌"
+    "order_success": "Order placed successfully",
+    "order_error": "Error placing order"
   }
 }

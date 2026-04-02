@@ -1,20 +1,3 @@
-<script setup>
-// بنستقبل الأقسام والكاتيجوري النشطة كـ Props
-defineProps({
-  categories: {
-    type: Array,
-    required: true,
-  },
-  activeCategory: {
-    type: String,
-    required: true,
-  },
-});
-
-// بنعرف الـ Emit عشان نبلغ الأب بتغيير القسم
-defineEmits(["update:activeCategory"]);
-</script>
-
 <template>
   <div class="sticky top-0 z-30 bg-gray-50/80 backdrop-blur-md py-4">
     <div class="max-w-7xl mx-auto px-6">
@@ -36,6 +19,21 @@ defineEmits(["update:activeCategory"]);
     </div>
   </div>
 </template>
+
+<script setup>
+defineProps({
+  categories: {
+    type: Array,
+    required: true,
+  },
+  activeCategory: {
+    type: String,
+    required: true,
+  },
+});
+
+defineEmits(["update:activeCategory"]);
+</script>
 
 <style scoped>
 .no-scrollbar::-webkit-scrollbar {

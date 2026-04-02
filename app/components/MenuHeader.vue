@@ -2,11 +2,13 @@
   <header
     class="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100/50 transition-all duration-300 h-20"
   >
-    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-center items-center">
-      <!-- Brand Logo -->
-      <div class="flex items-center gap-4">
+    <div
+      class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center h-full"
+    >
+      <!-- Brand Logo (Right side in RTL) -->
+      <div class="flex items-center gap-3">
         <div
-          class="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center overflow-hidden border border-gray-100 shadow-sm"
+          class="w-10 h-10 bg-gray-50 rounded-2xl flex items-center justify-center overflow-hidden border border-gray-100 shadow-sm"
         >
           <img
             v-if="restaurant.logo"
@@ -14,19 +16,37 @@
             class="w-full h-full object-cover"
             :alt="restaurant.business_name"
           />
-          <span v-else class="text-2xl">🍽️</span>
+          <BaseIcon name="food" class="w-6 h-6 text-gray-200" />
         </div>
-        <div class="space-y-0.5">
+        <div class="space-y-0 text-right">
           <span
-            class="text-orange-600/60 text-[10px] font-black tracking-widest uppercase block"
+            class="text-orange-600/60 text-[8px] font-black tracking-widest uppercase block mb-0.5"
           >
             {{ $t("welcome") }}
           </span>
-          <h1 class="text-xl md:text-2xl font-black text-gray-900 leading-none">
+          <h1 class="text-sm md:text-md font-black text-gray-900 leading-none">
             {{ getLocaleTxt(restaurant, "business_name") }}
           </h1>
         </div>
       </div>
+
+      <!-- History Icon (Left side in RTL) -->
+      <button
+        @click="showHistory = true"
+        class="flex items-center gap-2 px-5 py-2 bg-gray-50/50 hover:bg-orange-50 rounded-2xl transition-all active:scale-95 group border border-gray-100 shadow-sm pr-2"
+        aria-label="Previous Orders"
+      >
+        <div
+          class="w-9 h-9 bg-white rounded-xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform"
+        >
+          <BaseIcon name="history" class="w-5 h-5 text-orange-600" />
+        </div>
+        <div class="flex gap-1 items-start leading-none ml-1">
+          <span class="text-[11px] font-black text-gray-800">
+            طلباتك السابقة</span
+          >
+        </div>
+      </button>
     </div>
   </header>
 
@@ -36,6 +56,9 @@
     :whatsappNumber="restaurant.whatsapp_number || ''"
     @close="showCart = false"
   />
+
+  <!-- History Modal -->
+  <OrderHistoryModal :isOpen="showHistory" @close="showHistory = false" />
 </template>
 
 <script setup>
@@ -43,7 +66,9 @@ defineProps(["restaurant", "locale"]);
 const { setLocale } = useI18n();
 
 const { totalPrice, cartCount } = useCart();
+const { loadHistory } = useOrderHistory();
 const showCart = ref(false);
+const showHistory = ref(false);
 const { locale } = useI18n();
 
 const getLocaleTxt = (item, field) => {
@@ -57,4 +82,10 @@ const getLocaleTxt = (item, field) => {
     ""
   );
 };
+
+onMounted(() => {
+  if (process.client) {
+    loadHistory();
+  }
+});
 </script>

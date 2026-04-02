@@ -20,7 +20,13 @@
         <div
           class="bg-white rounded-[2rem] p-8 max-w-sm w-full relative z-[110] shadow-2xl border border-gray-100 animate-in zoom-in-95 duration-200"
         >
-          <div class="text-3xl mb-4 text-center">👋</div>
+          <div class="flex justify-center mb-6">
+            <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center text-gray-400">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
+              </svg>
+            </div>
+          </div>
           <h3 class="text-xl font-black text-gray-900 mb-2 text-center">
             {{ $t("admin.logout_confirm_title") }}
           </h3>
@@ -99,10 +105,9 @@
             active-class="bg-orange-50 text-orange-600 shadow-sm shadow-orange-50"
             exact-active-class="bg-orange-50 text-orange-600"
           >
-            <span
-              class="text-xl shrink-0 group-hover:scale-110 transition-transform"
-              >🏠</span
-            >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 shrink-0 group-hover:scale-110 transition-transform">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+            </svg>
             <span v-show="!isCollapsed" class="whitespace-nowrap">{{
               $t("admin.dashboard")
             }}</span>
@@ -113,10 +118,9 @@
             class="flex items-center gap-3 p-4 rounded-2xl transition-all font-bold hover:bg-orange-50 text-gray-500 overflow-hidden group"
             active-class="bg-orange-50 text-orange-600 shadow-sm shadow-orange-50"
           >
-            <span
-              class="text-xl shrink-0 group-hover:scale-110 transition-transform"
-              >🍴</span
-            >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 shrink-0 group-hover:scale-110 transition-transform">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5V6.75a4.5 4.5 0 1 1 9 0v3.75M3.375 3h17.25c.621 0 1.125-.504 1.125-1.125v1.5c0 .621-.504 1.125-1.125 1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
+            </svg>
             <span v-show="!isCollapsed" class="whitespace-nowrap">{{
               $t("admin.menu")
             }}</span>
@@ -129,10 +133,9 @@
               class="flex items-center gap-3 p-4 rounded-2xl transition-all font-bold hover:bg-orange-50 text-gray-500 overflow-hidden group"
               :title="isCollapsed ? $t('admin.view_menu') : ''"
             >
-              <span
-                class="text-xl shrink-0 group-hover:scale-110 transition-transform"
-                >🌐</span
-              >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 shrink-0 group-hover:scale-110 transition-transform">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418" />
+              </svg>
               <span
                 v-show="!isCollapsed"
                 class="whitespace-nowrap underline-offset-4 decoration-orange-300"
@@ -147,10 +150,9 @@
             class="flex items-center gap-3 p-4 rounded-2xl transition-all font-bold hover:bg-orange-50 text-gray-500 overflow-hidden group"
             active-class="bg-orange-50 text-orange-600 shadow-sm shadow-orange-50"
           >
-            <span
-              class="text-xl shrink-0 group-hover:scale-110 transition-transform"
-              >⚙️</span
-            >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 shrink-0 group-hover:scale-110 transition-transform">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M10.343 3.94c.09-.542.56-.94 1.114-.94h1.086c.554 0 1.024.398 1.114.94l.15 1.033A1.875 1.875 0 0 0 15.42 6.5l.84-.368c.503-.22 1.085-.017 1.353.46l.543.94c.268.477.16 1.077-.247 1.455l-.768.71a1.875 1.875 0 0 0-.586 1.884l.15 1.033c.09.542-.38 1.01-.933 1.01h-1.086c-.554 0-1.024-.398-1.114-.94l-.15-1.033a1.875 1.875 0 0 0-1.614-1.54l-.84.368c-.503.22-1.085.017-1.353-.46l-.543-.94c-.268-.477-.16-1.077.247-1.455l.768-.71a1.875 1.875 0 0 0 .586-1.884l-.15-1.033a1.875 1.875 0 0 0 1.614-1.54l.84-.368c.503-.22 1.085-.017 1.353.46l.543.94c.268.477.16 1.077-.247 1.455l-.768.71a1.875 1.875 0 0 0-.586 1.884l.15 1.033c.09.542.413-.94.966-.94h1.086c.554 0 1.024.398 1.114.94l.15 1.033a1.875 1.875 0 0 0 1.614 1.54l.84-.368c.503-.22 1.085-.017 1.353.46l.543.94c.268.477.16 1.077-.247 1.455l-.768.71a1.875 1.875 0 0 0-.586 1.884l.15 1.033c.09.542.36-.94-.194-.94h-1.086" />
+            </svg>
             <span v-show="!isCollapsed" class="whitespace-nowrap">{{
               $t("admin.settings")
             }}</span>
@@ -161,10 +163,9 @@
             class="flex items-center gap-3 p-4 rounded-2xl transition-all font-bold hover:bg-orange-50 text-gray-500 overflow-hidden group"
             active-class="bg-orange-50 text-orange-600 shadow-sm shadow-orange-50"
           >
-            <span
-              class="text-xl shrink-0 group-hover:scale-110 transition-transform"
-              >📦</span
-            >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 shrink-0 group-hover:scale-110 transition-transform">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5m6 4.125 2.25 2.25m0 0 2.25 2.25M12 13.875l2.25-2.25M12 13.875l-2.25 2.25M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
+            </svg>
             <span v-show="!isCollapsed" class="whitespace-nowrap">{{
               $t("admin.orders")
             }}</span>
@@ -179,7 +180,9 @@
                 isLangDropdownOpen ? 'bg-gray-50 ring-1 ring-gray-100' : ''
               "
             >
-              <span class="text-xl shrink-0">🌍</span>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 shrink-0">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582" />
+              </svg>
               <span
                 v-show="!isCollapsed"
                 class="whitespace-nowrap flex-grow text-right"
@@ -237,7 +240,9 @@
             class="flex items-center gap-3 w-full p-4 text-red-700 font-bold hover:bg-red-50 rounded-2xl transition-all overflow-hidden"
             :title="isCollapsed ? $t('admin.logout') : ''"
           >
-            <span class="text-xl shrink-0 rotate-180">➜]</span>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 shrink-0">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
+            </svg>
             <span v-show="!isCollapsed" class="whitespace-nowrap">{{
               $t("admin.logout")
             }}</span>

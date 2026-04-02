@@ -39,11 +39,12 @@
             :item="item"
           />
         </div>
-        <div v-else class="text-center py-20">
+          <div class="mb-4 flex justify-center">
+            <BaseIcon name="boxes" class="w-16 h-16 opacity-20" />
+          </div>
           <p class="text-gray-400 text-lg font-bold">
-            لا توجد وجبات في هذا القسم حالياً 🍴
+            لا توجد وجبات في هذا القسم حالياً
           </p>
-        </div>
       </main>
 
       <!-- Floating Cart Bar (Appears when cart is not empty) -->
@@ -69,7 +70,9 @@
       <div
         class="flex-grow flex flex-col items-center justify-center p-6 text-center"
       >
-        <h1 class="text-6xl mb-4">🔍</h1>
+        <div class="mb-6">
+          <BaseIcon name="search" class="w-20 h-20 text-orange-200" />
+        </div>
         <h2 class="text-2xl font-black text-gray-800">المطعم غير موجود</h2>
         <p class="text-gray-500 mt-2">تأكد من الرابط الصحيح للمنيو</p>
         <NuxtLink

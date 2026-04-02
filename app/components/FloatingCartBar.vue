@@ -20,7 +20,7 @@
           <div
             class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center text-xl relative shrink-0"
           >
-            🛒
+            <BaseIcon name="cart" class="w-6 h-6" />
             <span
               class="absolute -top-1 -right-1 bg-white text-orange-600 text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center shadow-sm"
             >
@@ -39,16 +39,23 @@
           </div>
         </div>
 
-        <!-- "View Order" CTA -->
-        <div class="flex items-center gap-2 font-black text-sm pr-2 relative z-10">
+        <!-- View Order -->
+        <div
+          class="flex items-center gap-2 font-black text-sm pr-2 relative z-10"
+        >
           {{ $t("cart.title") }}
-          <span class="text-xl transition-transform group-hover:translate-x-1" :class="isRTL ? '-scale-x-100' : ''">→</span>
+          <BaseIcon
+            name="arrow"
+            class="w-5 h-5 transition-transform group-hover:-translate-x-1"
+            :class="!isRTL ? 'rotate-180 group-hover:translate-x-1' : ''"
+          />
         </div>
 
         <!-- Animated Background Glow -->
-        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+        <div
+          class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"
+        ></div>
       </button>
-
     </div>
   </Transition>
 </template>

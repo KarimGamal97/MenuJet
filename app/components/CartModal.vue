@@ -13,20 +13,23 @@
         class="relative w-full sm:max-w-md bg-white rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl z-10 max-h-[90vh] flex flex-col"
       >
         <div class="flex items-center justify-between px-6 pt-6 pb-2">
-          <h2 class="text-xl font-black text-gray-800">
-            🛒 {{ $t("cart.title") }}
+          <h2 class="text-xl font-black text-gray-800 flex items-center gap-2">
+            <BaseIcon name="cart" class="w-6 h-6 text-orange-600" />
+            {{ $t("cart.title") }}
           </h2>
           <button
             @click="emit('close')"
             class="w-9 h-9 flex items-center justify-center rounded-2xl bg-gray-100 text-gray-400 hover:bg-gray-200 transition-colors font-bold text-lg"
           >
-            ×
+            <BaseIcon name="close" class="w-5 h-5" />
           </button>
         </div>
 
         <div class="flex-1 overflow-y-auto px-6 py-3 space-y-3">
           <div v-if="cart.length === 0" class="text-center py-14">
-            <div class="text-5xl mb-3">🍽️</div>
+            <div class="flex justify-center mb-6">
+              <BaseIcon name="empty" class="w-20 h-20 text-gray-100" />
+            </div>
             <p class="text-gray-400 font-bold">{{ $t("cart.empty") }}</p>
           </div>
 
@@ -43,7 +46,7 @@
                 :src="item.image"
                 class="w-full h-full object-cover"
               />
-              <span v-else class="text-xl">🍽️</span>
+              <BaseIcon name="heart" class="w-6 h-6 text-gray-400 opacity-20" />
             </div>
             <div class="flex-grow min-w-0">
               <p class="font-bold text-gray-800 text-sm truncate">
@@ -58,7 +61,7 @@
                 @click="decreaseQty(item.id)"
                 class="w-7 h-7 rounded-full bg-white border border-gray-200 text-gray-500 font-black"
               >
-                -
+                <BaseIcon name="minus" class="w-4 h-4 mx-auto" />
               </button>
               <span class="text-sm font-black text-gray-800 w-4 text-center">{{
                 item.quantity
@@ -67,7 +70,7 @@
                 @click="increaseQty(item.id)"
                 class="w-7 h-7 rounded-full bg-orange-500 text-white font-black"
               >
-                +
+                <BaseIcon name="plus" class="w-4 h-4 mx-auto" />
               </button>
             </div>
           </div>
@@ -117,8 +120,14 @@
       <div
         class="relative bg-white rounded-[2.5rem] w-full max-w-sm shadow-2xl z-10 overflow-hidden"
       >
-        <div class="bg-gray-900 px-6 pt-10 pb-8 text-center">
-          <div class="text-6xl mb-4">✅</div>
+        <div class="bg-gray-900 px-6 pt-10 pb-12 text-center">
+          <div class="flex justify-center mb-6">
+            <div
+              class="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center animate-pulse"
+            >
+              <BaseIcon name="check" class="w-10 h-10 text-green-500" />
+            </div>
+          </div>
           <h2 class="text-white font-black text-xl">
             {{ $t("cart.cashier_title") }}
           </h2>
@@ -160,6 +169,7 @@ const emit = defineEmits(["close"]);
 
 const { t } = useI18n();
 const { cart, increaseQty, decreaseQty, totalPrice, clearCart } = useCart();
+const { addOrder } = useOrderHistory();
 const client = useSupabaseClient();
 const route = useRoute();
 
@@ -172,7 +182,7 @@ const placeCashierOrder = async () => {
   isSubmitting.value = true;
 
   try {
-    // 1. Get restaurant UID
+    // Get restaurant UID
     const { data: profile, error: profileError } = await client
       .from("profiles")
       .select("user_id")
@@ -181,7 +191,7 @@ const placeCashierOrder = async () => {
 
     if (profileError || !profile) throw new Error("Restaurant not found");
 
-    // 2. Insert the Order
+    // Insert the Order
     const { data: order, error: orderError } = await client
       .from("orders")
       .insert({
@@ -195,13 +205,22 @@ const placeCashierOrder = async () => {
 
     if (orderError) throw orderError;
 
-    // 3. Set the order number FIRST
-    orderNumber.value = order.id.toString().padStart(4, "0");
+    // Set the order number FIRST
+    const orderNum = order.id.toString().padStart(4, "0");
+    orderNumber.value = orderNum;
 
-    // 4. Show the confirmation modal
+    // Save to local history
+    addOrder({
+      id: orderNum,
+      items: [...cart.value],
+      total: totalPrice.value,
+      type: "cashier",
+    });
+
+    // Show the confirmation modal
     showCashierModal.value = true;
 
-    // 5. Delay closing the main cart to prevent data loss in UI
+    // Delay closing the main cart to prevent data loss in UI
     setTimeout(() => {
       clearCart();
       emit("close");
@@ -216,13 +235,21 @@ const placeCashierOrder = async () => {
 };
 
 const handleWhatsappOrder = () => {
+  // Save to local history before clearing
+  addOrder({
+    id: "WA-" + Date.now().toString().slice(-4),
+    items: [...cart.value],
+    total: totalPrice.value,
+    type: "whatsapp",
+  });
+
   clearCart();
   emit("close");
 };
 
 const closeCashierModal = () => {
   showCashierModal.value = false;
-  orderNumber.value = ""; // Reset for next time
+  orderNumber.value = "";
 };
 
 const whatsappLink = computed(() => {

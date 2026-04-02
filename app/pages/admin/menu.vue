@@ -20,7 +20,13 @@
           <div
             class="bg-white rounded-[2.5rem] p-8 max-w-sm w-full relative z-[110] shadow-2xl border border-gray-100 animate-in zoom-in-95 duration-200"
           >
-            <div class="text-3xl mb-4 text-center">🗑️</div>
+            <div class="flex justify-center mb-6">
+              <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center text-red-600">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.177H8.084a2.25 2.25 0 0 1-2.244-2.177L6.18 6.096m14.586 0c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.177H8.084a2.25 2.25 0 0 1-2.244-2.177L6.18 6.096m14.586 0c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.177H8.084a2.25 2.25 0 0 1-2.244-2.177L6.18 6.096m14.586 0c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.177H8.084a2.25 2.25 0 0 1-2.244-2.177L6.18 6.096" />
+                </svg>
+              </div>
+            </div>
             <h3 class="text-xl font-black text-gray-900 mb-2 text-center">
               {{ $t("admin.delete_confirm_title") }}
             </h3>
@@ -61,7 +67,9 @@
           @click="openAddModal"
           class="w-full sm:w-auto bg-orange-600 text-white px-6 py-3 md:py-4 rounded-2xl font-bold shadow-lg shadow-orange-200 transition-all hover:bg-orange-700 active:scale-95 flex items-center justify-center gap-2"
         >
-          <span class="text-xl">+</span>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
           {{ $t("admin.add_item") }}
         </button>
       </div>
@@ -75,10 +83,9 @@
             :placeholder="$t('admin.search_placeholder')"
             class="w-full p-4 pr-12 bg-white rounded-2xl border-none shadow-sm outline-none focus:ring-2 focus:ring-orange-500 transition-shadow"
           />
-          <span
-            class="absolute right-4 top-1/2 -translate-y-1/2 text-xl opacity-40"
-            >🔍</span
-          >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 opacity-30">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+          </svg>
         </div>
 
         <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1 px-1">
@@ -116,9 +123,11 @@
             />
             <div
               v-else
-              class="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center text-xl"
+              class="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-200"
             >
-              🍴
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5V6.75a4.5 4.5 0 1 1 9 0v3.75M3.375 3h17.25c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
+              </svg>
             </div>
 
             <div>
@@ -144,13 +153,17 @@
                 @click="openEditModal(item)"
                 class="w-10 h-10 flex items-center justify-center rounded-xl bg-orange-50 text-orange-500 md:opacity-0 group-hover:opacity-100 transition-all hover:bg-orange-500 hover:text-white"
               >
-                ✏️
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                </svg>
               </button>
               <button
                 @click="initiateDelete(item.id)"
                 class="w-10 h-10 flex items-center justify-center rounded-xl bg-red-50 text-red-500 md:opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white shrink-0"
               >
-                🗑️
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.177H8.084a2.25 2.25 0 0 1-2.244-2.177L6.18 6.096m14.586 0c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.177H8.084a2.25 2.25 0 0 1-2.244-2.177L6.18 6.096m14.586 0c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.177H8.084a2.25 2.25 0 0 1-2.244-2.177L6.18 6.096" />
+                </svg>
               </button>
             </div>
             <!-- Availability Badge -->
