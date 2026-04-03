@@ -84,7 +84,10 @@
     "qr_code_title": "رمز المنيو (QR Code) الخاص بك",
     "qr_code_subtitle": "امسح الكود لتجربة المنيو، أو قم بنسخ الرابط لمشاركته مع زبائنك.",
     "copy_link": "نسخ الرابط",
-    "download_qr": "تحميل الكود"
+    "download_qr": "تحميل الكود",
+    "order_status_pending": "قيد التحضير",
+    "order_status_completed": "تم الانتهاء",
+    "order_confirm_btn": "تأكيد التسليم"
   },
   "cart": {
     "title": "طلبك",

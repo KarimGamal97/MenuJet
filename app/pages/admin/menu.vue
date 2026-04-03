@@ -21,10 +21,10 @@
             class="bg-white rounded-[2.5rem] p-8 max-w-sm w-full relative z-[110] shadow-2xl border border-gray-100 animate-in zoom-in-95 duration-200"
           >
             <div class="flex justify-center mb-6">
-              <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center text-red-600">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.177H8.084a2.25 2.25 0 0 1-2.244-2.177L6.18 6.096m14.586 0c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.177H8.084a2.25 2.25 0 0 1-2.244-2.177L6.18 6.096m14.586 0c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.177H8.084a2.25 2.25 0 0 1-2.244-2.177L6.18 6.096m14.586 0c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.177H8.084a2.25 2.25 0 0 1-2.244-2.177L6.18 6.096" />
-                </svg>
+              <div
+                class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center text-red-600"
+              >
+                <BaseIcon name="trash" class="w-8 h-8" />
               </div>
             </div>
             <h3 class="text-xl font-black text-gray-900 mb-2 text-center">
@@ -67,9 +67,7 @@
           @click="openAddModal"
           class="w-full sm:w-auto bg-orange-600 text-white px-6 py-3 md:py-4 rounded-2xl font-bold shadow-lg shadow-orange-200 transition-all hover:bg-orange-700 active:scale-95 flex items-center justify-center gap-2"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-5 h-5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-          </svg>
+          <BaseIcon name="plus" class="w-5 h-5" />
           {{ $t("admin.add_item") }}
         </button>
       </div>
@@ -83,9 +81,10 @@
             :placeholder="$t('admin.search_placeholder')"
             class="w-full p-4 pr-12 bg-white rounded-2xl border-none shadow-sm outline-none focus:ring-2 focus:ring-orange-500 transition-shadow"
           />
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 opacity-30">
-            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-          </svg>
+          <BaseIcon
+            name="search"
+            class="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 opacity-30"
+          />
         </div>
 
         <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1 px-1">
@@ -125,9 +124,7 @@
               v-else
               class="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-200"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5V6.75a4.5 4.5 0 1 1 9 0v3.75M3.375 3h17.25c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
-              </svg>
+              <BaseIcon name="photo" class="w-8 h-8" />
             </div>
 
             <div>
@@ -153,16 +150,25 @@
                 @click="openEditModal(item)"
                 class="w-10 h-10 flex items-center justify-center rounded-xl bg-orange-50 text-orange-500 md:opacity-0 group-hover:opacity-100 transition-all hover:bg-orange-500 hover:text-white"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
-                </svg>
+                <BaseIcon name="edit" class="w-4 h-4" />
               </button>
               <button
                 @click="initiateDelete(item.id)"
                 class="w-10 h-10 flex items-center justify-center rounded-xl bg-red-50 text-red-500 md:opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white shrink-0"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.177H8.084a2.25 2.25 0 0 1-2.244-2.177L6.18 6.096m14.586 0c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.177H8.084a2.25 2.25 0 0 1-2.244-2.177L6.18 6.096m14.586 0c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.177H8.084a2.25 2.25 0 0 1-2.244-2.177L6.18 6.096" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="2"
+                  stroke="currentColor"
+                  class="w-4 h-4"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.177H8.084a2.25 2.25 0 0 1-2.244-2.177L6.18 6.096m14.586 0c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.177H8.084a2.25 2.25 0 0 1-2.244-2.177L6.18 6.096m14.586 0c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.177H8.084a2.25 2.25 0 0 1-2.244-2.177L6.18 6.096"
+                  />
                 </svg>
               </button>
             </div>
@@ -204,19 +210,17 @@
           <input
             v-model="newItem.name"
             :placeholder="$t('admin.item_name')"
-            class="w-full p-4 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-orange-500 shadow-inner"
+            class="w-full p-4 bg-white border-2 border-orange-500/10 rounded-[1.5rem] outline-none focus:border-orange-500 transition-all font-bold text-gray-800 shadow-sm"
           />
           <input
             v-model="newItem.price"
             type="number"
             :placeholder="$t('admin.item_price')"
-            class="w-full p-4 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-orange-500 shadow-inner"
+            class="w-full p-4 bg-white border-2 border-orange-500/10 rounded-[1.5rem] outline-none focus:border-orange-500 transition-all font-bold text-gray-800 shadow-sm"
           />
 
           <!-- Availability Toggle -->
-          <div
-            class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl"
-          >
+          <div class="flex items-center justify-between p-4 rounded-2xl">
             <span class="text-sm font-bold text-gray-700">{{
               $t("admin.available") || "متوفر للطلب"
             }}</span>
@@ -236,22 +240,61 @@
             </button>
           </div>
 
-          <div class="space-y-1">
-            <label class="text-xs font-bold text-gray-500 px-1">{{
-              $t("admin.choose_category")
-            }}</label>
-            <select
-              v-model="newItem.category"
-              class="w-full p-4 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-orange-500"
+          <div class="space-y-2 relative">
+            <label
+              class="text-[10px] font-black text-gray-400 px-1 uppercase tracking-wider"
+              >{{ $t("admin.choose_category") }}</label
             >
-              <option
-                v-for="cat in availableCategories"
-                :key="cat"
-                :value="cat"
+
+            <!-- Custom Dropdown -->
+            <div class="relative">
+              <button
+                type="button"
+                @click="isCategoryDropdownOpen = !isCategoryDropdownOpen"
+                class="w-full p-4 bg-white border-2 border-orange-500/10 rounded-[1.5rem] outline-none flex items-center justify-between font-bold text-gray-800 shadow-sm transition-all focus:border-orange-500"
               >
-                {{ cat }}
-              </option>
-            </select>
+                <span>{{
+                  newItem.category || $t("admin.choose_category")
+                }}</span>
+                <BaseIcon
+                  name="chevron-down"
+                  class="w-4 h-4 text-orange-500 transition-transform duration-200"
+                  :class="{ 'rotate-180': isCategoryDropdownOpen }"
+                />
+              </button>
+
+              <div
+                v-if="isCategoryDropdownOpen"
+                class="absolute top-full mt-2 left-0 right-0 bg-white rounded-[1.5rem] shadow-2xl border border-gray-100 overflow-hidden z-[60] animate-in slide-in-from-top-2 duration-200"
+              >
+                <div class="p-2 space-y-1">
+                  <button
+                    v-for="cat in availableCategories"
+                    :key="cat"
+                    type="button"
+                    @click="
+                      newItem.category = cat;
+                      isCategoryDropdownOpen = false;
+                    "
+                    :class="[
+                      'w-full text-right px-4 py-3 rounded-xl font-bold transition-colors',
+                      newItem.category === cat
+                        ? 'bg-orange-600 text-white shadow-md shadow-orange-100'
+                        : 'text-gray-600 hover:bg-orange-50 hover:text-orange-600',
+                    ]"
+                  >
+                    {{ cat }}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Overlay for click outside (simple version) -->
+            <div
+              v-if="isCategoryDropdownOpen"
+              @click="isCategoryDropdownOpen = false"
+              class="fixed inset-0 z-[55]"
+            ></div>
           </div>
 
           <div class="space-y-2">
@@ -297,27 +340,24 @@
 </template>
 
 <script setup>
-// 1. التعريفات الأساسية
 definePageMeta({ layout: "admin", middleware: "auth" });
 const client = useSupabaseClient();
 const user = useSupabaseUser();
 const { $toast } = useNuxtApp();
 
-// 2. الحالة (State)
 const isModalOpen = ref(false);
 const showDeleteModal = ref(false);
 const itemToDelete = ref(null);
 const editingId = ref(null);
 const loading = ref(false);
 const uploadLoading = ref(false);
+const isCategoryDropdownOpen = ref(false);
 const imageUrl = ref("");
 const newItem = ref({ name: "", price: "", category: "", available: true });
 
-// متغيرات الفلترة
 const searchQuery = ref("");
 const selectedCategory = ref("الكل");
 
-// 3. جلب بيانات البروفايل
 const { data: profile } = await useAsyncData(
   "admin-profile",
   async () => {
@@ -332,14 +372,12 @@ const { data: profile } = await useAsyncData(
   { watch: [user] },
 );
 
-// أقسام الافتراضية
 const availableCategories = computed(() => {
   return profile.value?.categories?.length
     ? profile.value.categories
     : ["Main", "Drinks", "Dessert"];
 });
 
-// تعيين القسم الافتراضي للفورم
 watchEffect(() => {
   if (!newItem.value.category && availableCategories.value.length) {
     newItem.value.category = availableCategories.value[0];
@@ -350,7 +388,6 @@ const dynamicCategories = computed(() => {
   return ["الكل", ...availableCategories.value];
 });
 
-// 4. جلب الوجبات
 const {
   data: items,
   refresh,
@@ -367,7 +404,6 @@ const {
         .order("created_at", { ascending: false });
 
       if (error) {
-        // Fallback without order if it fails
         const { data: fallbackData } = await client
           .from("menu_items")
           .select("*")
@@ -382,7 +418,6 @@ const {
   { lazy: true, server: false, watch: [user] },
 );
 
-// 5. منطق الفلترة اللحظي
 const filteredItems = computed(() => {
   if (!items.value) return [];
   return items.value.filter((item) => {
@@ -397,7 +432,6 @@ const filteredItems = computed(() => {
   });
 });
 
-// 6. دالة رفع الصورة
 const handleFileUpload = async (event) => {
   const file = event.target.files[0];
   const uId = user.value?.sub || user.value?.id;
@@ -423,7 +457,6 @@ const handleFileUpload = async (event) => {
   }
 };
 
-// 7. دوال فتح المودال
 const openAddModal = () => {
   editingId.value = null;
   newItem.value = {
@@ -441,13 +474,12 @@ const openEditModal = (item) => {
     name: item.name,
     price: item.price,
     category: item.category,
-    available: item.available !== false, // Default to true if null/undefined
+    available: item.available !== false,
   };
   imageUrl.value = item.image || "";
   isModalOpen.value = true;
 };
 
-// 8. دالة حفظ الصنف (إما إضافة أو تعديل)
 const addItem = async () => {
   const uId = user.value?.sub || user.value?.id;
   if (!uId) return $toast.error($t("admin.error_auth"));
@@ -468,14 +500,12 @@ const addItem = async () => {
 
     let error;
     if (editingId.value) {
-      // تعديل
       const { error: updateError } = await client
         .from("menu_items")
         .update(dataToSave)
         .eq("id", editingId.value);
       error = updateError;
     } else {
-      // إضافة
       const { error: insertError } = await client
         .from("menu_items")
         .insert(dataToSave);
@@ -495,7 +525,6 @@ const addItem = async () => {
   }
 };
 
-// 8. منطق الحذف
 const initiateDelete = (id) => {
   itemToDelete.value = id;
   showDeleteModal.value = true;

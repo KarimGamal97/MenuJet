@@ -157,6 +157,31 @@
           </div>
         </div>
 
+        <!-- Restaurant Status Toggle -->
+        <div class="md:col-span-2">
+          <div class="p-4 bg-orange-50/30 rounded-2xl border border-orange-100/50 flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-black text-gray-800 mb-1">حالة المطعم</h3>
+              <p class="text-[10px] text-gray-400 font-bold">تحكم في ظهور "جاهزون لاستقبال طلباتك" للزبائن</p>
+            </div>
+            <button 
+              @click="form.is_active = !form.is_active"
+              type="button"
+              :class="[
+                'w-14 h-8 rounded-full transition-all duration-300 relative p-1',
+                form.is_active ? 'bg-orange-600' : 'bg-gray-200'
+              ]"
+            >
+              <div 
+                :class="[
+                  'w-6 h-6 bg-white rounded-full shadow-sm transition-transform duration-300 transform',
+                  form.is_active ? '-translate-x-6' : 'translate-x-0'
+                ]"
+              ></div>
+            </button>
+          </div>
+        </div>
+
         <!-- إدارة الأقسام -->
         <div class="md:col-span-2 pt-4">
           <div class="flex items-center justify-between mb-4 px-1">
@@ -281,6 +306,7 @@ const form = ref({
   whatsapp_number: "",
   categories: ["Main", "Drinks", "Dessert"],
   logo: "",
+  is_active: true,
 });
 
 // 1. جلب البيانات - الجدول يستخدم user_id كمعرف المستخدم الحقيقي
@@ -312,6 +338,7 @@ watch(
         whatsapp_number: newData.whatsapp_number || "",
         categories: newData.categories || ["Main", "Drinks", "Dessert"],
         logo: newData.logo || "",
+        is_active: newData.is_active !== false,
       };
     }
   },
@@ -384,6 +411,7 @@ const saveSettings = async () => {
       whatsapp_number: form.value.whatsapp_number,
       categories: form.value.categories,
       logo: form.value.logo,
+      is_active: form.value.is_active,
     };
 
     const { error } = await client

@@ -2,9 +2,7 @@
   <div class="p-6 space-y-6" dir="rtl">
     <div class="flex justify-between items-center">
       <h1 class="text-2xl font-black text-gray-800 flex items-center gap-3">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-8 h-8 text-orange-600">
-          <path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5m6 4.125 2.25 2.25m0 0 2.25 2.25M12 13.875l2.25-2.25M12 13.875l-2.25 2.25M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
-        </svg>
+        <BaseIcon name="boxes" class="w-8 h-8 text-orange-600" />
         Live Cashier Orders
       </h1>
       <div class="flex items-center gap-2">
@@ -26,10 +24,8 @@
       v-if="orders.length === 0"
       class="flex flex-col items-center justify-center py-20 bg-gray-50 rounded-[2.5rem] border-2 border-dashed border-gray-200"
     >
-      <div class="mb-6">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-20 h-20 text-gray-200">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
-        </svg>
+      <div class="mb-6 text-gray-100">
+        <BaseIcon name="boxes" class="w-20 h-20" />
       </div>
       <p class="text-gray-500 font-bold">No orders received yet today</p>
     </div>
@@ -41,8 +37,8 @@
         :class="[
           'p-6 rounded-[2.5rem] border-2 transition-all duration-500',
           order.status === 'pending'
-            ? 'bg-white border-orange-200 shadow-xl shadow-orange-50'
-            : 'bg-gray-50 border-transparent opacity-75 shadow-none',
+            ? 'bg-white border-orange-200 shadow-xl shadow-orange-100'
+            : 'bg-green-50/30 border-green-500/50 opacity-80 shadow-none',
         ]"
       >
         <div class="flex justify-between items-start mb-4">
@@ -51,9 +47,17 @@
               class="text-[10px] uppercase tracking-wider font-black text-gray-400"
               >Order ID</span
             >
-            <h3 class="text-2xl font-black text-orange-600">
-              #{{ order.id.toString().padStart(4, "0") }}
-            </h3>
+            <div class="flex items-center gap-2">
+              <h3 class="text-2xl font-black text-orange-600">
+                #{{ order.id.toString().padStart(4, "0") }}
+              </h3>
+              <div
+                v-if="order.status === 'pending'"
+                class="bg-orange-50 text-orange-600 text-[10px] font-black px-2 py-0.5 rounded-lg border border-orange-100 uppercase tracking-tighter"
+              >
+                {{ $t("admin.order_status_pending") }}
+              </div>
+            </div>
           </div>
           <div class="text-left">
             <span
@@ -107,24 +111,51 @@
           </div>
 
           <div class="flex gap-2">
-              <button
-                v-if="order.status === 'pending'"
-                @click="updateStatus(order.id, 'completed')"
-                class="bg-green-500 text-white px-5 py-2.5 rounded-2xl font-bold hover:bg-green-600 active:scale-95 transition-all shadow-lg shadow-green-100 text-sm flex items-center gap-2"
-              >
-                {{ $t("admin.confirm") || "Done" }} 
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-4 h-4">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                </svg>
-              </button>
+            <button
+              v-if="order.status === 'pending'"
+              @click="updateStatus(order.id, 'completed')"
+              class="bg-green-500 text-white px-6 py-3 rounded-2xl font-bold hover:bg-green-600 active:scale-95 transition-all shadow-lg shadow-green-100 text-sm flex items-center gap-2"
+            >
+              {{ $t("admin.order_confirm_btn") || "Complete" }}
+              <BaseIcon name="chevron-left" class="w-4 h-4" />
+            </button>
             <span
               v-else
-              class="text-green-600 font-bold bg-green-50 px-5 py-2.5 rounded-2xl text-sm"
-              >Completed</span
+              class="text-green-600 font-bold bg-green-50 px-5 py-2.5 rounded-2xl text-sm border border-green-100/50"
             >
+              {{ $t("admin.order_status_completed") || "Completed" }}
+            </span>
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- Pagination Controls -->
+    <div
+      v-if="totalPages > 1"
+      class="flex items-center justify-center gap-4 pt-10"
+    >
+      <button
+        @click="changePage(page - 1)"
+        :disabled="page === 1"
+        class="w-12 h-12 bg-white border border-gray-100 rounded-2xl flex items-center justify-center text-gray-400 hover:text-orange-600 hover:border-orange-200 transition-all disabled:opacity-50 disabled:pointer-events-none shadow-sm"
+      >
+        <BaseIcon name="chevron-right" class="w-5 h-5" />
+      </button>
+
+      <div class="flex items-center gap-2">
+        <span class="text-sm font-black text-gray-800">{{ page }}</span>
+        <span class="text-xs font-bold text-gray-400">/</span>
+        <span class="text-sm font-black text-gray-400">{{ totalPages }}</span>
+      </div>
+
+      <button
+        @click="changePage(page + 1)"
+        :disabled="page >= totalPages"
+        class="w-12 h-12 bg-white border border-gray-100 rounded-2xl flex items-center justify-center text-gray-400 hover:text-orange-600 hover:border-orange-200 transition-all disabled:opacity-50 disabled:pointer-events-none shadow-sm"
+      >
+        <BaseIcon name="chevron-left" class="w-5 h-5" />
+      </button>
     </div>
   </div>
 </template>
@@ -137,18 +168,42 @@ const user = useSupabaseUser();
 const orders = ref([]);
 const realtimeChannel = ref(null);
 
+// Pagination State
+const page = ref(1);
+const pageSize = ref(15);
+const totalOrders = ref(0);
+const totalPages = computed(() =>
+  Math.ceil(totalOrders.value / pageSize.value),
+);
+
 // 1. Core Fetch Function
 const fetchOrders = async (userId) => {
   if (!userId) return;
-  console.log("📡 Fetching orders for UID:", userId);
-  const { data, error } = await client
+
+  const start = (page.value - 1) * pageSize.value;
+  const end = start + pageSize.value - 1;
+
+  console.log(`📡 Fetching orders for UID: ${userId}, Page: ${page.value}`);
+
+  const { data, error, count } = await client
     .from("orders")
-    .select("*")
+    .select("*", { count: "exact" })
     .eq("user_id", userId)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .range(start, end);
 
   if (error) console.error("❌ Fetch Error:", error);
-  else orders.value = data || [];
+  else {
+    orders.value = data || [];
+    totalOrders.value = count || 0;
+  }
+};
+
+const changePage = (newPage) => {
+  page.value = newPage;
+  const userId = user.value?.id || user.value?.sub;
+  if (userId) fetchOrders(userId);
+  window.scrollTo({ top: 0, behavior: "smooth" });
 };
 
 // 2. Core Realtime Function

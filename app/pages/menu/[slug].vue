@@ -8,22 +8,42 @@
       <MenuHeader :restaurant="restaurant" :locale="locale" />
 
       <nav
-        class="sticky top-20 z-40 bg-white/90 backdrop-blur-md border-b border-gray-100 flex py-2 shadow-sm overflow-x-auto no-scrollbar"
+        class="sticky top-20 z-40 bg-white/90 backdrop-blur-md border-b border-gray-100 flex py-3 shadow-sm"
       >
-        <div class="flex gap-2 px-4 mx-auto w-max md:justify-center">
-          <button
-            v-for="cat in categories"
-            :key="cat"
-            @click="activeCategory = cat"
-            :class="[
-              'px-6 py-2.5 rounded-2xl font-bold whitespace-nowrap text-sm transition-all duration-300 shrink-0',
-              activeCategory === cat
-                ? 'bg-orange-600 text-white shadow-lg shadow-orange-100 scale-105'
-                : 'bg-gray-50 text-gray-400 hover:bg-gray-100',
-            ]"
-          >
-            {{ cat === "all" ? "الكل" : cat }}
-          </button>
+        <div
+          class="flex flex-col md:flex-row items-center gap-3 px-4 mx-auto max-w-3xl w-full"
+        >
+          <!-- Search Input -->
+          <div class="relative w-full md:w-64 lg:w-80 shrink-0">
+            <input
+              v-model="searchQuery"
+              type="text"
+              :placeholder="$t('search') || 'بحث عن وجبة...'"
+              class="w-full py-3 pr-10 pl-4 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-orange-500 transition-all text-sm font-bold shadow-sm"
+            />
+            <div
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+            >
+              <BaseIcon name="search" class="w-4 h-4" />
+            </div>
+          </div>
+
+          <!-- Categories List -->
+          <div class="flex gap-2 overflow-x-auto no-scrollbar py-1">
+            <button
+              v-for="cat in categories"
+              :key="cat"
+              @click="activeCategory = cat"
+              :class="[
+                'px-6 py-2.5 rounded-2xl font-bold whitespace-nowrap text-sm transition-all duration-300 shrink-0',
+                activeCategory === cat
+                  ? 'bg-orange-600 text-white shadow-lg shadow-orange-100'
+                  : 'bg-gray-50 text-gray-400 hover:bg-gray-100',
+              ]"
+            >
+              {{ cat === "all" ? "الكل" : cat }}
+            </button>
+          </div>
         </div>
       </nav>
 
@@ -39,12 +59,17 @@
             :item="item"
           />
         </div>
+        <div
+          v-else
+          class="text-center py-20 bg-white rounded-[2rem] border border-dashed border-gray-100"
+        >
           <div class="mb-4 flex justify-center">
             <BaseIcon name="boxes" class="w-16 h-16 opacity-20" />
           </div>
           <p class="text-gray-400 text-lg font-bold">
-            لا توجد وجبات في هذا القسم حالياً
+            {{ $t("menu.no_items") || "لا توجد وجبات في هذا القسم حالياً" }}
           </p>
+        </div>
       </main>
 
       <!-- Floating Cart Bar (Appears when cart is not empty) -->
@@ -71,15 +96,13 @@
         class="flex-grow flex flex-col items-center justify-center p-6 text-center"
       >
         <div class="mb-6">
-          <BaseIcon name="search" class="w-20 h-20 text-orange-200" />
+          <BaseIcon name="not-found" class="w-24 h-24 text-gray-200" />
         </div>
-        <h2 class="text-2xl font-black text-gray-800">المطعم غير موجود</h2>
-        <p class="text-gray-500 mt-2">تأكد من الرابط الصحيح للمنيو</p>
-        <NuxtLink
-          to="/"
-          class="mt-6 bg-orange-600 text-white px-8 py-3 rounded-2xl font-bold transition-transform active:scale-95 shadow-lg shadow-orange-100"
-          >العودة للرئيسية</NuxtLink
-        >
+        <h2 class="text-2xl font-black text-orange-600">المطعم غير موجود</h2>
+        <p class="text-gray-400 mt-3 max-w-[280px] mx-auto leading-relaxed">
+          عذراً، لم نتمكن من العثور على منيو بهذا الاسم. يرجى التأكد من مسح كود
+          QR الصحيح للمطعم.
+        </p>
       </div>
     </template>
   </div>
@@ -118,6 +141,7 @@ const {
 );
 
 const activeCategory = ref("all");
+const searchQuery = ref("");
 
 const categories = computed(() => {
   const items = (restaurant.value?.menu_items || []).filter(
@@ -128,10 +152,21 @@ const categories = computed(() => {
 });
 
 const filteredItems = computed(() => {
-  const items = (restaurant.value?.menu_items || []).filter(
+  let items = (restaurant.value?.menu_items || []).filter(
     (i) => i.available !== false,
   );
-  if (activeCategory.value === "all") return items;
-  return items.filter((i) => i.category === activeCategory.value);
+
+  // Filter by category
+  if (activeCategory.value !== "all") {
+    items = items.filter((i) => i.category === activeCategory.value);
+  }
+
+  // Search filter
+  if (searchQuery.value) {
+    const q = searchQuery.value.toLowerCase();
+    items = items.filter((i) => (i.name || "").toLowerCase().includes(q));
+  }
+
+  return items;
 });
 </script>

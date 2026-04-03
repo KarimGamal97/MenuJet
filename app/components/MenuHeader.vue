@@ -24,9 +24,43 @@
           >
             {{ $t("welcome") }}
           </span>
-          <h1 class="text-sm md:text-md font-black text-gray-900 leading-none">
-            {{ getLocaleTxt(restaurant, "business_name") }}
-          </h1>
+          <div class="flex items-center gap-1.5 pt-1">
+            <h1
+              class="text-sm md:text-md font-black text-gray-900 leading-none"
+            >
+              {{ getLocaleTxt(restaurant, "business_name") }}
+            </h1>
+            <!-- Active Badge -->
+            <div
+              v-if="restaurant.is_active"
+              class="flex items-center gap-1 bg-green-50 px-2 py-0.5 rounded-full border border-green-100 shadow-sm"
+            >
+              <span class="relative flex h-1.5 w-1.5">
+                <span
+                  class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"
+                ></span>
+                <span
+                  class="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500"
+                ></span>
+              </span>
+              <span
+                class="text-[9px] font-bold text-green-600 whitespace-nowrap"
+                >جاهزون لاستقبال طلباتك</span
+              >
+            </div>
+            <!-- Inactive Badge -->
+            <div
+              v-else
+              class="flex items-center gap-1 bg-gray-50 px-2 py-0.5 rounded-full border border-gray-100 opacity-60 shadow-sm"
+            >
+              <span
+                class="inline-flex rounded-full h-1.5 w-1.5 bg-gray-300"
+              ></span>
+              <span class="text-[9px] font-bold text-gray-500 whitespace-nowrap"
+                >مغلق حالياً</span
+              >
+            </div>
+          </div>
         </div>
       </div>
 

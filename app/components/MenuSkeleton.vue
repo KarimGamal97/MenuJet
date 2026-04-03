@@ -13,9 +13,13 @@
       <div class="w-24 h-10 bg-gray-100 rounded-2xl"></div>
     </div>
 
-    <!-- Category Tabs Skeleton -->
-    <div class="flex gap-2 px-6 overflow-hidden">
-      <div v-for="i in 4" :key="i" class="w-20 h-10 bg-white border border-gray-100 rounded-2xl flex-shrink-0"></div>
+    <!-- Category Tabs & Search Skeleton -->
+    <div class="flex flex-col md:flex-row items-center gap-4 px-6 overflow-hidden">
+      <div class="w-full md:w-48 h-10 bg-gray-100 rounded-2xl shrink-0"></div>
+      <div class="hidden md:block h-8 w-px bg-gray-100 shrink-0"></div>
+      <div class="w-full flex gap-2 overflow-x-auto no-scrollbar py-1">
+        <div v-for="i in 4" :key="i" class="w-20 h-10 bg-white border border-gray-100 rounded-2xl flex-shrink-0"></div>
+      </div>
     </div>
 
     <!-- Items List Skeleton -->
