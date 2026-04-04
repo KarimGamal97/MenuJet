@@ -100,7 +100,9 @@
     "live_orders": "الطلبات الحالية",
     "order_id": "رقم الطلب",
     "order_time": "الوقت",
-    "order_total": "إجمالي المبلغ"
+    "order_total": "إجمالي المبلغ",
+    "status_available": "متاح الآن",
+    "status_closed": "مغلق حالياً"
   },
   "cart": {
     "title": "طلبك",

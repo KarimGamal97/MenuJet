@@ -36,13 +36,13 @@ export const useSettings = () => {
         .eq("user_id", userId);
 
       if (error) throw error;
-      
+
       profile.value = { ...profile.value, ...updateData };
-      $toast.success("Settings updated successfully");
+      $toast.success("تم تحديث الإعدادات بنجاح");
       return true;
     } catch (err: any) {
       console.error("Update Profile Error:", err);
-      $toast.error("Failed to update settings");
+      $toast.error("فشل تحديث الإعدادات");
       return false;
     } finally {
       loading.value = false;
@@ -68,7 +68,7 @@ export const useSettings = () => {
       return data.publicUrl;
     } catch (err: any) {
       console.error("Logo Upload Error:", err);
-      $toast.error("Failed to upload logo");
+      $toast.error("فشل رفع الشعار");
       return null;
     } finally {
       uploading.value = false;

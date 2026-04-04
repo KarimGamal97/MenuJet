@@ -24,7 +24,7 @@
           >
             {{ $t("welcome") }}
           </span>
-          <div class="flex items-center gap-1.5 pt-1">
+          <div class="flex flex-col gap-1 pt-1">
             <h1
               class="text-sm md:text-md font-black text-gray-900 leading-none"
             >
@@ -33,7 +33,7 @@
             <!-- Active Badge -->
             <div
               v-if="restaurant.is_active"
-              class="flex items-center gap-1 bg-green-50 px-2 py-0.5 rounded-full border border-green-100 shadow-sm"
+              class="flex items-center gap-1 w-fit"
             >
               <span class="relative flex h-1.5 w-1.5">
                 <span
@@ -44,20 +44,18 @@
                 ></span>
               </span>
               <span
-                class="text-[9px] font-bold text-green-600 whitespace-nowrap"
-                >جاهزون لاستقبال طلباتك</span
+                class="text-[8px] font-bold text-green-500 whitespace-nowrap uppercase"
+                >{{ $t("admin.status_available") || "Available" }}</span
               >
             </div>
             <!-- Inactive Badge -->
-            <div
-              v-else
-              class="flex items-center gap-1 bg-gray-50 px-2 py-0.5 rounded-full border border-gray-100 opacity-60 shadow-sm"
-            >
+            <div v-else class="flex items-center gap-1 w-fit opacity-60">
               <span
                 class="inline-flex rounded-full h-1.5 w-1.5 bg-gray-300"
               ></span>
-              <span class="text-[9px] font-bold text-gray-500 whitespace-nowrap"
-                >مغلق حالياً</span
+              <span
+                class="text-[8px] font-bold text-gray-400 whitespace-nowrap uppercase"
+                >{{ $t("admin.status_closed") || "Closed" }}</span
               >
             </div>
           </div>

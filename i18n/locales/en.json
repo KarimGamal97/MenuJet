@@ -100,7 +100,9 @@
     "order_id": "Order ID",
     "order_time": "Time",
     "order_total": "Total Amount",
-    "order_confirm_btn": "Complete Order"
+    "order_confirm_btn": "Complete Order",
+    "status_available": "Available Now",
+    "status_closed": "Closed Currently"
   },
   "cart": {
     "title": "Your Order",
