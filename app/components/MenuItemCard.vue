@@ -1,53 +1,67 @@
 <template>
   <div
-    @click="addToCart(item)"
-    class="bg-white p-4 rounded-[2rem] shadow-sm border border-gray-50 flex items-center gap-4 transition-all active:scale-95 group hover:shadow-md relative overflow-hidden cursor-pointer"
+    class="bg-white p-5 rounded-3xl border border-gray-50 shadow-sm flex justify-between items-center group animate-in fade-in duration-300 transition-all hover:shadow-md"
   >
-    <!-- Circular Image -->
-    <div
-      class="w-20 h-20 rounded-full flex-shrink-0 overflow-hidden bg-gray-50 border-2 border-white shadow-sm flex items-center justify-center relative z-10"
-    >
+    <div class="flex items-center gap-4 text-right">
       <img
         v-if="item.image"
         :src="item.image"
-        class="w-full h-full object-cover transition-transform group-hover:scale-110"
+        class="w-16 h-16 rounded-2xl object-cover bg-gray-100 shadow-sm transition-transform group-hover:scale-105 border border-gray-50 shrink-0"
       />
-      <BaseIcon v-else name="food" class="w-8 h-8 text-orange-100" />
-    </div>
+      <div
+        v-else
+        class="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-200 border border-gray-50 shrink-0"
+      >
+        <BaseIcon name="photo" class="w-8 h-8" />
+      </div>
 
-    <!-- Name & Description -->
-    <div class="flex-grow min-w-0 pr-1 flex flex-col justify-center">
-      <h3 class="font-bold text-gray-800 text-lg leading-tight truncate">
-        {{ getLocaleTxt(item, "name") }}
-      </h3>
-      <p class="text-gray-400 text-xs mt-1 line-clamp-1 opacity-70">
-        {{ getLocaleTxt(item, "description") || $t("no_description") }}
-      </p>
-
-      <!-- Price  -->
-      <div class="mt-2 flex items-baseline gap-1">
-        <span class="text-orange-600 font-black text-lg">{{ item.price }}</span>
-        <span class="text-orange-400 text-[10px] font-bold">{{
-          $t("currency")
-        }}</span>
+      <div class="min-w-0">
+        <span class="text-[10px] bg-orange-50 text-orange-600 px-2 py-1 rounded-lg font-bold uppercase">
+          {{ item.category }}
+        </span>
+        <h3 class="font-bold text-gray-800 mt-1 line-clamp-1 truncate min-w-0 text-sm">
+          {{ item.name }}
+        </h3>
+        <p class="text-orange-600 font-bold text-xs">
+          {{ item.price }} {{ $t("admin.currency") }}
+        </p>
       </div>
     </div>
 
-    <!-- 3. Left side: Plus Action Button  -->
-    <BaseIcon name="plus" class="w-5 h-5" />
-
-    <!-- Background subtle pattern/decoration -->
-    <div
-      class="absolute -right-4 -bottom-4 w-12 h-12 bg-orange-50/30 rounded-full z-0 blur-xl"
-    ></div>
+    <!-- Actions Area -->
+    <div class="flex flex-col gap-2">
+      <div class="flex gap-2">
+        <BaseButton
+          @click="emit('edit', item)"
+          variant="outline"
+          icon="edit"
+          class="!w-9 !h-9 !p-0 !rounded-xl md:opacity-0 group-hover:opacity-100"
+        />
+        <BaseButton
+          @click="emit('delete', item.id)"
+          variant="outline"
+          icon="trash"
+          class="!w-9 !h-9 !p-0 !rounded-xl md:opacity-0 group-hover:opacity-100 !text-red-500 hover:!bg-red-500 hover:!text-white"
+        />
+      </div>
+      <!-- Availability Badge -->
+      <span
+        v-if="item.available === false"
+        class="text-[9px] bg-gray-100 text-gray-400 px-2 py-1 rounded-lg font-bold text-center uppercase"
+      >
+        {{ $t("admin.hidden") }}
+      </span>
+    </div>
   </div>
 </template>
 
 <script setup>
-const { addToCart } = useCart();
-defineProps(["item"]);
-const { locale } = useI18n();
+defineProps({
+  item: {
+    type: Object,
+    required: true,
+  },
+});
 
-const getLocaleTxt = (item, field) =>
-  item[`${field}_${locale.value}`] || item[`${field}_ar`] || item[field] || "";
+const emit = defineEmits(["edit", "delete"]);
 </script>

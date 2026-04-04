@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-50 flex flex-col font-sans" dir="rtl">
+  <div class="min-h-screen bg-gray-50 flex flex-col" dir="rtl">
     <template v-if="pending">
       <MenuSkeleton />
     </template>

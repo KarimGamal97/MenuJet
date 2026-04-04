@@ -1,5 +1,5 @@
 <template>
-  <div class="h-screen bg-gray-50 flex overflow-hidden font-sans">
+  <div class="h-screen bg-gray-50 flex overflow-hidden">
     <!-- Backdrop for mobile -->
     <div
       v-if="isMobileOpen"

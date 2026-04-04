@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="min-h-screen flex items-center justify-center bg-gray-50 px-6 font-sans"
-  >
+  <div class="min-h-screen flex items-center justify-center bg-gray-50 px-6">
     <div class="text-center">
       <h1 class="text-2xl font-black text-orange-600 mb-2 italic">MenuJet</h1>
       <div
