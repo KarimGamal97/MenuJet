@@ -9,7 +9,10 @@
   >
     <div class="flex justify-between items-start mb-4">
       <div>
-        <span class="text-[10px] uppercase tracking-wider font-bold text-gray-400">Order ID</span>
+        <span
+          class="text-[10px] uppercase tracking-wider font-bold text-gray-400"
+          >{{ $t("admin.order_id") || "Order ID" }}</span
+        >
         <div class="flex items-center gap-2">
           <h3 class="text-2xl font-bold text-orange-600">
             #{{ order.id.toString().padStart(4, "0") }}
@@ -23,7 +26,10 @@
         </div>
       </div>
       <div class="text-left">
-        <span class="text-[10px] uppercase tracking-wider font-bold text-gray-400">Time</span>
+        <span
+          class="text-[10px] uppercase tracking-wider font-bold text-gray-400"
+          >{{ $t("admin.order_time") || "Time" }}</span
+        >
         <p class="text-sm font-bold text-gray-600">
           {{
             new Date(order.created_at).toLocaleTimeString("en-US", {
@@ -48,7 +54,7 @@
           >
             {{ item.quantity }}
           </span>
-          <span class="font-bold text-gray-700 text-sm italic">{{ item.name }}</span>
+          <span class="font-bold text-gray-700 text-sm">{{ item.name }}</span>
         </div>
         <span class="font-bold text-gray-900 text-sm">
           {{ item.price * item.quantity }}
@@ -58,9 +64,13 @@
     </div>
 
     <!-- Footer Action -->
-    <div class="flex justify-between items-center border-t border-gray-100 pt-4">
+    <div
+      class="flex justify-between items-center border-t border-gray-100 pt-4"
+    >
       <div>
-        <span class="text-[10px] font-bold text-gray-400 block">Total Amount</span>
+        <span class="text-[10px] font-bold text-gray-400 block"
+          >{{ $t("admin.order_total") || "Total Amount" }}</span
+        >
         <div class="text-xl font-bold text-gray-800">
           {{ order.total_price }}
           <small class="text-xs">{{ $t("currency") }}</small>
@@ -73,7 +83,7 @@
           @click="emit('update-status', order.id, 'completed')"
           variant="primary"
           class="!bg-yellow-500 hover:!bg-yellow-600 !shadow-yellow-100"
-          icon="chevron-left"
+          icon="chevron-right"
           :loading="loading"
         >
           {{ $t("admin.order_confirm_btn") || "Complete" }}

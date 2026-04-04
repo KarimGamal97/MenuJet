@@ -95,7 +95,12 @@
     "cleanup_all": "Clear ALL orders forever",
     "cleanup_confirm": "Are you sure? This data will be gone forever.",
     "cleanup_btn": "Start Cleanup",
-    "cleanup_success": "Cleanup successful"
+    "cleanup_success": "Cleanup successful",
+    "live_orders": "Live Orders",
+    "order_id": "Order ID",
+    "order_time": "Time",
+    "order_total": "Total Amount",
+    "order_confirm_btn": "Complete Order"
   },
   "cart": {
     "title": "Your Order",

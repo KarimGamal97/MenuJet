@@ -16,10 +16,14 @@
       </div>
 
       <div class="min-w-0">
-        <span class="text-[10px] bg-orange-50 text-orange-600 px-2 py-1 rounded-lg font-bold uppercase">
+        <span
+          class="text-[10px] bg-orange-50 text-orange-600 px-2 py-1 rounded-lg font-bold uppercase"
+        >
           {{ item.category }}
         </span>
-        <h3 class="font-bold text-gray-800 mt-1 line-clamp-1 truncate min-w-0 text-sm">
+        <h3
+          class="font-bold text-gray-800 mt-1 line-clamp-1 truncate min-w-0 text-sm"
+        >
           {{ item.name }}
         </h3>
         <p class="text-orange-600 font-bold text-xs">
@@ -30,7 +34,8 @@
 
     <!-- Actions Area -->
     <div class="flex flex-col gap-2">
-      <div class="flex gap-2">
+      <!-- Admin Mode: Edit/Delete -->
+      <div v-if="isAdmin" class="flex gap-2">
         <BaseButton
           @click="emit('edit', item)"
           variant="outline"
@@ -44,6 +49,17 @@
           class="!w-9 !h-9 !p-0 !rounded-xl md:opacity-0 group-hover:opacity-100 !text-red-500 hover:!bg-red-500 hover:!text-white"
         />
       </div>
+
+      <!-- Public Mode: Add to Cart -->
+      <div v-else>
+        <BaseButton
+          @click="addToCart(item)"
+          variant="outline"
+          icon="plus"
+          class="!w-9 !h-9 !p-0 !rounded-xl text-orange-600 border-orange-100 hover:bg-orange-50 active:scale-95"
+        />
+      </div>
+
       <!-- Availability Badge -->
       <span
         v-if="item.available === false"
@@ -56,10 +72,16 @@
 </template>
 
 <script setup>
+const { addToCart } = useCart();
+
 defineProps({
   item: {
     type: Object,
     required: true,
+  },
+  isAdmin: {
+    type: Boolean,
+    default: false,
   },
 });
 

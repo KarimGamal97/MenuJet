@@ -7,30 +7,14 @@
         <div
           class="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center"
         >
-          <BaseIcon name="boxes" class="w-7 h-7 text-orange-600" />
+          <BaseIcon name="cart" class="w-7 h-7 text-orange-600" />
         </div>
-        <h1 class="text-xl font-bold text-gray-800">Live Orders</h1>
+        <h1 class="text-xl font-bold text-gray-800">
+          {{ $t("admin.live_orders") }}
+        </h1>
       </div>
 
       <div class="flex items-center gap-3">
-        <!-- Live Status Label -->
-        <div
-          class="hidden sm:flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-xl"
-        >
-          <span class="relative flex h-2 w-2">
-            <span
-              class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"
-            ></span>
-            <span
-              class="relative inline-flex rounded-full h-2 w-2 bg-green-500"
-            ></span>
-          </span>
-          <span class="text-[10px] font-bold text-gray-400"
-            >Live Connection</span
-          >
-        </div>
-
-        <!-- Reset/Cleanup Center Trigger -->
         <BaseButton
           variant="ghost"
           icon="trash"
@@ -83,9 +67,7 @@
         </button>
       </div>
 
-      <p
-        class="mt-6 text-[10px] text-red-500 font-bold px-1 text-center italic"
-      >
+      <p class="mt-6 text-[10px] text-red-500 font-bold px-1 text-center">
         {{ $t("admin.cleanup_confirm") }}
       </p>
 
@@ -206,7 +188,9 @@ const {
   stopRealtimeOrders,
 } = useOrders();
 
-const totalPages = computed(() => Math.ceil(totalOrders.value / pageSize.value));
+const totalPages = computed(() =>
+  Math.ceil(totalOrders.value / pageSize.value),
+);
 
 const changePage = (newPage) => {
   page.value = newPage;

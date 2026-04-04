@@ -264,7 +264,7 @@
         >
           <BaseIcon name="menu" class="h-6 w-6" />
         </button>
-        <span class="font-black text-orange-600 italic">MenuJet</span>
+        <span class="font-black text-orange-600">MenuJet</span>
       </header>
 
       <!-- Main Scrollable Area -->
