@@ -74,7 +74,7 @@
 
       <!-- Filter Section -->
       <div class="flex flex-col md:flex-row gap-4">
-        <div class="relative flex-1">
+        <div class="relative md:w-1/4">
           <input
             v-model="searchQuery"
             type="text"
@@ -87,7 +87,9 @@
           />
         </div>
 
-        <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1 px-1">
+        <div
+          class="flex-1 flex gap-2 overflow-x-auto no-scrollbar pb-1 px-1 min-w-0"
+        >
           <button
             v-for="cat in dynamicCategories"
             :key="cat"
@@ -156,20 +158,7 @@
                 @click="initiateDelete(item.id)"
                 class="w-10 h-10 flex items-center justify-center rounded-xl bg-red-50 text-red-500 md:opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white shrink-0"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="2"
-                  stroke="currentColor"
-                  class="w-4 h-4"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.177H8.084a2.25 2.25 0 0 1-2.244-2.177L6.18 6.096m14.586 0c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.177H8.084a2.25 2.25 0 0 1-2.244-2.177L6.18 6.096m14.586 0c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.177H8.084a2.25 2.25 0 0 1-2.244-2.177L6.18 6.096"
-                  />
-                </svg>
+                <BaseIcon name="trash" class="w-4 h-4" />
               </button>
             </div>
             <!-- Availability Badge -->
@@ -215,6 +204,11 @@
           <input
             v-model="newItem.price"
             type="number"
+            min="1"
+            max="99999"
+            oninput="
+              if (this.value.length > 5) this.value = this.value.slice(0, 5);
+            "
             :placeholder="$t('admin.item_price')"
             class="w-full p-4 bg-white border-2 border-orange-500/10 rounded-[1.5rem] outline-none focus:border-orange-500 transition-all font-bold text-gray-800 shadow-sm"
           />
@@ -307,12 +301,13 @@
               accept="image/*"
               class="w-full text-sm text-gray-500 file:ml-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100"
             />
-            <p
+            <div
               v-if="uploadLoading"
-              class="text-xs text-orange-500 font-bold animate-pulse"
+              class="flex items-center gap-2 text-xs text-orange-500 font-bold"
             >
+              <div class="w-3 h-3 border-2 border-orange-500/30 border-t-orange-500 rounded-full animate-spin"></div>
               {{ $t("admin.uploading_image") }}
-            </p>
+            </div>
             <p v-if="imageUrl" class="text-xs text-green-500 font-bold">
               {{ $t("admin.upload_success") }}
             </p>
@@ -322,9 +317,10 @@
             <button
               @click="addItem"
               :disabled="loading || uploadLoading"
-              class="flex-1 bg-orange-600 text-white py-4 rounded-2xl font-black shadow-lg shadow-orange-100 disabled:opacity-50 transition-all active:scale-95"
+              class="flex-1 bg-orange-600 text-white py-4 rounded-2xl font-black shadow-lg shadow-orange-100 disabled:opacity-50 transition-all active:scale-95 flex items-center justify-center gap-2"
             >
-              {{ loading ? $t("admin.saving") : $t("admin.save") }}
+              <div v-if="loading" class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+              <span v-else>{{ $t("admin.save") }}</span>
             </button>
             <button
               @click="isModalOpen = false"

@@ -99,7 +99,8 @@
               :disabled="isSubmitting"
               class="flex-1 flex items-center justify-center py-4 bg-gray-900 text-white rounded-2xl font-black disabled:opacity-50 text-[12px]"
             >
-              {{ isSubmitting ? "..." : $t("cart.order_cashier") }}
+              <div v-if="isSubmitting" class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+              <span v-else>{{ $t("cart.order_cashier") }}</span>
             </button>
           </div>
         </div>

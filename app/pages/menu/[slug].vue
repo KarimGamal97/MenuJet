@@ -18,7 +18,7 @@
             <input
               v-model="searchQuery"
               type="text"
-              :placeholder="$t('search') || 'بحث عن وجبة...'"
+              :placeholder="$t('admin.search_placeholder')"
               class="w-full py-3 pr-10 pl-4 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-orange-500 transition-all text-sm font-bold shadow-sm"
             />
             <div
@@ -144,11 +144,11 @@ const activeCategory = ref("all");
 const searchQuery = ref("");
 
 const categories = computed(() => {
-  const items = (restaurant.value?.menu_items || []).filter(
-    (i) => i.available !== false,
-  );
-  const cats = items.map((i) => i.category).filter(Boolean);
-  return ["all", ...new Set(cats)];
+  const profileCats = restaurant.value?.categories?.length
+    ? restaurant.value.categories
+    : ["Main", "Drinks", "Dessert"];
+
+  return ["all", ...profileCats];
 });
 
 const filteredItems = computed(() => {

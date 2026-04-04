@@ -12,7 +12,7 @@
         :src="item.image"
         class="w-full h-full object-cover transition-transform group-hover:scale-110"
       />
-      <BaseIcon name="food" class="w-8 h-8 text-orange-200" />
+      <BaseIcon v-else name="food" class="w-8 h-8 text-orange-100" />
     </div>
 
     <!-- Name & Description -->

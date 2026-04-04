@@ -5,7 +5,6 @@
   "currency": "EGP",
   "all": "All",
   "order_now_footer": "Order Now!",
-
   "login": {
     "title": "Login",
     "subtitle": "Welcome back to the",
@@ -33,8 +32,10 @@
     "dashboard_subtitle": "Welcome back! Here's a quick look at your restaurant today.",
     "items_label": "Total Items",
     "items_unit": "Items",
-    "visits_label": "Menu Visits",
-    "visits_unit": "Visits",
+    "visits_label": "Total Orders",
+    "visits_unit": "Orders",
+    "revenue_label": "Total Revenue",
+    "revenue_unit": "LE",
     "status_label": "Menu Status",
     "status_active": "Active",
     "status_inactive": "Inactive",
@@ -84,7 +85,17 @@
     "qr_code_title": "Your Menu QR Code",
     "qr_code_subtitle": "Scan the code to try the menu, or copy the link to share with your customers.",
     "copy_link": "Copy Link",
-    "download_qr": "Download QR"
+    "download_qr": "Download QR",
+    "order_status_pending": "Pending",
+    "order_status_completed": "Completed",
+    "cleanup_title": "Orders Cleanup",
+    "cleanup_subtitle": "Remove old or completed orders to keep things fast.",
+    "cleanup_completed": "Clear all completed orders",
+    "cleanup_older_than_7": "Clear orders older than 7 days",
+    "cleanup_all": "Clear ALL orders forever",
+    "cleanup_confirm": "Are you sure? This data will be gone forever.",
+    "cleanup_btn": "Start Cleanup",
+    "cleanup_success": "Cleanup successful"
   },
   "cart": {
     "title": "Your Order",
@@ -99,5 +110,16 @@
     "close": "Done, Thank you!",
     "order_success": "Order placed successfully",
     "order_error": "Error placing order"
+  },
+  "history": {
+    "title": "Previous Orders",
+    "empty": "No previous orders found",
+    "whatsapp_order": "WhatsApp Order",
+    "cashier_order": "Cashier Order",
+    "order_prefix": "Order #",
+    "total": "Total"
+  },
+  "menu": {
+    "no_items": "No items in this section"
   }
 }

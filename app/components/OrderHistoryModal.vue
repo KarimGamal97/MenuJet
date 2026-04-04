@@ -21,7 +21,7 @@
             >
               <BaseIcon name="history" class="w-6 h-6" />
             </div>
-            طلبياتك السابقة
+            {{ $t("history.title") }}
           </h2>
           <button
             @click="$emit('close')"
@@ -36,7 +36,7 @@
             <div class="flex justify-center mb-6">
               <BaseIcon name="journal" class="w-20 h-20 text-gray-100" />
             </div>
-            <p class="text-gray-400 font-bold">لا توجد طلبيات سابقة حالياً</p>
+            <p class="text-gray-400 font-bold">{{ $t("history.empty") }}</p>
           </div>
 
           <div
@@ -49,17 +49,23 @@
                 <span
                   class="text-[10px] font-black text-orange-600 bg-orange-50 px-3 py-1 rounded-full uppercase tracking-wider"
                 >
-                  {{ order.type === "whatsapp" ? "طلب واتساب" : "طلب كاشير" }}
+                  {{
+                    order.type === "whatsapp"
+                      ? $t("history.whatsapp_order")
+                      : $t("history.cashier_order")
+                  }}
                 </span>
                 <h3 class="text-lg font-black text-gray-800 mt-2">
-                  طلب #{{ order.id }}
+                  {{ $t("history.order_prefix") }}{{ order.id }}
                 </h3>
                 <p class="text-[10px] text-gray-400 font-bold mt-1">
                   {{ formatDate(order.time) }}
                 </p>
               </div>
               <div class="text-right">
-                <p class="text-sm text-gray-400 font-bold">الإجمالي</p>
+                <p class="text-sm text-gray-400 font-bold">
+                  {{ $t("history.total") }}
+                </p>
                 <p class="text-lg font-black text-orange-600">
                   {{ order.total }} {{ $t("currency") }}
                 </p>
@@ -100,11 +106,12 @@ defineProps({
 defineEmits(["close"]);
 
 const { history } = useOrderHistory();
+const { locale } = useI18n();
 
 const formatDate = (dateString) => {
   if (!dateString) return "";
   const date = new Date(dateString);
-  return date.toLocaleString("ar-EG", {
+  return date.toLocaleString(locale.value === "ar" ? "ar-EG" : "en-US", {
     year: "numeric",
     month: "short",
     day: "numeric",

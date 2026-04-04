@@ -2,10 +2,9 @@
   "welcome": "أهلاً بك في",
   "order_now": "اطلب الآن عبر واتساب",
   "no_description": "لا يوجد وصف لهذه الوجبة",
-  "currency": "جنية",
+  "currency": "جنيه",
   "all": "الكل",
   "order_now_footer": "اعمل اوردر دلوقتي",
-
   "login": {
     "title": "تسجيل الدخول",
     "subtitle": "مرحباً بك مجدداً في لوحة تحكم",
@@ -21,7 +20,7 @@
   "admin": {
     "dashboard": "الرئيسية",
     "menu": "قائمة الطعام",
-    "settings": "الإعدادات",
+    "settings": "اعدادات المطعم",
     "view_menu": "عرض المنيو",
     "logout": "خروج",
     "logout_confirm_title": "تسجيل الخروج",
@@ -30,18 +29,20 @@
     "confirm": "نعم، خروج",
     "dashboard_label": "لوحة التحكم",
     "dashboard_title": "لوحة التحكم",
-    "dashboard_subtitle": "مرحباً بك، إليك نظرة سريعة على مطعمك اليوم.",
+    "dashboard_subtitle": "مرحباً، إليك كل ما يدور في مطعمك اليوم.",
     "items_label": "عدد الأصناف",
     "items_unit": "صنف",
-    "visits_label": "زيارات المنيو",
-    "visits_unit": "زيارة",
+    "visits_label": "إجمالي الطلبات",
+    "visits_unit": "طلب",
+    "revenue_label": "إجمالي المبيعات",
+    "revenue_unit": "جنيه",
     "status_label": "حالة المنيو",
     "status_active": "نشط",
     "status_inactive": "غير نشط",
     "logout_success": "تم تسجيل الخروج بنجاح",
     "menu_title": "قائمة الطعام",
     "add_item": "إضافة صنف",
-    "search_placeholder": "ابحث عن صنف...",
+    "search_placeholder": "بحث...",
     "all_categories": "الكل",
     "currency": "ج.م",
     "no_results": "لا توجد نتائج مطابقة",
@@ -86,8 +87,16 @@
     "copy_link": "نسخ الرابط",
     "download_qr": "تحميل الكود",
     "order_status_pending": "قيد التحضير",
-    "order_status_completed": "تم الانتهاء",
-    "order_confirm_btn": "تأكيد التسليم"
+    "order_status_completed": "تم التسليم",
+    "order_confirm_btn": "بانتظار التسليم",
+    "cleanup_title": "تصفية الطلبات",
+    "cleanup_subtitle": "احذف الطلبات القديمة أو المكتملة لتسريع الأداء",
+    "cleanup_completed": "حذف جميع الطلبات المكتملة",
+    "cleanup_older_than_7": "حذف الطلبات أقدم من 7 أيام",
+    "cleanup_all": "حذف جميع الطلبات نهائياً",
+    "cleanup_confirm": "هل أنت متأكد من المسح؟ ستفقد هذه البيانات للأبد.",
+    "cleanup_btn": "بدء التصفية",
+    "cleanup_success": "تمت التصفية بنجاح"
   },
   "cart": {
     "title": "طلبك",
@@ -102,5 +111,16 @@
     "close": "تم ، شكراً",
     "order_success": "تم إرسال طلبك بنجاح",
     "order_error": "حدث خطأ أثناء إرسال الطلب"
+  },
+  "history": {
+    "title": "طلباتك السابقة",
+    "empty": "لا توجد طلبيات سابقة حالياً",
+    "whatsapp_order": "طلب واتساب",
+    "cashier_order": "طلب كاشير",
+    "order_prefix": "طلب #",
+    "total": "الإجمالي"
+  },
+  "menu": {
+    "no_items": "لا توجد وجبات في هذا القسم حالياً"
   }
 }

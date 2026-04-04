@@ -77,7 +77,7 @@
         </div>
         <div class="flex gap-1 items-start leading-none ml-1">
           <span class="text-[11px] font-black text-gray-800">
-            طلباتك السابقة</span
+            {{ $t("history.title") }}</span
           >
         </div>
       </button>
