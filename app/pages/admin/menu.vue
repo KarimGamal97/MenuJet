@@ -103,6 +103,7 @@
           v-for="item in filteredItems"
           :key="item.id"
           :item="item"
+          :is-admin="true"
           @edit="openEditModal"
           @delete="initiateDelete"
         />
@@ -138,7 +139,9 @@
           type="number"
           :label="$t('admin.item_price')"
           :placeholder="$t('admin.item_price')"
-          oninput="if (this.value.length > 5) this.value = this.value.slice(0, 5);"
+          oninput="
+            if (this.value.length > 5) this.value = this.value.slice(0, 5);
+          "
         />
 
         <BaseToggle
@@ -293,7 +296,10 @@ const availableCategories = computed(() => {
     : ["Main", "Drinks", "Dessert"];
 });
 
-const dynamicCategories = computed(() => ["الكل", ...availableCategories.value]);
+const dynamicCategories = computed(() => [
+  "الكل",
+  ...availableCategories.value,
+]);
 
 // Initialize Data
 onMounted(async () => {

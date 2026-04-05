@@ -1,6 +1,7 @@
 <template>
   <div
-    class="bg-white p-5 rounded-3xl border border-gray-50 shadow-sm flex justify-between items-center group animate-in fade-in duration-300 transition-all hover:shadow-md"
+    class="bg-white p-5 rounded-3xl border border-gray-50 shadow-sm flex justify-between items-center group animate-in fade-in duration-300 transition-all hover:shadow-md cursor-pointer active:scale-[0.99]"
+    @click="handleCardClick"
   >
     <div class="flex items-center gap-4 text-right">
       <img
@@ -37,13 +38,13 @@
       <!-- Admin Mode: Edit/Delete -->
       <div v-if="isAdmin" class="flex gap-2">
         <BaseButton
-          @click="emit('edit', item)"
+          @click.stop="emit('edit', item)"
           variant="outline"
           icon="edit"
           class="!w-9 !h-9 !p-0 !rounded-xl md:opacity-0 group-hover:opacity-100"
         />
         <BaseButton
-          @click="emit('delete', item.id)"
+          @click.stop="emit('delete', item.id)"
           variant="outline"
           icon="trash"
           class="!w-9 !h-9 !p-0 !rounded-xl md:opacity-0 group-hover:opacity-100 !text-red-500 hover:!bg-red-500 hover:!text-white"
@@ -53,7 +54,7 @@
       <!-- Public Mode: Add to Cart -->
       <div v-else>
         <BaseButton
-          @click="addToCart(item)"
+          @click.stop="addToCart(item)"
           variant="outline"
           icon="plus"
           class="!w-9 !h-9 !p-0 !rounded-xl text-orange-600 border-orange-100 hover:bg-orange-50 active:scale-95"
@@ -74,7 +75,7 @@
 <script setup>
 const { addToCart } = useCart();
 
-defineProps({
+const props = defineProps({
   item: {
     type: Object,
     required: true,
@@ -86,4 +87,14 @@ defineProps({
 });
 
 const emit = defineEmits(["edit", "delete"]);
+
+const handleCardClick = () => {
+  if (props.isAdmin) {
+    emit("edit", props.item);
+  } else {
+    if (props.item.available !== false) {
+      addToCart(props.item);
+    }
+  }
+};
 </script>
