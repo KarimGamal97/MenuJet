@@ -102,7 +102,8 @@
     "order_time": "الوقت",
     "order_total": "إجمالي المبلغ",
     "status_available": "متاح الآن",
-    "status_closed": "مغلق حالياً"
+    "status_closed": "مغلق حالياً",
+    "choose_logo": "اختر صورة الشعار"
   },
   "cart": {
     "title": "طلبك",

@@ -1,7 +1,7 @@
 <template>
   <div
     :class="[
-      'p-6 rounded-3xl border-2 transition-all duration-500',
+      'p-6 rounded-3xl border-2 transition-all duration-500 flex flex-col h-full',
       order.status === 'pending'
         ? 'bg-white border-orange-200 shadow-xl shadow-orange-100'
         : 'bg-green-50/10 border-green-500/20 opacity-80 shadow-none',
@@ -42,7 +42,7 @@
     </div>
 
     <!-- Items List -->
-    <div class="space-y-2 mb-6">
+    <div class="space-y-2 mb-6 flex-grow">
       <div
         v-for="item in order.items"
         :key="item.id"
@@ -68,9 +68,9 @@
       class="flex justify-between items-center border-t border-gray-100 pt-4"
     >
       <div>
-        <span class="text-[10px] font-bold text-gray-400 block"
-          >{{ $t("admin.order_total") || "Total Amount" }}</span
-        >
+        <span class="text-[10px] font-bold text-gray-400 block">{{
+          $t("admin.order_total") || "Total Amount"
+        }}</span>
         <div class="text-xl font-bold text-gray-800">
           {{ order.total_price }}
           <small class="text-xs">{{ $t("currency") }}</small>

@@ -52,7 +52,7 @@
                 :loading="uploading"
                 class="pointer-events-none"
               >
-                {{ $t("admin.choose_logo") || "اختر صورة الشعار" }}
+                {{ $t("admin.choose_logo") }}
               </BaseButton>
               <input
                 type="file"
@@ -83,6 +83,12 @@
               class="flex-1 py-4 px-1 bg-transparent border-none outline-none font-bold placeholder:text-gray-300 text-sm"
             />
           </div>
+          <p
+            class="text-[10px] text-amber-500 font-bold mt-3 px-1 flex items-center gap-1.5"
+          >
+            <BaseIcon name="alert" class="w-3.5 h-3.5" />
+            {{ $t("admin.slug_qr_warning") }}
+          </p>
 
           <!-- QR Code Section -->
           <div
@@ -125,13 +131,6 @@
               </div>
             </div>
           </div>
-
-          <p
-            class="text-[10px] text-amber-500 font-bold mt-3 px-1 flex items-center gap-1.5"
-          >
-            <BaseIcon name="alert" class="w-3.5 h-3.5" />
-            {{ $t("admin.slug_qr_warning") }}
-          </p>
         </div>
 
         <!-- رقم الواتساب -->
@@ -303,7 +302,8 @@ const downloadQr = async () => {
 const addCategory = () => {
   const cat = newCategory.value.trim();
   if (!cat) return $toast.error($t("admin.error_fields"));
-  if (form.value.categories.includes(cat)) return $toast.error($t("admin.category_exists"));
+  if (form.value.categories.includes(cat))
+    return $toast.error($t("admin.category_exists"));
 
   form.value.categories.push(cat);
   newCategory.value = "";
