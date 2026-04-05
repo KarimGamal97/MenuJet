@@ -187,25 +187,35 @@ const placeCashierOrder = async () => {
   isSubmitting.value = true;
 
   try {
-    // Use passed prop if available, otherwise query by slug
-    let restaurantUserId = props.restaurantUserId;
+    let finalRestaurantId = props.restaurantUserId;
 
-    if (!restaurantUserId) {
-      const { data: profile, error: profileError } = await client
-        .from("profiles")
-        .select("user_id")
-        .eq("slug", route.params.slug)
-        .single();
+    if (!finalRestaurantId) {
+      const slug = route.params.slug;
+      if (slug) {
+        const { data: profile, error: profileError } = await client
+          .from("profiles")
+          .select("user_id")
+          .eq("slug", slug)
+          .single();
 
-      if (profileError || !profile) throw new Error("Restaurant not found");
-      restaurantUserId = profile.user_id;
+        if (profile && !profileError) {
+          finalRestaurantId = profile.user_id;
+        }
+      }
     }
 
-    // Insert the Order
+    if (!finalRestaurantId) {
+      alert(
+        "خطأ: لم يتم العثور على كود المطعم (Restaurant ID missing). تأكد من الرابط.",
+      );
+      isSubmitting.value = false;
+      return;
+    }
+
     const { data: order, error: orderError } = await client
       .from("orders")
       .insert({
-        user_id: restaurantUserId,
+        user_id: finalRestaurantId,
         items: cart.value,
         total_price: totalPrice.value,
         status: "pending",
@@ -213,13 +223,17 @@ const placeCashierOrder = async () => {
       .select("id")
       .single();
 
-    if (orderError) throw orderError;
+    if (orderError) {
+      console.error("Supabase Insert Error:", orderError);
+      alert(
+        `عذراً، فشل إرسال الطلب.\nالسبب: ${orderError.message}\nالتفاصيل: ${orderError.hint || "لا يوجد"}`,
+      );
+      throw orderError;
+    }
 
-    // Set the order number FIRST
     const orderNum = order.id.toString().padStart(4, "0");
     orderNumber.value = orderNum;
 
-    // Save to local history
     addOrder({
       id: orderNum,
       items: [...cart.value],
@@ -227,17 +241,15 @@ const placeCashierOrder = async () => {
       type: "cashier",
     });
 
-    // Show the confirmation modal
     showCashierModal.value = true;
 
-    // Delay closing the main cart to prevent data loss in UI
     setTimeout(() => {
       clearCart();
       emit("close");
       toast.success(t("cart.order_success"));
-    }, 200);
+    }, 300);
   } catch (err) {
-    console.error("Order Error:", err.message);
+    console.error("Detailed Order Error:", err);
     toast.error(t("cart.order_error"));
   } finally {
     isSubmitting.value = false;
