@@ -212,6 +212,8 @@ const placeCashierOrder = async () => {
       return;
     }
 
+    console.log("الـ ID اللي هيتبعت:", finalRestaurantId);
+
     const { data: order, error: orderError } = await client
       .from("orders")
       .insert({

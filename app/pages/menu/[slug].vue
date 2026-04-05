@@ -79,6 +79,7 @@
       />
 
       <CartModal
+        v-if="restaurant && restaurant.user_id"
         :isOpen="showCart"
         :whatsappNumber="restaurant.whatsapp_number"
         :restaurantUserId="restaurant.user_id"
