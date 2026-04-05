@@ -99,7 +99,10 @@
               :disabled="isSubmitting"
               class="flex-1 flex items-center justify-center py-4 bg-gray-900 text-white rounded-2xl font-black disabled:opacity-50 text-[12px]"
             >
-              <div v-if="isSubmitting" class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+              <div
+                v-if="isSubmitting"
+                class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"
+              ></div>
               <span v-else>{{ $t("cart.order_cashier") }}</span>
             </button>
           </div>
@@ -164,6 +167,7 @@ import { toast } from "vue-sonner";
 const props = defineProps({
   isOpen: Boolean,
   whatsappNumber: { type: String, default: "" },
+  restaurantUserId: { type: String, default: "" },
 });
 
 const emit = defineEmits(["close"]);
@@ -183,20 +187,25 @@ const placeCashierOrder = async () => {
   isSubmitting.value = true;
 
   try {
-    // Get restaurant UID
-    const { data: profile, error: profileError } = await client
-      .from("profiles")
-      .select("user_id")
-      .eq("slug", route.params.slug)
-      .single();
+    // Use passed prop if available, otherwise query by slug
+    let restaurantUserId = props.restaurantUserId;
 
-    if (profileError || !profile) throw new Error("Restaurant not found");
+    if (!restaurantUserId) {
+      const { data: profile, error: profileError } = await client
+        .from("profiles")
+        .select("user_id")
+        .eq("slug", route.params.slug)
+        .single();
+
+      if (profileError || !profile) throw new Error("Restaurant not found");
+      restaurantUserId = profile.user_id;
+    }
 
     // Insert the Order
     const { data: order, error: orderError } = await client
       .from("orders")
       .insert({
-        user_id: profile.user_id,
+        user_id: restaurantUserId,
         items: cart.value,
         total_price: totalPrice.value,
         status: "pending",
