@@ -1,7 +1,10 @@
+import type { Profile } from "~/types";
+
 export const useSettings = () => {
   const client = useSupabaseClient<any>();
   const { $toast } = useNuxtApp();
-  const profile = ref<any>(null);
+  const { t } = useI18n();
+  const profile = ref<Profile | null>(null);
   const loading = ref(false);
   const uploading = ref(false);
 
@@ -38,11 +41,11 @@ export const useSettings = () => {
       if (error) throw error;
 
       profile.value = { ...profile.value, ...updateData };
-      $toast.success("تم تحديث الإعدادات بنجاح");
+      $toast.success(t("admin.settings_success"));
       return true;
     } catch (err: any) {
       console.error("Update Profile Error:", err);
-      $toast.error("فشل تحديث الإعدادات");
+      $toast.error(t("admin.error_fields"));
       return false;
     } finally {
       loading.value = false;

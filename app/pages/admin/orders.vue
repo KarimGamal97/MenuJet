@@ -1,5 +1,11 @@
 <template>
   <div class="p-6 space-y-6" dir="rtl">
+    <!-- Skeleton while loading -->
+    <template v-if="loading">
+      <OrdersSkeleton />
+    </template>
+
+    <template v-else>
     <div
       class="flex justify-between items-center bg-white p-4 rounded-3xl shadow-sm"
     >
@@ -143,13 +149,14 @@
         class="w-12 h-12 !p-0 !rounded-2xl"
       />
     </div>
+    </template>
   </div>
 </template>
 
 <script setup>
 definePageMeta({ layout: "admin", middleware: "auth" });
 
-const user = useSupabaseUser();
+const { userId } = useAuthUser();
 
 // Cleanup State
 const showCleanupModal = ref(false);
@@ -194,21 +201,19 @@ const totalPages = computed(() =>
 
 const changePage = (newPage) => {
   page.value = newPage;
-  const userId = user.value?.id || user.value?.sub;
-  if (userId) fetchOrders(userId, page.value, pageSize.value);
+  if (userId.value) fetchOrders(userId.value, page.value, pageSize.value);
   window.scrollTo({ top: 0, behavior: "smooth" });
 };
 
 // Handle Cleanup
 const handleCleanup = async () => {
-  const userId = user.value?.id || user.value?.sub;
-  if (!userId || !selectedCleanupType.value) return;
+  if (!userId.value || !selectedCleanupType.value) return;
 
-  const success = await cleanupOrders(userId, selectedCleanupType.value);
+  const success = await cleanupOrders(userId.value, selectedCleanupType.value);
   if (success) {
     showCleanupModal.value = false;
     page.value = 1;
-    await fetchOrders(userId, page.value, pageSize.value);
+    await fetchOrders(userId.value, page.value, pageSize.value);
   }
 };
 
@@ -219,10 +224,9 @@ const playNotificationSound = () => {
 
 // 3. The Activation Logic
 onMounted(async () => {
-  const userId = user.value?.id || user.value?.sub;
-  if (userId) {
-    await fetchOrders(userId, page.value, pageSize.value);
-    setupRealtimeOrders(userId, playNotificationSound);
+  if (userId.value) {
+    await fetchOrders(userId.value, page.value, pageSize.value);
+    setupRealtimeOrders(userId.value, playNotificationSound);
   }
 });
 

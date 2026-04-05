@@ -13,16 +13,11 @@
         @close="showDeleteModal = false"
         :title="$t('admin.delete_confirm_title')"
         :subtitle="$t('admin.delete_confirm_msg')"
-        max-width="max-w-xs"
+        icon="trash"
+        iconColor="bg-red-50 text-red-600"
+        :showClose="false"
+        max-width="max-w-sm"
       >
-        <div class="flex justify-center mb-4">
-          <div
-            class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center text-red-600"
-          >
-            <BaseIcon name="trash" class="w-8 h-8" />
-          </div>
-        </div>
-
         <template #footer>
           <div class="flex gap-3">
             <BaseButton
@@ -259,7 +254,7 @@
 <script setup>
 definePageMeta({ layout: "admin", middleware: "auth" });
 
-const user = useSupabaseUser();
+const { user, userId } = useAuthUser();
 const { $toast } = useNuxtApp();
 
 // Composables
@@ -303,9 +298,8 @@ const dynamicCategories = computed(() => [
 
 // Initialize Data
 onMounted(async () => {
-  const userId = user.value?.id || user.value?.sub;
-  if (userId) {
-    await Promise.all([fetchMenuItems(userId), fetchProfile(userId)]);
+  if (userId.value) {
+    await Promise.all([fetchMenuItems(userId.value), fetchProfile(userId.value)]);
   }
 });
 
@@ -333,10 +327,9 @@ const filteredItems = computed(() => {
 // Actions
 const handleFileUpload = async (event) => {
   const file = event.target.files[0];
-  const userId = user.value?.id || user.value?.sub;
-  if (!file || !userId) return;
+  if (!file || !userId.value) return;
 
-  const url = await uploadMenuImage(file, userId);
+  const url = await uploadMenuImage(file, userId.value);
   if (url) imageUrl.value = url;
 };
 
@@ -365,8 +358,7 @@ const openEditModal = (item) => {
 };
 
 const handleSaveItem = async () => {
-  const userId = user.value?.id || user.value?.sub;
-  if (!userId) return;
+  if (!userId.value) return;
 
   if (!newItem.value.name || !newItem.value.price || !newItem.value.category) {
     return $toast.error($t("admin.error_fields"));
@@ -382,7 +374,7 @@ const handleSaveItem = async () => {
   if (editingId.value) {
     result = await updateMenuItem(editingId.value, itemData);
   } else {
-    result = await addItemToMenu(itemData, userId);
+    result = await addItemToMenu(itemData, userId.value);
   }
 
   if (result) {

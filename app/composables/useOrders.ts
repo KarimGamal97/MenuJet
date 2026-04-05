@@ -1,7 +1,14 @@
+import type { Order, OrderStatus } from "~/types";
+
+// Named constant instead of magic number
+const CLEANUP_DAYS_THRESHOLD = 7;
+
 export const useOrders = () => {
   const client = useSupabaseClient<any>();
   const { $toast } = useNuxtApp();
-  const orders = ref<any[]>([]);
+  const { t } = useI18n();
+
+  const orders = ref<Order[]>([]);
   const totalOrders = ref(0);
   const loading = ref(false);
   const realtimeChannel = ref<any>(null);
@@ -32,7 +39,10 @@ export const useOrders = () => {
     }
   };
 
-  const updateOrderStatus = async (orderId: string | number, status: string) => {
+  const updateOrderStatus = async (
+    orderId: string | number,
+    status: OrderStatus,
+  ) => {
     try {
       const { error } = await client
         .from("orders")
@@ -41,8 +51,9 @@ export const useOrders = () => {
 
       if (error) throw error;
 
-      const idx = orders.value.findIndex((o: any) => o.id === orderId);
-      if (idx !== -1) orders.value[idx].status = status;
+      const idx = orders.value.findIndex((o) => o.id === orderId);
+      const order = orders.value[idx];
+      if (order) order.status = status;
       $toast.success("Order status updated");
     } catch (err: any) {
       console.error("Update Status Error:", err);
@@ -59,15 +70,15 @@ export const useOrders = () => {
       if (type === "completed") {
         query = query.eq("status", "completed");
       } else if (type === "old") {
-        const sevenDaysAgo = new Date();
-        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-        query = query.lt("created_at", sevenDaysAgo.toISOString());
+        const cutoffDate = new Date();
+        cutoffDate.setDate(cutoffDate.getDate() - CLEANUP_DAYS_THRESHOLD);
+        query = query.lt("created_at", cutoffDate.toISOString());
       }
 
       const { error } = await query;
       if (error) throw error;
 
-      $toast.success("Orders cleaned successfully");
+      $toast.success(t("admin.cleanup_success"));
       return true;
     } catch (err: any) {
       console.error("Cleanup Error:", err);

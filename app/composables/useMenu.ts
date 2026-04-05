@@ -1,7 +1,9 @@
+import type { MenuItem } from "~/types";
+
 export const useMenu = () => {
   const client = useSupabaseClient<any>();
   const { $toast } = useNuxtApp();
-  const items = ref<any[]>([]);
+  const items = ref<MenuItem[]>([]);
   const pending = ref(false);
   const loading = ref(false);
   const uploading = ref(false);
@@ -52,7 +54,7 @@ export const useMenu = () => {
         .single();
 
       if (error) throw error;
-      items.value.unshift(data);
+      items.value.unshift(data as MenuItem);
       $toast.success("Item added successfully");
       return data;
     } catch (err: any) {
@@ -76,9 +78,9 @@ export const useMenu = () => {
         .single();
 
       if (error) throw error;
-      
-      const idx = items.value.findIndex((m: any) => m.id === id);
-      if (idx !== -1) items.value[idx] = data;
+
+      const idx = items.value.findIndex((m) => m.id === id);
+      if (idx !== -1) items.value[idx] = data as MenuItem;
       
       $toast.success("Item updated successfully");
       return data;
@@ -98,8 +100,8 @@ export const useMenu = () => {
       const { error } = await client.from("menu_items").delete().eq("id", id);
 
       if (error) throw error;
-      
-      const idx = items.value.findIndex((m: any) => m.id === id);
+
+      const idx = items.value.findIndex((m) => m.id === id);
       if (idx !== -1) items.value.splice(idx, 1);
       
       $toast.success("Item deleted successfully");

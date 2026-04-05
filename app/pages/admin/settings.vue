@@ -219,7 +219,7 @@
 <script setup>
 definePageMeta({ layout: "admin", middleware: "auth" });
 
-const user = useSupabaseUser();
+const { userId } = useAuthUser();
 const { $toast } = useNuxtApp();
 
 // Composables
@@ -244,9 +244,8 @@ const form = ref({
 
 // Initialize Data
 onMounted(async () => {
-  const userId = user.value?.id || user.value?.sub;
-  if (userId) {
-    const data = await fetchProfile(userId);
+  if (userId.value) {
+    const data = await fetchProfile(userId.value);
     if (data) {
       form.value = {
         business_name: data.business_name || "",
@@ -318,16 +317,14 @@ const removeCategory = (index) => {
 
 const uploadLogo = async (event) => {
   const file = event.target.files[0];
-  const userId = user.value?.id || user.value?.sub;
-  if (!file || !userId) return;
+  if (!file || !userId.value) return;
 
-  const url = await uploadLogoAction(file, userId);
+  const url = await uploadLogoAction(file, userId.value);
   if (url) form.value.logo = url;
 };
 
 const saveSettings = async () => {
-  const userId = user.value?.id || user.value?.sub;
-  if (!userId) return;
+  if (!userId.value) return;
 
   const settingsData = {
     ...form.value,
