@@ -5,10 +5,10 @@
     <div
       class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center h-full"
     >
-      <!-- Brand Logo (Right side in RTL) -->
-      <div class="flex items-center gap-3">
+      <!-- Brand Logo & Status -->
+      <div class="flex flex-col items-center gap-1.5 shrink-0">
         <div
-          class="w-10 h-10 bg-gray-50 rounded-2xl flex items-center justify-center overflow-hidden border border-gray-100 shadow-sm"
+          class="w-50 h-14 bg-gray-100 rounded-[1.25rem] flex items-center justify-center overflow-hidden border-2 border-white shadow-sm ring-1 ring-gray-100 transition-transform active:scale-95"
         >
           <img
             v-if="restaurant.logo"
@@ -16,53 +16,42 @@
             class="w-full h-full object-cover"
             :alt="restaurant.business_name"
           />
-          <BaseIcon name="food" class="w-6 h-6 text-gray-200" />
+          <BaseIcon v-else name="food" class="w-7 h-7 text-gray-200" />
         </div>
-        <div class="space-y-0 text-right">
-          <span
-            class="text-orange-600/60 text-[8px] font-black tracking-widest uppercase block mb-0.5"
-          >
-            {{ $t("welcome") }}
+
+        <!-- Status Badge below Logo -->
+        <div
+          v-if="restaurant.is_active"
+          class="flex items-center gap-1.5 bg-green-50 px-2 py-0.5 rounded-full"
+        >
+          <span class="relative flex h-1.5 w-1.5">
+            <span
+              class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"
+            ></span>
+            <span
+              class="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500"
+            ></span>
           </span>
-          <div class="flex flex-col gap-1 pt-1">
-            <h1
-              class="text-sm md:text-md font-black text-gray-900 leading-none"
-            >
-              {{ getLocaleTxt(restaurant, "business_name") }}
-            </h1>
-            <!-- Active Badge -->
-            <div
-              v-if="restaurant.is_active"
-              class="flex items-center gap-1 w-fit"
-            >
-              <span class="relative flex h-1.5 w-1.5">
-                <span
-                  class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"
-                ></span>
-                <span
-                  class="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500"
-                ></span>
-              </span>
-              <span
-                class="text-[8px] font-bold text-green-500 whitespace-nowrap uppercase"
-                >{{ $t("admin.status_available") || "Available" }}</span
-              >
-            </div>
-            <!-- Inactive Badge -->
-            <div v-else class="flex items-center gap-1 w-fit opacity-60">
-              <span
-                class="inline-flex rounded-full h-1.5 w-1.5 bg-gray-300"
-              ></span>
-              <span
-                class="text-[8px] font-bold text-gray-400 whitespace-nowrap uppercase"
-                >{{ $t("admin.status_closed") || "Closed" }}</span
-              >
-            </div>
-          </div>
+          <span
+            class="text-[9px] font-black text-green-600 whitespace-nowrap uppercase tracking-tight"
+          >
+            {{ $t("admin.status_available") }}
+          </span>
+        </div>
+        <div
+          v-else
+          class="flex items-center gap-1.5 bg-gray-50 px-2 py-0.5 rounded-full opacity-70"
+        >
+          <span class="inline-flex rounded-full h-1.5 w-1.5 bg-gray-300"></span>
+          <span
+            class="text-[9px] font-black text-gray-400 whitespace-nowrap uppercase tracking-tight"
+          >
+            {{ $t("admin.status_closed") }}
+          </span>
         </div>
       </div>
 
-      <!-- History Icon (Left side in RTL) -->
+      <!-- History Icon  -->
       <button
         @click="showHistory = true"
         class="flex items-center gap-2 px-5 py-2 bg-gray-50/50 hover:bg-orange-50 rounded-2xl transition-all active:scale-95 group border border-gray-100 shadow-sm pr-2"

@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-50 flex flex-col" dir="rtl">
+  <div class="min-h-screen bg-gray-50 flex flex-col max-w-full overflow-x-hidden" dir="rtl">
     <template v-if="pending">
       <MenuSkeleton />
     </template>
@@ -29,20 +29,22 @@
           </div>
 
           <!-- Categories List -->
-          <div class="flex gap-2 overflow-x-auto no-scrollbar py-1">
-            <button
-              v-for="cat in categories"
-              :key="cat"
-              @click="activeCategory = cat"
-              :class="[
-                'px-6 py-2 rounded-2xl font-bold whitespace-nowrap text-sm transition-all duration-300 shrink-0 border-2',
-                activeCategory === cat
-                  ? 'bg-orange-600 text-white border-orange-600 shadow-md shadow-orange-100'
-                  : 'bg-gray-50 text-gray-400 border-transparent hover:bg-gray-100',
-              ]"
-            >
-              {{ cat }}
-            </button>
+          <div class="flex-1 min-w-0 w-full">
+            <div class="flex gap-2 overflow-x-auto no-scrollbar py-1 w-full">
+              <button
+                v-for="cat in categories"
+                :key="cat"
+                @click="activeCategory = cat"
+                :class="[
+                  'px-6 py-2 rounded-2xl font-bold whitespace-nowrap text-sm transition-all duration-300 shrink-0 border-2',
+                  activeCategory === cat
+                    ? 'bg-orange-600 text-white border-orange-600 shadow-md shadow-orange-100'
+                    : 'bg-gray-50 text-gray-400 border-transparent hover:bg-gray-100',
+                ]"
+              >
+                {{ cat }}
+              </button>
+            </div>
           </div>
         </div>
       </nav>
@@ -158,15 +160,13 @@ const activeCategory = ref("");
 const searchQuery = ref("");
 
 const categories = computed(() => {
-  return restaurant.value?.categories?.length
-    ? restaurant.value.categories
-    : ["Main", "Drinks", "Dessert"];
+  return restaurant.value?.categories || [];
 });
 
 watch(
-  categories,
+  () => restaurant.value?.categories,
   (newCats) => {
-    if (newCats.length > 0) {
+    if (newCats && newCats.length > 0) {
       // If no category is selected OR current selected category is not in the new list
       if (!activeCategory.value || !newCats.includes(activeCategory.value)) {
         activeCategory.value = newCats[0];
@@ -181,15 +181,18 @@ const filteredItems = computed(() => {
     (i) => i.available !== false,
   );
 
-  // Filter by category
-  if (activeCategory.value) {
-    items = items.filter((i) => i.category === activeCategory.value);
-  }
-
   // Search filter
   if (searchQuery.value) {
     const q = searchQuery.value.toLowerCase();
-    items = items.filter((i) => (i.name || "").toLowerCase().includes(q));
+    return items.filter((i) => (i.name || "").toLowerCase().includes(q));
+  }
+
+  // Filter by category - if category filter gives 0 results, show ALL items
+  if (activeCategory.value) {
+    const categoryItems = items.filter(
+      (i) => !i.category || i.category === activeCategory.value,
+    );
+    return categoryItems.length > 0 ? categoryItems : items;
   }
 
   return items;

@@ -84,42 +84,72 @@
         <div
           class="flex-1 flex gap-2 overflow-x-auto no-scrollbar pb-1 px-1 min-w-0"
         >
-          <button
-            v-for="cat in dynamicCategories"
-            :key="cat"
-            @click="selectedCategory = cat"
-            :class="[
-              'px-5 py-3 rounded-2xl font-bold transition-all whitespace-nowrap text-sm md:text-base',
-              selectedCategory === cat
-                ? 'bg-orange-600 text-white shadow-md shadow-orange-100'
-                : 'bg-white text-gray-400 hover:bg-orange-50 hover:text-orange-600',
-            ]"
-          >
-            {{ cat === "الكل" ? $t("admin.all_categories") : cat }}
-          </button>
+          <!-- Skeleton Loading for Categories (Shown while loading OR before profile exists) -->
+          <template v-if="profileLoading || !profile">
+            <div
+              v-for="i in 4"
+              :key="i"
+              class="w-24 h-12 bg-gray-200 animate-pulse rounded-2xl shrink-0"
+            ></div>
+          </template>
+
+          <template v-else>
+            <button
+              v-for="(cat, index) in dynamicCategories"
+              :key="index"
+              @click="selectedCategory = cat"
+              :class="[
+                'px-5 py-3 rounded-2xl font-bold transition-all whitespace-nowrap text-sm md:text-base',
+                selectedCategory === cat
+                  ? 'bg-orange-600 text-white shadow-md shadow-orange-100'
+                  : 'bg-white text-gray-400 hover:bg-orange-50 hover:text-orange-600',
+              ]"
+            >
+              {{ cat }}
+            </button>
+          </template>
         </div>
       </div>
 
-      <div
-        v-if="filteredItems.length > 0"
-        class="flex flex-row flex-wrap gap-4"
-      >
-        <MenuItemCard
-          v-for="item in filteredItems"
-          :key="item.id"
-          :item="item"
-          :is-admin="true"
-          @edit="openEditModal"
-          @delete="initiateDelete"
-          class="w-full md:w-[calc(50%-8px)] lg:w-[calc(33.333%-11px)]"
-        />
-      </div>
+      <!-- Items List / Skeleton -->
+      <template v-if="itemsPending">
+        <div class="flex flex-row flex-wrap gap-4">
+          <div
+            v-for="i in 6"
+            :key="i"
+            class="w-full md:w-[calc(50%-8px)] lg:w-[calc(33.333%-11px)] h-32 bg-white rounded-3xl border border-gray-100 p-4 flex items-center gap-4 animate-pulse"
+          >
+            <div class="w-20 h-20 bg-gray-100 rounded-2xl shrink-0"></div>
+            <div class="flex-1 space-y-3">
+              <div class="h-4 bg-gray-100 rounded-full w-3/4"></div>
+              <div class="h-3 bg-gray-100 rounded-full w-1/2"></div>
+            </div>
+          </div>
+        </div>
+      </template>
+
+      <template v-else-if="filteredItems.length > 0">
+        <div class="flex flex-row flex-wrap gap-4">
+          <MenuItemCard
+            v-for="item in filteredItems"
+            :key="item.id"
+            :item="item"
+            :is-admin="true"
+            @edit="openEditModal"
+            @delete="initiateDelete"
+            class="w-full md:w-[calc(50%-8px)] lg:w-[calc(33.333%-11px)]"
+          />
+        </div>
+      </template>
 
       <!-- Empty State -->
       <div
         v-else
         class="text-center py-20 bg-white rounded-[2rem] border border-dashed border-gray-100"
       >
+        <div class="mb-4 flex justify-center">
+          <BaseIcon name="boxes" class="w-16 h-16 opacity-10" />
+        </div>
         <p class="text-gray-400 font-bold">{{ $t("admin.no_results") }}</p>
       </div>
     </template>
@@ -136,13 +166,33 @@
       <div class="space-y-4 mt-2">
         <BaseInput v-model="newItem.name" :label="$t('admin.item_name')" />
 
-        <!-- Size Selector + Price per size -->
+        <!-- Pricing Type Selector -->
         <div class="space-y-2">
           <label
             class="text-[10px] font-black text-gray-400 px-1 uppercase tracking-wider block"
+            >نوع التسعير</label
           >
-            {{ $t("admin.item_size") }}
-          </label>
+          <div class="flex gap-2">
+            <button
+              v-for="pt in pricingTypes"
+              :key="pt.value"
+              type="button"
+              @click="newItem.pricingType = pt.value"
+              :class="[
+                'flex-1 py-2.5 rounded-2xl font-bold text-xs transition-all border-2 flex flex-col items-center gap-0.5',
+                newItem.pricingType === pt.value
+                  ? 'bg-orange-600 text-white border-orange-600 shadow-md shadow-orange-100'
+                  : 'bg-gray-50 text-gray-400 border-transparent hover:border-orange-200 hover:text-orange-600',
+              ]"
+            >
+              <span class="text-base leading-none">{{ pt.icon }}</span>
+              <span>{{ pt.label }}</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- By Size (sm/md/lg) -->
+        <div v-if="newItem.pricingType === 'size'" class="space-y-2">
           <div class="flex gap-2">
             <button
               v-for="size in ['sm', 'md', 'lg']"
@@ -159,7 +209,6 @@
               {{ size }}
             </button>
           </div>
-          <!-- Price for active size -->
           <div class="pt-1">
             <BaseInput
               v-model="newItem.prices[newItem.activeSize]"
@@ -170,7 +219,6 @@
               "
             />
           </div>
-          <!-- Quick overview of all prices -->
           <div class="flex gap-2 pt-1">
             <div
               v-for="s in ['sm', 'md', 'lg']"
@@ -188,6 +236,55 @@
               </p>
             </div>
           </div>
+        </div>
+
+        <!-- By Count (e.g. 10P / 15P / 25P) -->
+        <div v-else-if="newItem.pricingType === 'count'" class="space-y-2">
+          <div
+            class="flex text-[10px] font-black text-gray-400 uppercase tracking-wider gap-2 px-1"
+          >
+            <span class="flex-1">العدد / القطع</span>
+            <span class="w-20 text-center">السعر</span>
+          </div>
+          <div
+            v-for="(opt, i) in newItem.countOptions"
+            :key="i"
+            class="flex gap-2 items-center"
+          >
+            <div
+              class="flex-1 flex items-center gap-2 bg-gray-50 rounded-2xl px-3 border-2 border-transparent focus-within:border-orange-400 transition-colors"
+            >
+              <input
+                v-model="opt.label"
+                type="text"
+                :placeholder="`مثال: ${['10', '15', '25'][i]}`"
+                class="flex-1 py-3 bg-transparent outline-none font-bold text-sm text-gray-800"
+                maxlength="5"
+              />
+              <span class="text-xs text-gray-400 font-bold shrink-0">قطعة</span>
+            </div>
+            <input
+              v-model="opt.price"
+              type="number"
+              placeholder="السعر"
+              class="w-20 py-3 px-3 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-orange-400 outline-none font-bold text-sm text-gray-800 transition-colors"
+              oninput="
+                if (this.value.length > 5) this.value = this.value.slice(0, 5);
+              "
+            />
+          </div>
+        </div>
+
+        <!-- Fixed Price -->
+        <div v-else class="space-y-2">
+          <BaseInput
+            v-model="newItem.fixedPrice"
+            type="number"
+            label="السعر الثابت"
+            oninput="
+              if (this.value.length > 5) this.value = this.value.slice(0, 5);
+            "
+          />
         </div>
 
         <div class="space-y-2 relative">
@@ -361,7 +458,7 @@ const {
   uploadMenuImage,
 } = useMenu();
 
-const { profile, fetchProfile } = useSettings();
+const { profile, loading: profileLoading, fetchProfile } = useSettings();
 
 // UI State
 const isModalOpen = ref(false);
@@ -372,8 +469,15 @@ const isCategoryDropdownOpen = ref(false);
 const imageUrl = ref("");
 const newItem = ref({
   name: "",
+  pricingType: "size",
   prices: { sm: "", md: "", lg: "" },
   activeSize: "sm",
+  countOptions: [
+    { label: "", price: "" },
+    { label: "", price: "" },
+    { label: "", price: "" },
+  ],
+  fixedPrice: "",
   category: "",
   available: true,
   description: "",
@@ -382,34 +486,68 @@ const newItem = ref({
 const searchQuery = ref("");
 const selectedCategory = ref("");
 
-// Categories Logic
 const availableCategories = computed(() => {
-  return profile.value?.categories?.length
+  // Never show defaults during loading
+  if (profileLoading.value || !profile.value) return [];
+
+  // Show defaults only if profile is loaded and categories is actually empty
+  return profile.value.categories?.length
     ? profile.value.categories
     : ["Main", "Drinks", "Dessert"];
 });
 
 const dynamicCategories = computed(() => availableCategories.value);
 
-// Initialize Data
-onMounted(async () => {
-  if (userId.value) {
-    await Promise.all([
-      fetchMenuItems(userId.value),
-      fetchProfile(userId.value),
-    ]);
-  }
-});
+const pricingTypes = [
+  { value: "size", label: $t("admin.by_size") },
+  { value: "count", label: $t("admin.by_count") },
+  { value: "fixed", label: $t("admin.by_fixed") },
+];
 
-// Watch for category initialization
-watchEffect(() => {
-  if (!newItem.value.category && availableCategories.value.length) {
-    newItem.value.category = availableCategories.value[0];
-  }
-  if (!selectedCategory.value && availableCategories.value.length) {
-    selectedCategory.value = availableCategories.value[0];
-  }
-});
+const detectPricingType = (prices) => {
+  if (!prices || Object.keys(prices).length === 0) return "size";
+  if (Object.keys(prices).some((k) => ["sm", "md", "lg"].includes(k)))
+    return "size";
+  if ("fixed" in prices) return "fixed";
+  return "count";
+};
+
+// Data fetching watch
+watch(
+  userId,
+  (newVal) => {
+    if (newVal) {
+      fetchMenuItems(newVal);
+      fetchProfile(newVal);
+    }
+  },
+  { immediate: true },
+);
+
+// Ensure a category is always selected
+watch(
+  () => availableCategories.value,
+  (newCategories) => {
+    if (newCategories && newCategories.length > 0) {
+      if (
+        !selectedCategory.value ||
+        !newCategories.includes(selectedCategory.value)
+      ) {
+        selectedCategory.value = newCategories[0];
+      }
+      if (
+        !newItem.value.category ||
+        !newCategories.includes(newItem.value.category)
+      ) {
+        newItem.value.category = newCategories[0];
+      }
+    } else {
+      selectedCategory.value = "";
+      newItem.value.category = "";
+    }
+  },
+  { immediate: true },
+);
 
 // Computed filtering
 const filteredItems = computed(() => {
@@ -445,8 +583,15 @@ const openAddModal = () => {
   editingId.value = null;
   newItem.value = {
     name: "",
+    pricingType: "size",
     prices: { sm: "", md: "", lg: "" },
     activeSize: "sm",
+    countOptions: [
+      { label: "", price: "" },
+      { label: "", price: "" },
+      { label: "", price: "" },
+    ],
+    fixedPrice: "",
     category: availableCategories.value[0],
     available: true,
     description: "",
@@ -457,14 +602,32 @@ const openAddModal = () => {
 
 const openEditModal = (item) => {
   editingId.value = item.id;
+  const type = detectPricingType(item.prices);
+  const countOptions = [
+    { label: "", price: "" },
+    { label: "", price: "" },
+    { label: "", price: "" },
+  ];
+  if (type === "count" && item.prices) {
+    Object.entries(item.prices).forEach(([label, price], i) => {
+      if (i < 3) countOptions[i] = { label, price: String(price) };
+    });
+  }
   newItem.value = {
     name: item.name,
-    prices: item.prices || {
-      sm: item.price || "",
-      md: item.price || "",
-      lg: item.price || "",
-    },
+    pricingType: type,
+    prices:
+      type === "size"
+        ? {
+            sm: String(item.prices?.sm || ""),
+            md: String(item.prices?.md || ""),
+            lg: String(item.prices?.lg || ""),
+          }
+        : { sm: "", md: "", lg: "" },
     activeSize: "sm",
+    countOptions,
+    fixedPrice:
+      type === "fixed" ? String(item.prices?.fixed || item.price || "") : "",
     category: item.category,
     available: item.available !== false,
     description: item.description || "",
@@ -476,24 +639,39 @@ const openEditModal = (item) => {
 const handleSaveItem = async () => {
   if (!userId.value) return;
 
-  const { name, prices, category } = newItem.value;
-  const hasPrices = prices.sm || prices.md || prices.lg;
+  const { name, pricingType, prices, countOptions, fixedPrice, category } =
+    newItem.value;
+  let cleanPrices = {};
+  let displayPrice = 0;
+  let hasPrices = false;
+
+  if (pricingType === "size") {
+    for (const s of ["sm", "md", "lg"]) {
+      if (prices[s]) cleanPrices[s] = Number(prices[s]);
+    }
+    hasPrices = Object.keys(cleanPrices).length > 0;
+    if (hasPrices) displayPrice = Math.min(...Object.values(cleanPrices));
+  } else if (pricingType === "count") {
+    for (const opt of countOptions) {
+      if (opt.label && opt.price) cleanPrices[opt.label] = Number(opt.price);
+    }
+    hasPrices = Object.keys(cleanPrices).length > 0;
+    if (hasPrices) displayPrice = Math.min(...Object.values(cleanPrices));
+  } else {
+    if (fixedPrice) {
+      cleanPrices = { fixed: Number(fixedPrice) };
+      displayPrice = Number(fixedPrice);
+      hasPrices = true;
+    }
+  }
+
   if (!name || !hasPrices || !category) {
     return $toast.error($t("admin.error_fields"));
   }
 
-  // Convert prices to numbers, keep only filled ones
-  const cleanPrices = {};
-  for (const s of ["sm", "md", "lg"]) {
-    if (prices[s]) cleanPrices[s] = Number(prices[s]);
-  }
-
-  // Use smallest price as the display price (for card)
-  const displayPrice = Math.min(...Object.values(cleanPrices));
-
   const itemData = {
-    name: newItem.value.name,
-    category: newItem.value.category,
+    name,
+    category,
     available: newItem.value.available,
     description: newItem.value.description,
     image: imageUrl.value || null,

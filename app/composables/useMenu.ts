@@ -136,6 +136,32 @@ export const useMenu = () => {
     }
   };
 
+  const updateItemsCategory = async (
+    oldCategory: string,
+    newCategory: string,
+    userId: string,
+  ) => {
+    if (!oldCategory || !newCategory || !userId) return false;
+    try {
+      const { error } = await client
+        .from("menu_items")
+        .update({ category: newCategory })
+        .eq("user_id", userId)
+        .eq("category", oldCategory);
+
+      if (error) throw error;
+
+      // Update local state
+      items.value = items.value.map((m) =>
+        m.category === oldCategory ? { ...m, category: newCategory } : m,
+      );
+      return true;
+    } catch (err: any) {
+      console.error("Update Items Category Error:", err);
+      return false;
+    }
+  };
+
   const uploadMenuImage = async (file: File, userId: string) => {
     if (!file || !userId) return null;
     uploading.value = true;
@@ -174,6 +200,7 @@ export const useMenu = () => {
     updateMenuItem,
     deleteMenuItem,
     deleteItemsByCategory,
+    updateItemsCategory,
     uploadMenuImage,
   };
 };

@@ -224,19 +224,73 @@
           <div
             class="flex flex-wrap gap-2 mt-6 min-h-[50px] p-3 bg-gray-50/50 rounded-2xl border border-dashed border-gray-200"
           >
-            <div
-              v-for="(cat, index) in form.categories"
-              :key="index"
-              class="bg-white text-gray-700 px-4 py-2 rounded-xl flex items-center gap-2 border border-gray-100 shadow-sm animate-in zoom-in duration-200 group hover:border-orange-200"
-            >
-              <span class="font-bold text-sm">{{ cat }}</span>
-              <button
-                @click="initiateRemoveCategory(index)"
-                class="text-gray-300 hover:text-red-500 transition-colors flex items-center justify-center p-1"
+            <!-- Skeleton for settings categories during loading -->
+            <template v-if="profileLoading || !profile">
+              <div
+                v-for="i in 5"
+                :key="i"
+                class="w-20 h-10 bg-gray-200 animate-pulse rounded-xl"
+              ></div>
+            </template>
+
+            <template v-else>
+              <div
+                v-for="(cat, index) in form.categories"
+                :key="index"
+                class="bg-white text-gray-700 px-3 py-2 rounded-xl flex items-center gap-2 border border-gray-100 shadow-sm animate-in zoom-in duration-200 group hover:border-orange-200 overflow-hidden"
               >
-                <BaseIcon name="close" class="w-4 h-4" />
-              </button>
-            </div>
+                <!-- Move Controls -->
+                <div
+                  class="flex flex-col gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity translate-x-1"
+                >
+                  <button
+                    @click="moveCategory(index, -1)"
+                    v-if="index > 0"
+                    class="text-gray-300 hover:text-orange-500 p-0.5 transition-colors"
+                  >
+                    <BaseIcon name="arrow-up" class="w-2.5 h-2.5" />
+                  </button>
+                  <button
+                    @click="moveCategory(index, 1)"
+                    v-if="index < form.categories.length - 1"
+                    class="text-gray-300 hover:text-orange-500 p-0.5 transition-colors"
+                  >
+                    <BaseIcon name="arrow-down" class="w-2.5 h-2.5" />
+                  </button>
+                </div>
+
+                <!-- Item Content -->
+                <div class="flex items-center gap-2">
+                  <template v-if="editingCategoryIndex === index">
+                    <input
+                      v-model="editingCategoryName"
+                      @blur="saveCategoryName(index)"
+                      @keyup.enter="saveCategoryName(index)"
+                      @keyup.esc="cancelEditCategory"
+                      ref="editInput"
+                      class="bg-gray-50 border-none outline-none font-bold text-sm w-24 px-1 rounded text-center"
+                      autofocus
+                    />
+                  </template>
+                  <template v-else>
+                    <span
+                      class="font-bold text-sm cursor-pointer hover:text-orange-600 transition-colors"
+                      @click="startEditCategory(index)"
+                    >
+                      {{ cat }}
+                    </span>
+                  </template>
+                </div>
+
+                <!-- Delete Button -->
+                <button
+                  @click="initiateRemoveCategory(index)"
+                  class="text-gray-300 hover:text-red-500 transition-colors flex items-center justify-center p-1"
+                >
+                  <BaseIcon name="close" class="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </template>
           </div>
         </div>
       </div>
@@ -266,6 +320,7 @@ const { $toast } = useNuxtApp();
 // Composables
 const {
   profile,
+  loading: profileLoading,
   loading: actionLoading,
   uploading: logoUploading,
   fetchProfile,
@@ -273,14 +328,14 @@ const {
   uploadLogo: uploadLogoAction,
 } = useSettings();
 
-const { deleteItemsByCategory } = useMenu();
+const { deleteItemsByCategory, updateItemsCategory } = useMenu();
 
 const newCategory = ref("");
 const form = ref({
   business_name: "",
   slug: "",
   whatsapp_number: "",
-  categories: ["Main", "Drinks", "Dessert"],
+  categories: [],
   logo: "",
   is_active: true,
 });
@@ -294,7 +349,7 @@ onMounted(async () => {
         business_name: data.business_name || "",
         slug: data.slug || "",
         whatsapp_number: data.whatsapp_number || "",
-        categories: data.categories || ["Main", "Drinks", "Dessert"],
+        categories: data.categories || [],
         logo: data.logo || "",
         is_active: data.is_active !== false,
       };
@@ -349,6 +404,65 @@ const addCategory = () => {
 
   form.value.categories.push(cat);
   newCategory.value = "";
+};
+
+// Category Reordering & Editing Logic
+const editingCategoryIndex = ref(-1);
+const editingCategoryName = ref("");
+const editInput = ref(null);
+
+const startEditCategory = (index) => {
+  editingCategoryIndex.value = index;
+  editingCategoryName.value = form.value.categories[index];
+  nextTick(() => {
+    // Handling possible array from v-for ref
+    const input = Array.isArray(editInput.value)
+      ? editInput.value[0]
+      : editInput.value;
+    input?.focus?.();
+  });
+};
+
+const cancelEditCategory = () => {
+  editingCategoryIndex.value = -1;
+  editingCategoryName.value = "";
+};
+
+const saveCategoryName = async (index) => {
+  const oldName = form.value.categories[index];
+  const newName = editingCategoryName.value.trim();
+
+  if (!newName || newName === oldName) {
+    cancelEditCategory();
+    return;
+  }
+
+  // Prevent duplicate names
+  if (form.value.categories.some((c, i) => c === newName && i !== index)) {
+    $toast.error($t("admin.category_exists"));
+    cancelEditCategory();
+    return;
+  }
+
+  // Update local state IMMEDIATELY for snappy UI
+  form.value.categories[index] = newName;
+  cancelEditCategory();
+
+  // If we have a user, update the menu items too (background)
+  if (userId.value) {
+    await updateItemsCategory(oldName, newName, userId.value);
+  }
+};
+
+const moveCategory = (index, direction) => {
+  const newIndex = index + direction;
+  if (newIndex < 0 || newIndex >= form.value.categories.length) return;
+
+  const cats = [...form.value.categories];
+  const temp = cats[index];
+  cats[index] = cats[newIndex];
+  cats[newIndex] = temp;
+  form.value.categories = cats;
 };
 
 const showDeleteCategoryModal = ref(false);

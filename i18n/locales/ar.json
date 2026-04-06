@@ -119,7 +119,22 @@
     "item_deleted_successfully": "تم حذف الصنف بنجاح",
     "item_deleted_error": "خطأ في حذف الصنف",
     "order_status_updated": "تم تحديث حالة الطلب بنجاح",
-    "order_status_failed": "فشل تحديث حالة الطلب"
+    "order_status_failed": "فشل تحديث حالة الطلب",
+    "quantity": "الكمية",
+    "size": "الحجم",
+    "price": "السعر",
+    "add_to_cart": "أضف للسلة",
+    "total": "الإجمالي",
+    "order_whatsapp": "اطلب عبر واتساب",
+    "order_cashier": "اطلب عند الكاشير",
+    "whatsapp_msg_header": "طلب جديد",
+    "cashier_title": "تم استلام طلبك",
+    "cashier_subtitle": "يرجى تقديم رقم الطلب للكاشير",
+    "items_count": "عدد العناصر",
+    "close": "تم ، شكراً",
+    "order_success": "تم إرسال طلبك بنجاح",
+    "order_error": "حدث خطأ أثناء إرسال الطلب",
+    "piece": "قطعة"
   },
   "cart": {
     "title": "طلبك",
