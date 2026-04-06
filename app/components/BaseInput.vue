@@ -1,13 +1,14 @@
 <template>
-  <div class="space-y-1.5 w-full">
-    <label
-      v-if="label"
-      class="text-[10px] uppercase tracking-wider font-bold text-gray-400 px-1"
-    >
-      {{ label }}
-    </label>
-
+  <div class="w-full">
     <div class="relative group">
+      <!-- Floating Label -->
+      <label
+        v-if="label"
+        class="absolute -top-2 right-3 bg-white px-1.5 text-[10px] font-black uppercase tracking-wider text-gray-400 group-focus-within:text-orange-500 transition-colors z-10 pointer-events-none"
+      >
+        {{ label }}
+      </label>
+
       <!-- Left Icon (Optional) -->
       <div
         v-if="icon"
@@ -23,9 +24,12 @@
         :placeholder="placeholder"
         :disabled="disabled"
         :class="[
-          'w-full p-4 bg-gray-50 border-2 border-transparent rounded-2xl outline-none focus:border-orange-500 focus:bg-white transition-all font-bold text-gray-800 shadow-sm text-sm',
+          'w-full p-4 bg-white border-2 rounded-2xl outline-none focus:border-orange-500 transition-all font-bold text-gray-800 text-sm',
+          label
+            ? 'border-gray-200'
+            : 'bg-gray-50 border-transparent focus:bg-white shadow-sm',
           icon ? 'pr-12' : 'px-4',
-          error ? 'border-red-500 bg-red-50/10' : '',
+          error ? 'border-red-400' : '',
           disabled ? 'opacity-50 cursor-not-allowed' : '',
         ]"
         v-bind="$attrs"
@@ -43,6 +47,7 @@
 </template>
 
 <script setup>
+defineOptions({ inheritAttrs: false });
 defineProps({
   modelValue: [String, Number],
   label: String,

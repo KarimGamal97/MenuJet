@@ -45,7 +45,7 @@ export const useSettings = () => {
       return true;
     } catch (err: any) {
       console.error("Update Profile Error:", err);
-      $toast.error(t("admin.error_fields"));
+      $toast.error(err?.message || "فشل تحديث الإعدادات");
       return false;
     } finally {
       loading.value = false;

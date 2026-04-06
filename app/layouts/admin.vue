@@ -128,26 +128,6 @@
             }}</span>
           </NuxtLink>
 
-          <div v-if="profile?.slug">
-            <a
-              :href="`/menu/${profile.slug}`"
-              target="_blank"
-              class="flex items-center gap-3 p-4 rounded-2xl transition-all font-bold hover:bg-orange-50 text-gray-500 overflow-hidden group"
-              :title="isCollapsed ? $t('admin.view_menu') : ''"
-            >
-              <BaseIcon
-                name="journal"
-                class="w-6 h-6 shrink-0 group-hover:scale-110 transition-transform"
-              />
-              <span
-                v-show="!isCollapsed"
-                class="whitespace-nowrap underline-offset-4 decoration-orange-300"
-              >
-                {{ $t("admin.view_menu") }}
-              </span>
-            </a>
-          </div>
-
           <NuxtLink
             to="/admin/orders"
             class="flex items-center gap-3 p-4 rounded-2xl transition-all font-bold hover:bg-orange-50 text-gray-500 overflow-hidden group"

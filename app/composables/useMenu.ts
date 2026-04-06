@@ -3,6 +3,7 @@ import type { MenuItem } from "~/types";
 export const useMenu = () => {
   const client = useSupabaseClient<any>();
   const { $toast } = useNuxtApp();
+  const { t } = useI18n();
   const items = ref<MenuItem[]>([]);
   const pending = ref(false);
   const loading = ref(false);
@@ -24,11 +25,11 @@ export const useMenu = () => {
           .from("menu_items")
           .select("*")
           .eq("user_id", userId);
-        
+
         if (fallbackError) throw fallbackError;
         data = fallbackData;
       }
-      
+
       items.value = data || [];
     } catch (err: any) {
       console.error("Fetch Menu Error Details:", {
@@ -55,11 +56,11 @@ export const useMenu = () => {
 
       if (error) throw error;
       items.value.unshift(data as MenuItem);
-      $toast.success("Item added successfully");
+      $toast.success(t("admin.item_added_successfully"));
       return data;
     } catch (err: any) {
       console.error("Add Menu Item Error:", err);
-      $toast.error("Failed to add menu item");
+      $toast.error(t("admin.item_added_error"));
       return false;
     } finally {
       loading.value = false;
@@ -81,12 +82,12 @@ export const useMenu = () => {
 
       const idx = items.value.findIndex((m) => m.id === id);
       if (idx !== -1) items.value[idx] = data as MenuItem;
-      
-      $toast.success("Item updated successfully");
+
+      $toast.success(t("admin.item_updated_successfully"));
       return data;
     } catch (err: any) {
       console.error("Update Menu Item Error:", err);
-      $toast.error("Failed to update menu item");
+      $toast.error(t("admin.item_updated_error"));
       return false;
     } finally {
       loading.value = false;
@@ -103,15 +104,35 @@ export const useMenu = () => {
 
       const idx = items.value.findIndex((m) => m.id === id);
       if (idx !== -1) items.value.splice(idx, 1);
-      
-      $toast.success("Item deleted successfully");
+
+      $toast.success(t("admin.item_deleted_successfully") || "Item deleted successfully");
       return true;
     } catch (err: any) {
       console.error("Delete Menu Item Error:", err);
-      $toast.error("Failed to delete menu item");
+      $toast.error(t("admin.item_deleted_error") || "Failed to delete menu item");
       return false;
     } finally {
       loading.value = false;
+    }
+  };
+
+  const deleteItemsByCategory = async (category: string, userId: string) => {
+    if (!category || !userId) return false;
+    try {
+      const { error } = await client
+        .from("menu_items")
+        .delete()
+        .eq("user_id", userId)
+        .eq("category", category);
+
+      if (error) throw error;
+
+      // Remove from local state
+      items.value = items.value.filter((m) => m.category !== category);
+      return true;
+    } catch (err: any) {
+      console.error("Delete Items By Category Error:", err);
+      return false;
     }
   };
 
@@ -125,12 +146,14 @@ export const useMenu = () => {
 
     try {
       const { error: uploadError } = await client.storage
-        .from("menu-items")
+        .from("menu-images")
         .upload(filePath, file);
 
       if (uploadError) throw uploadError;
 
-      const { data } = client.storage.from("menu-items").getPublicUrl(filePath);
+      const { data } = client.storage
+        .from("menu-images")
+        .getPublicUrl(filePath);
       return data.publicUrl;
     } catch (err: any) {
       console.error("Image Upload Error:", err);
@@ -150,6 +173,7 @@ export const useMenu = () => {
     addItemToMenu,
     updateMenuItem,
     deleteMenuItem,
+    deleteItemsByCategory,
     uploadMenuImage,
   };
 };

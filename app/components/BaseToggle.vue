@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl transition-colors hover:bg-gray-100/80 cursor-pointer"
+    class="flex items-center justify-between p-4 rounded-2xl transition-colors cursor-pointer"
     @click="emit('update:modelValue', !modelValue)"
   >
     <span class="text-sm font-bold text-gray-700">{{ label }}</span>

@@ -35,13 +35,13 @@
               :key="cat"
               @click="activeCategory = cat"
               :class="[
-                'px-6 py-2.5 rounded-2xl font-bold whitespace-nowrap text-sm transition-all duration-300 shrink-0',
+                'px-6 py-2 rounded-2xl font-bold whitespace-nowrap text-sm transition-all duration-300 shrink-0 border-2',
                 activeCategory === cat
-                  ? 'bg-orange-600 text-white shadow-lg shadow-orange-100'
-                  : 'bg-gray-50 text-gray-400 hover:bg-gray-100',
+                  ? 'bg-orange-600 text-white border-orange-600 shadow-md shadow-orange-100'
+                  : 'bg-gray-50 text-gray-400 border-transparent hover:bg-gray-100',
               ]"
             >
-              {{ cat === "all" ? "الكل" : cat }}
+              {{ cat }}
             </button>
           </div>
         </div>
@@ -51,23 +51,21 @@
         <div
           v-if="filteredItems.length > 0"
           class="flex flex-col gap-3"
-          :class="cartCount > 0 ? 'pb-36' : 'pb-10'"
+          :class="cartCount > 0 ? 'pb-40' : 'pb-16'"
         >
           <MenuItemCard
             v-for="item in filteredItems"
             :key="item.id"
             :item="item"
+            @select="openItemModal"
           />
         </div>
-        <div
-          v-else
-          class="text-center py-20 bg-white rounded-[2rem] border border-dashed border-gray-100"
-        >
+        <div v-else class="text-center py-5">
           <div class="mb-4 flex justify-center">
             <BaseIcon name="boxes" class="w-16 h-16 opacity-20" />
           </div>
           <p class="text-gray-400 text-lg font-bold">
-            {{ $t("menu.no_items") || "لا توجد وجبات في هذا القسم حالياً" }}
+            {{ $t("menu.no_items") }}
           </p>
         </div>
       </main>
@@ -76,6 +74,13 @@
       <FloatingCartBar
         :whatsappNumber="restaurant.whatsapp_number"
         @openCart="showCart = true"
+      />
+
+      <!-- Item Detail Modal -->
+      <ItemDetailModal
+        :isOpen="showItemModal"
+        :item="selectedItem"
+        @close="showItemModal = false"
       />
 
       <CartModal
@@ -116,6 +121,13 @@ const route = useRoute();
 const client = useSupabaseClient();
 const { cartCount } = useCart();
 const showCart = ref(false);
+const showItemModal = ref(false);
+const selectedItem = ref({});
+
+const openItemModal = (item) => {
+  selectedItem.value = item;
+  showItemModal.value = true;
+};
 
 const {
   data: restaurant,
@@ -142,16 +154,27 @@ const {
   { lazy: true },
 );
 
-const activeCategory = ref("all");
+const activeCategory = ref("");
 const searchQuery = ref("");
 
 const categories = computed(() => {
-  const profileCats = restaurant.value?.categories?.length
+  return restaurant.value?.categories?.length
     ? restaurant.value.categories
     : ["Main", "Drinks", "Dessert"];
-
-  return ["all", ...profileCats];
 });
+
+watch(
+  categories,
+  (newCats) => {
+    if (newCats.length > 0) {
+      // If no category is selected OR current selected category is not in the new list
+      if (!activeCategory.value || !newCats.includes(activeCategory.value)) {
+        activeCategory.value = newCats[0];
+      }
+    }
+  },
+  { immediate: true },
+);
 
 const filteredItems = computed(() => {
   let items = (restaurant.value?.menu_items || []).filter(
@@ -159,7 +182,7 @@ const filteredItems = computed(() => {
   );
 
   // Filter by category
-  if (activeCategory.value !== "all") {
+  if (activeCategory.value) {
     items = items.filter((i) => i.category === activeCategory.value);
   }
 

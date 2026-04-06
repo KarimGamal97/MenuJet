@@ -51,6 +51,9 @@
             <div class="flex-grow min-w-0">
               <p class="font-bold text-gray-800 text-sm truncate">
                 {{ item.name }}
+                <span v-if="item.size" class="text-orange-600"
+                  >({{ item.size }})</span
+                >
               </p>
               <p class="text-orange-600 font-black text-sm mt-0.5">
                 {{ item.price * item.quantity }} {{ $t("currency") }}

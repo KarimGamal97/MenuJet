@@ -54,10 +54,10 @@ export const useOrders = () => {
       const idx = orders.value.findIndex((o) => o.id === orderId);
       const order = orders.value[idx];
       if (order) order.status = status;
-      $toast.success("Order status updated");
+      $toast.success(t("admin.order_status_updated"));
     } catch (err: any) {
       console.error("Update Status Error:", err);
-      $toast.error("Failed to update status");
+      $toast.error(t("admin.order_status_failed"));
     }
   };
 

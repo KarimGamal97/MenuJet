@@ -40,20 +40,30 @@
         <h2 class="text-xl md:text-2xl font-bold text-gray-800">
           {{ $t("admin.menu_title") }}
           <span
-            class="text-orange-600 bg-orange-50 px-3 py-1 rounded-xl text-sm md:text-base mr-2"
+            class="text-orange-600 bg-orange-50 px-3 py-1 rounded-xl text-sm md:text-base ml-2"
           >
             {{ items?.length || 0 }}
           </span>
         </h2>
-        <BaseButton
-          variant="primary"
-          icon="plus"
-          @click="openAddModal"
-          fullWidth
-          class="sm:w-auto"
-        >
-          {{ $t("admin.add_item") }}
-        </BaseButton>
+        <div class="flex gap-3 w-full sm:w-auto">
+          <BaseButton
+            variant="primary"
+            icon="plus"
+            @click="openAddModal"
+            class="flex-1 sm:flex-none sm:w-auto"
+          >
+            {{ $t("admin.add_item") }}
+          </BaseButton>
+          <BaseButton
+            v-if="profile?.slug"
+            variant="outline"
+            icon="journal"
+            @click="navigateToMenu"
+            class="flex-1 sm:flex-none sm:w-auto"
+          >
+            {{ $t("admin.view_menu") }}
+          </BaseButton>
+        </div>
       </div>
 
       <!-- Filter Section -->
@@ -67,7 +77,7 @@
           />
           <BaseIcon
             name="search"
-            class="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 opacity-30"
+            class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 opacity-30"
           />
         </div>
 
@@ -92,7 +102,7 @@
 
       <div
         v-if="filteredItems.length > 0"
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+        class="flex flex-row flex-wrap gap-4"
       >
         <MenuItemCard
           v-for="item in filteredItems"
@@ -101,6 +111,7 @@
           :is-admin="true"
           @edit="openEditModal"
           @delete="initiateDelete"
+          class="w-full md:w-[calc(50%-8px)] lg:w-[calc(33.333%-11px)]"
         />
       </div>
 
@@ -120,33 +131,73 @@
       :title="
         $t(editingId ? 'admin.edit_modal_title' : 'admin.add_modal_title')
       "
-      max-width="max-w-md"
+      max-width="max-w-md "
     >
-      <div class="space-y-4">
-        <BaseInput
-          v-model="newItem.name"
-          :label="$t('admin.item_name')"
-          :placeholder="$t('admin.item_name')"
-        />
+      <div class="space-y-4 mt-2">
+        <BaseInput v-model="newItem.name" :label="$t('admin.item_name')" />
 
-        <BaseInput
-          v-model="newItem.price"
-          type="number"
-          :label="$t('admin.item_price')"
-          :placeholder="$t('admin.item_price')"
-          oninput="
-            if (this.value.length > 5) this.value = this.value.slice(0, 5);
-          "
-        />
-
-        <BaseToggle
-          v-model="newItem.available"
-          :label="$t('admin.available') || 'متوفر للطلب'"
-        />
+        <!-- Size Selector + Price per size -->
+        <div class="space-y-2">
+          <label
+            class="text-[10px] font-black text-gray-400 px-1 uppercase tracking-wider block"
+          >
+            {{ $t("admin.item_size") }}
+          </label>
+          <div class="flex gap-2">
+            <button
+              v-for="size in ['sm', 'md', 'lg']"
+              :key="size"
+              type="button"
+              @click="newItem.activeSize = size"
+              :class="[
+                'flex-1 py-3 rounded-2xl font-bold text-sm transition-all border-2',
+                newItem.activeSize === size
+                  ? 'bg-orange-600 text-white border-orange-600 shadow-md shadow-orange-100'
+                  : 'bg-gray-50 text-gray-400 border-transparent hover:border-orange-200 hover:text-orange-600',
+              ]"
+            >
+              {{ size }}
+            </button>
+          </div>
+          <!-- Price for active size -->
+          <div class="pt-1">
+            <BaseInput
+              v-model="newItem.prices[newItem.activeSize]"
+              type="number"
+              :label="`سعر ${newItem.activeSize.toUpperCase()}`"
+              oninput="
+                if (this.value.length > 5) this.value = this.value.slice(0, 5);
+              "
+            />
+          </div>
+          <!-- Quick overview of all prices -->
+          <div class="flex gap-2 pt-1">
+            <div
+              v-for="s in ['sm', 'md', 'lg']"
+              :key="s"
+              class="flex-1 bg-gray-50 rounded-xl p-2 text-center border border-gray-100"
+            >
+              <p class="text-[9px] font-black text-gray-400 uppercase mb-0.5">
+                {{ s }}
+              </p>
+              <p
+                class="text-xs font-black"
+                :class="newItem.prices[s] ? 'text-gray-700' : 'text-gray-300'"
+              >
+                {{ newItem.prices[s] || "—" }}
+              </p>
+            </div>
+          </div>
+        </div>
 
         <div class="space-y-2 relative">
           <!-- Custom Dropdown -->
           <div class="relative">
+            <label
+              class="absolute -top-2 right-3 bg-white px-1.5 text-[10px] font-black uppercase tracking-wider text-gray-400 group-focus-within:text-orange-500 transition-colors z-10 pointer-events-none flex gap-2"
+            >
+              <span>{{ $t("admin.item_category") }}</span>
+            </label>
             <button
               type="button"
               @click="isCategoryDropdownOpen = !isCategoryDropdownOpen"
@@ -190,6 +241,30 @@
           ></div>
         </div>
 
+        <!-- Short Description -->
+        <div class="relative group !mt-6">
+          <label
+            class="absolute -top-2 right-3 bg-white px-1.5 text-[10px] font-black uppercase tracking-wider text-gray-400 group-focus-within:text-orange-500 transition-colors z-10 pointer-events-none flex gap-2"
+          >
+            <span>{{ $t("admin.item_description") }}</span>
+            <span
+              :class="
+                newItem.description.length >= 30
+                  ? 'text-red-400'
+                  : 'text-gray-300'
+              "
+              >{{ newItem.description.length }}/30</span
+            >
+          </label>
+          <textarea
+            v-model="newItem.description"
+            :placeholder="$t('admin.item_description_placeholder')"
+            :maxlength="30"
+            rows="2"
+            class="w-full p-4 bg-white border-2 border-gray-200 rounded-2xl outline-none focus:border-orange-500 transition-all text-sm font-bold text-gray-800 resize-none"
+          />
+        </div>
+
         <div class="space-y-2">
           <label
             class="text-[10px] font-black text-gray-400 px-1 uppercase tracking-wider block"
@@ -197,21 +272,32 @@
           >
           <div class="flex items-center gap-4">
             <div
-              class="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center overflow-hidden border border-gray-200 shrink-0"
+              class="relative w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center overflow-hidden border border-gray-200 shrink-0"
             >
+              <template v-if="imageUploading">
+                <div
+                  class="absolute inset-0 bg-white/50 flex items-center justify-center z-10"
+                >
+                  <div
+                    class="w-5 h-5 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"
+                  ></div>
+                </div>
+              </template>
               <img
                 v-if="imageUrl"
                 :src="imageUrl"
                 class="w-full h-full object-cover"
+                :class="{ 'opacity-50': imageUploading }"
               />
               <BaseIcon v-else name="photo" class="w-6 h-6 text-gray-300" />
             </div>
             <label class="flex-1 cursor-pointer">
               <div
                 class="bg-white border-2 border-dashed border-gray-200 p-4 rounded-2xl text-center hover:border-orange-500 transition-colors"
+                :class="{ 'opacity-50 cursor-not-allowed': imageUploading }"
               >
                 <span class="text-xs font-bold text-gray-500">{{
-                  uploadLoading
+                  imageUploading
                     ? $t("admin.uploading_image")
                     : "انقر لاختيار صوره"
                 }}</span>
@@ -221,11 +307,16 @@
                 @change="handleFileUpload"
                 accept="image/*"
                 class="hidden"
-                :disabled="uploadLoading"
+                :disabled="imageUploading"
               />
             </label>
           </div>
         </div>
+
+        <BaseToggle
+          v-model="newItem.available"
+          :label="$t('admin.available')"
+        />
       </div>
 
       <template #footer>
@@ -279,10 +370,17 @@ const itemToDelete = ref(null);
 const editingId = ref(null);
 const isCategoryDropdownOpen = ref(false);
 const imageUrl = ref("");
-const newItem = ref({ name: "", price: "", category: "", available: true });
+const newItem = ref({
+  name: "",
+  prices: { sm: "", md: "", lg: "" },
+  activeSize: "sm",
+  category: "",
+  available: true,
+  description: "",
+});
 
 const searchQuery = ref("");
-const selectedCategory = ref("الكل");
+const selectedCategory = ref("");
 
 // Categories Logic
 const availableCategories = computed(() => {
@@ -291,15 +389,15 @@ const availableCategories = computed(() => {
     : ["Main", "Drinks", "Dessert"];
 });
 
-const dynamicCategories = computed(() => [
-  "الكل",
-  ...availableCategories.value,
-]);
+const dynamicCategories = computed(() => availableCategories.value);
 
 // Initialize Data
 onMounted(async () => {
   if (userId.value) {
-    await Promise.all([fetchMenuItems(userId.value), fetchProfile(userId.value)]);
+    await Promise.all([
+      fetchMenuItems(userId.value),
+      fetchProfile(userId.value),
+    ]);
   }
 });
 
@@ -307,6 +405,9 @@ onMounted(async () => {
 watchEffect(() => {
   if (!newItem.value.category && availableCategories.value.length) {
     newItem.value.category = availableCategories.value[0];
+  }
+  if (!selectedCategory.value && availableCategories.value.length) {
+    selectedCategory.value = availableCategories.value[0];
   }
 });
 
@@ -318,6 +419,7 @@ const filteredItems = computed(() => {
       ?.toLowerCase()
       .includes(searchQuery.value.toLowerCase());
     const matchesCategory =
+      !selectedCategory.value ||
       selectedCategory.value === "الكل" ||
       item.category === selectedCategory.value;
     return matchesSearch && matchesCategory;
@@ -325,6 +427,12 @@ const filteredItems = computed(() => {
 });
 
 // Actions
+const navigateToMenu = () => {
+  if (profile.value?.slug) {
+    window.open(`/menu/${profile.value.slug}`, "_blank");
+  }
+};
+
 const handleFileUpload = async (event) => {
   const file = event.target.files[0];
   if (!file || !userId.value) return;
@@ -337,9 +445,11 @@ const openAddModal = () => {
   editingId.value = null;
   newItem.value = {
     name: "",
-    price: "",
+    prices: { sm: "", md: "", lg: "" },
+    activeSize: "sm",
     category: availableCategories.value[0],
     available: true,
+    description: "",
   };
   imageUrl.value = "";
   isModalOpen.value = true;
@@ -349,9 +459,15 @@ const openEditModal = (item) => {
   editingId.value = item.id;
   newItem.value = {
     name: item.name,
-    price: item.price,
+    prices: item.prices || {
+      sm: item.price || "",
+      md: item.price || "",
+      lg: item.price || "",
+    },
+    activeSize: "sm",
     category: item.category,
     available: item.available !== false,
+    description: item.description || "",
   };
   imageUrl.value = item.image || "";
   isModalOpen.value = true;
@@ -360,14 +476,29 @@ const openEditModal = (item) => {
 const handleSaveItem = async () => {
   if (!userId.value) return;
 
-  if (!newItem.value.name || !newItem.value.price || !newItem.value.category) {
+  const { name, prices, category } = newItem.value;
+  const hasPrices = prices.sm || prices.md || prices.lg;
+  if (!name || !hasPrices || !category) {
     return $toast.error($t("admin.error_fields"));
   }
 
+  // Convert prices to numbers, keep only filled ones
+  const cleanPrices = {};
+  for (const s of ["sm", "md", "lg"]) {
+    if (prices[s]) cleanPrices[s] = Number(prices[s]);
+  }
+
+  // Use smallest price as the display price (for card)
+  const displayPrice = Math.min(...Object.values(cleanPrices));
+
   const itemData = {
-    ...newItem.value,
-    price: Number(newItem.value.price),
+    name: newItem.value.name,
+    category: newItem.value.category,
+    available: newItem.value.available,
+    description: newItem.value.description,
     image: imageUrl.value || null,
+    prices: cleanPrices,
+    price: displayPrice,
   };
 
   let result;

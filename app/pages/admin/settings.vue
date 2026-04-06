@@ -36,30 +36,41 @@
           >
           <div class="flex items-center gap-4">
             <div
-              class="w-20 h-20 bg-gray-100 rounded-3xl flex items-center justify-center overflow-hidden border-2 border-dashed border-gray-200"
+              class="relative w-20 h-20 bg-gray-100 rounded-3xl flex items-center justify-center overflow-hidden border-2 border-dashed border-gray-200 shrink-0"
             >
+              <template v-if="logoUploading">
+                <div
+                  class="absolute inset-0 bg-white/50 flex items-center justify-center z-10"
+                >
+                  <div
+                    class="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"
+                  ></div>
+                </div>
+              </template>
               <img
                 v-if="form.logo"
                 :src="form.logo"
                 class="w-full h-full object-cover"
+                :class="{ 'opacity-50': logoUploading }"
               />
-              <BaseIcon name="photo" class="w-8 h-8 opacity-20" />
+              <BaseIcon v-else name="photo" class="w-8 h-8 opacity-20" />
             </div>
             <label class="cursor-pointer">
               <BaseButton
                 variant="outline"
                 size="sm"
-                :loading="uploading"
-                class="pointer-events-none"
+                :loading="logoUploading"
+                @click="$refs.logoInput.click()"
               >
                 {{ $t("admin.choose_logo") }}
               </BaseButton>
               <input
+                ref="logoInput"
                 type="file"
                 class="hidden"
                 @change="uploadLogo"
                 accept="image/*"
-                :disabled="uploading"
+                :disabled="logoUploading"
               />
             </label>
           </div>
@@ -140,7 +151,6 @@
             :label="$t('admin.whatsapp_number')"
             :placeholder="$t('admin.whatsapp_placeholder')"
             icon="phone"
-            dir="ltr"
           />
         </div>
 
@@ -148,14 +158,45 @@
         <div class="md:col-span-2">
           <BaseToggle
             v-model="form.is_active"
-            label="حالة المطعم (جاهزون لاستقبال طلباتك)"
+            :label="$t('admin.restaurant_status_label')"
             class="!bg-orange-50/30 !border !border-orange-100/50"
           />
         </div>
 
+        <!-- Delete Category Confirmation Modal -->
+        <BaseModal
+          :isOpen="showDeleteCategoryModal"
+          @close="showDeleteCategoryModal = false"
+          :title="$t('admin.delete_category_title')"
+          :subtitle="$t('admin.delete_category_subtitle')"
+          icon="trash"
+          iconColor="bg-red-50 text-red-600"
+          :showClose="false"
+          max-width="max-w-sm"
+        >
+          <template #footer>
+            <div class="flex gap-3">
+              <BaseButton
+                variant="secondary"
+                fullWidth
+                @click="showDeleteCategoryModal = false"
+              >
+                {{ $t("admin.cancel") }}
+              </BaseButton>
+              <BaseButton
+                variant="danger"
+                fullWidth
+                @click="confirmRemoveCategory"
+              >
+                {{ $t("admin.confirm_delete") }}
+              </BaseButton>
+            </div>
+          </template>
+        </BaseModal>
+
         <!--  Categories -->
         <div class="md:col-span-2 pt-4">
-          <div class="flex items-center justify-between mb-4 px-1">
+          <div class="flex items-center gap-3 mb-4 px-1">
             <label class="text-sm font-bold text-gray-700">{{
               $t("admin.menu_sections")
             }}</label>
@@ -164,24 +205,6 @@
               >{{ form.categories.length }}
               {{ $t("admin.sections_count") }}</span
             >
-          </div>
-
-          <div
-            class="flex flex-wrap gap-2 mb-6 min-h-[50px] p-3 bg-gray-50/50 rounded-2xl border border-dashed border-gray-200"
-          >
-            <div
-              v-for="(cat, index) in form.categories"
-              :key="index"
-              class="bg-white text-gray-700 px-4 py-2 rounded-xl flex items-center gap-2 border border-gray-100 shadow-sm animate-in zoom-in duration-200 group hover:border-orange-200"
-            >
-              <span class="font-bold text-sm">{{ cat }}</span>
-              <button
-                @click="removeCategory(index)"
-                class="text-gray-300 hover:text-red-500 transition-colors flex items-center justify-center p-1"
-              >
-                <BaseIcon name="close" class="w-4 h-4" />
-              </button>
-            </div>
           </div>
 
           <div class="flex gap-3 items-end">
@@ -197,6 +220,24 @@
               class="!w-14 !h-14 !p-0 !grow-0 shrink-0"
             />
           </div>
+
+          <div
+            class="flex flex-wrap gap-2 mt-6 min-h-[50px] p-3 bg-gray-50/50 rounded-2xl border border-dashed border-gray-200"
+          >
+            <div
+              v-for="(cat, index) in form.categories"
+              :key="index"
+              class="bg-white text-gray-700 px-4 py-2 rounded-xl flex items-center gap-2 border border-gray-100 shadow-sm animate-in zoom-in duration-200 group hover:border-orange-200"
+            >
+              <span class="font-bold text-sm">{{ cat }}</span>
+              <button
+                @click="initiateRemoveCategory(index)"
+                class="text-gray-300 hover:text-red-500 transition-colors flex items-center justify-center p-1"
+              >
+                <BaseIcon name="close" class="w-4 h-4" />
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -205,7 +246,7 @@
           variant="primary"
           size="lg"
           fullWidth
-          :loading="loading"
+          :loading="actionLoading"
           @click="saveSettings"
           class="!font-bold"
         >
@@ -231,6 +272,8 @@ const {
   updateProfile,
   uploadLogo: uploadLogoAction,
 } = useSettings();
+
+const { deleteItemsByCategory } = useMenu();
 
 const newCategory = ref("");
 const form = ref({
@@ -308,11 +351,33 @@ const addCategory = () => {
   newCategory.value = "";
 };
 
-const removeCategory = (index) => {
+const showDeleteCategoryModal = ref(false);
+const categoryToDeleteIndex = ref(null);
+
+const removeCategory = async (index) => {
   if (form.value.categories.length <= 1) {
     return $toast.error($t("admin.at_least_one_category"));
   }
+  const catName = form.value.categories[index];
   form.value.categories.splice(index, 1);
+  if (userId.value && catName) {
+    await deleteItemsByCategory(catName, userId.value);
+  }
+};
+
+const initiateRemoveCategory = (index) => {
+  if (form.value.categories.length <= 1) {
+    return $toast.error($t("admin.at_least_one_category"));
+  }
+  categoryToDeleteIndex.value = index;
+  showDeleteCategoryModal.value = true;
+};
+
+const confirmRemoveCategory = async () => {
+  if (categoryToDeleteIndex.value === null) return;
+  await removeCategory(categoryToDeleteIndex.value);
+  categoryToDeleteIndex.value = null;
+  showDeleteCategoryModal.value = false;
 };
 
 const uploadLogo = async (event) => {
@@ -334,7 +399,7 @@ const saveSettings = async () => {
       .replace(/-+/g, "-"),
   };
 
-  await updateProfile(userId, settingsData);
+  await updateProfile(userId.value, settingsData);
 };
 </script>
 
