@@ -6,17 +6,13 @@
       class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center h-full"
     >
       <!-- Brand Logo & Status -->
-      <div class="flex flex-col items-center gap-1.5 shrink-0">
+      <div class="flex flex-col items-center shrink-0">
         <div
-          class="w-50 h-14 bg-gray-100 rounded-[1.25rem] flex items-center justify-center overflow-hidden border-2 border-white shadow-sm ring-1 ring-gray-100 transition-transform active:scale-95"
+          class="flex items-center justify-center overflow-hidden transition-transform mb-1"
         >
-          <img
-            v-if="restaurant.logo"
-            :src="restaurant.logo"
-            class="w-full h-full object-cover"
-            :alt="restaurant.business_name"
-          />
-          <BaseIcon v-else name="food" class="w-7 h-7 text-gray-200" />
+          <span class="text-orange-600 font-black capitalize">
+            {{ getLocaleTxt(restaurant, "business_name") }}
+          </span>
         </div>
 
         <!-- Status Badge below Logo -->

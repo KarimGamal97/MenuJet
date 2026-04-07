@@ -30,7 +30,7 @@
         </div>
 
         <!-- Logo Upload Section -->
-        <div class="md:col-span-2 mb-4">
+        <!-- <div class="md:col-span-2 mb-4">
           <label class="block text-sm font-bold mb-3 text-gray-700 px-1"
             >شعار المطعم</label
           >
@@ -74,7 +74,7 @@
               />
             </label>
           </div>
-        </div>
+        </div> -->
 
         <!-- رابط المنيو -->
         <div class="md:col-span-2">
