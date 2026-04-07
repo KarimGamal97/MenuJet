@@ -11,7 +11,7 @@
           class="flex items-center justify-center overflow-hidden transition-transform mb-1"
         >
           <span class="text-orange-600 font-black capitalize">
-            {{ getLocaleTxt(restaurant, "business_name") }}
+            {{ restaurant.business_name }}
           </span>
         </div>
 

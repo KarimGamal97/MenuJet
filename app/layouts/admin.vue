@@ -90,7 +90,7 @@
             {{
               isCollapsed && profile?.business_name
                 ? profile.business_name[0]
-                : profile?.business_name || "MenuJet"
+                : profile?.business_name
             }}
           </h1>
         </div>
