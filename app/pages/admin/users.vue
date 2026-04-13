@@ -6,12 +6,12 @@
       <div v-if="showAddModal" class="fixed inset-0 z-[100] flex items-center justify-center p-6">
         <div class="absolute inset-0 bg-black bg-opacity-30 backdrop-blur-sm" @click="closeModal" />
         <div class="bg-white rounded-[2rem] p-8 max-w-md w-full relative z-[110] shadow-2xl border border-gray-100" dir="rtl">
-          <h2 class="text-xl font-black text-gray-900 mb-1">إضافة مستخدم جديد</h2>
-          <p class="text-gray-400 text-sm mb-6">سيتم إنشاء حساب جديد مباشرة</p>
+          <h2 class="text-xl font-black text-gray-900 mb-1">{{ $t('admin.users_page.add_user_title') }}</h2>
+          <p class="text-gray-400 text-sm mb-6">{{ $t('admin.users_page.add_user_msg') }}</p>
 
           <div class="space-y-4">
             <div>
-              <label class="block text-sm font-bold text-gray-700 mb-1">البريد الإلكتروني</label>
+              <label class="block text-sm font-bold text-gray-700 mb-1">{{ $t('admin.users_page.email') }}</label>
               <input
                 v-model="newUser.email"
                 type="email"
@@ -21,7 +21,7 @@
             </div>
 
             <div>
-              <label class="block text-sm font-bold text-gray-700 mb-1">كلمة المرور</label>
+              <label class="block text-sm font-bold text-gray-700 mb-1">{{ $t('admin.users_page.password') }}</label>
               <input
                 v-model="newUser.password"
                 type="password"
@@ -31,7 +31,7 @@
             </div>
 
             <p class="text-xs text-gray-400 bg-gray-50 rounded-2xl p-3">
-              📌 سيتم ربط هذا الحساب تلقائياً بمطعمك الحالي
+              {{ $t('admin.users_page.auto_link_msg') }}
             </p>
 
 
@@ -42,14 +42,14 @@
               @click="closeModal"
               class="flex-1 py-3 bg-gray-50 text-gray-400 rounded-2xl font-bold hover:bg-gray-100 transition-colors"
             >
-              إلغاء
+              {{ $t('admin.users_page.cancel') }}
             </button>
             <button
               @click="createUser"
               :disabled="creating"
               class="flex-1 py-3 bg-orange-500 text-white rounded-2xl font-bold hover:bg-orange-600 transition-colors disabled:opacity-50"
             >
-              {{ creating ? 'جاري الإنشاء...' : 'إنشاء الحساب' }}
+              {{ creating ? $t('admin.users_page.creating_account') : $t('admin.users_page.create_account') }}
             </button>
           </div>
         </div>
@@ -64,22 +64,22 @@
           <div class="w-12 h-12 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center mb-4">
             <span class="text-2xl font-black text-red-500 line-through">!</span>
           </div>
-          <h2 class="text-xl font-black text-red-600 mb-1">مسح مستخدم نهائياً</h2>
-          <p class="text-gray-500 text-sm mb-6">هل أنت متأكد من مسح حساب <span class="font-bold text-gray-900">{{ userToDelete?.email || userToDelete?.full_name || 'هذا المستخدم' }}</span> نهائياً؟ هذا الإجراء سيقوم بمسح أوردراته وبياناته وسيؤدي لتسجيل خروجه فوراً.</p>
+          <h2 class="text-xl font-black text-red-600 mb-1">{{ $t('admin.users_page.delete_user_title') }}</h2>
+          <p class="text-gray-500 text-sm mb-6">{{ $t('admin.users_page.delete_user_confirm_pt1') }} <span class="font-bold text-gray-900">{{ userToDelete?.email || userToDelete?.full_name || $t('admin.users_page.default_user') }}</span> {{ $t('admin.users_page.delete_user_confirm_pt2') }}</p>
 
           <div class="flex gap-3 mt-8">
             <button
               @click="closeDeleteModal"
               class="flex-1 py-3 bg-gray-50 text-gray-400 rounded-2xl font-bold hover:bg-gray-100 transition-colors"
             >
-              إلغاء
+              {{ $t('admin.users_page.cancel') }}
             </button>
             <button
               @click="deleteUser"
               :disabled="deleting"
               class="flex-1 py-3 bg-red-600 text-white rounded-2xl font-bold hover:bg-red-700 transition-colors disabled:opacity-50"
             >
-              {{ deleting ? 'جاري المسح...' : 'مسح الحساب' }}
+              {{ deleting ? $t('admin.users_page.deleting') : $t('admin.users_page.delete_account') }}
             </button>
           </div>
         </div>
@@ -90,20 +90,20 @@
     <div class="flex flex-col-reverse md:flex-row justify-between items-start md:items-center gap-5 mb-8 w-full">
       <div class="flex flex-row items-center gap-3 w-full md:w-auto">
          <div class="bg-orange-50 flex items-center justify-center text-orange-600 px-4 py-3 rounded-xl font-bold text-sm whitespace-nowrap">
-          إجمالي: {{ users.length }}
+          {{ $t('admin.users_page.total') }} {{ users.length }}
         </div>
         <button
           @click="showAddModal = true"
           class="flex-1 md:flex-none justify-center flex items-center gap-2 bg-orange-500 text-white px-5 py-3 rounded-2xl font-bold text-sm hover:bg-orange-600 transition-all shadow-sm shadow-orange-100"
         >
           <span class="text-lg leading-none">+</span>
-          إضافة مستخدم
+          {{ $t('admin.users_page.add_user') }}
         </button>
        
       </div>
       <div class="w-full text-right">
-        <h1 class="text-2xl font-black text-gray-900">إدارة المستخدمين</h1>
-        <p class="text-gray-500 text-sm mt-1">يمكنك ترقية المستخدمين أو تعديل صلاحياتهم من هنا</p>
+        <h1 class="text-2xl font-black text-gray-900">{{ $t('admin.users_page.users_title') }}</h1>
+        <p class="text-gray-500 text-sm mt-1">{{ $t('admin.users_page.users_subtitle') }}</p>
       </div>
     </div>
 
@@ -112,9 +112,9 @@
       <table class="w-full text-right border-separate border-spacing-y-2" dir="rtl">
         <thead>
           <tr class="text-gray-400 text-sm">
-            <th class="pb-4 pr-6 font-medium text-right whitespace-nowrap">المستخدم</th>
-            <th class="pb-4 font-medium text-center whitespace-nowrap">الصلاحية الحالية</th>
-            <th class="pb-4 font-medium text-left pl-6 whitespace-nowrap">الإجراءات</th>
+            <th class="pb-4 pr-6 font-medium text-right whitespace-nowrap">{{ $t('admin.users_page.user') }}</th>
+            <th class="pb-4 font-medium text-center whitespace-nowrap">{{ $t('admin.users_page.current_role') }}</th>
+            <th class="pb-4 font-medium text-left pl-6 whitespace-nowrap">{{ $t('admin.users_page.actions') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -126,9 +126,9 @@
                 </div>
                 <div>
                   <div class="font-bold text-gray-900">
-                    {{ user.full_name || user.email?.split('@')[0] || 'مستخدم' }}
+                    {{ user.full_name || user.email?.split('@')[0] || $t('admin.users_page.default_user') }}
                   </div>
-                  <div class="text-xs text-gray-400">{{ user.business_name_ar }}</div>
+                  <div class="text-xs text-gray-400">{{ user.business_name_ar || $t('admin.users_page.restaurant_not_found') }}</div>
                 </div>
               </div>
             </td>
@@ -146,7 +146,7 @@
                   @click="confirmDeleteUser(user)"
                   class="bg-white text-red-600 border border-red-50 px-4 py-2 rounded-xl text-xs font-bold hover:bg-red-50 hover:border-red-200 transition-all shadow-sm"
                 >
-                  مسح
+                  {{ $t('admin.users_page.delete') }}
                 </button>
               </div>
             </td>
@@ -156,7 +156,7 @@
     </div>
 
     <div v-if="users.length === 0" class="py-20 text-center">
-      <p class="text-gray-400">لا يوجد مستخدمين مسجلين حالياً</p>
+      <p class="text-gray-400">{{ $t('admin.users_page.no_users') }}</p>
     </div>
   </div>
 </template>
@@ -169,6 +169,7 @@ definePageMeta({
 
 const client = useSupabaseClient()
 const { $toast } = useNuxtApp()
+const { t } = useI18n()
 const users = ref<any[]>([])
 
 // Modal state
@@ -199,7 +200,7 @@ const closeDeleteModal = () => {
 // Create user via secure server API
 const createUser = async () => {
   if (!newUser.value.email || !newUser.value.password) {
-    $toast.error('الإيميل وكلمة المرور مطلوبان')
+    $toast.error(t('admin.users_page.email_pass_req'))
     return
   }
   creating.value = true
@@ -208,11 +209,11 @@ const createUser = async () => {
       method: 'POST',
       body: newUser.value,
     })
-    $toast.success('تم إنشاء الحساب بنجاح!')
+    $toast.success(t('admin.users_page.create_success'))
     closeModal()
     await fetchUsers()
   } catch (err: any) {
-    $toast.error(err?.data?.message || 'حدث خطأ أثناء الإنشاء')
+    $toast.error(err?.data?.message || t('admin.users_page.create_error'))
   } finally {
     creating.value = false
   }
@@ -227,7 +228,7 @@ const fetchUsers = async () => {
 
   if (error) {
     console.error(error)
-    $toast.error('فشل تحميل المستخدمين')
+    $toast.error(t('admin.users_page.fetch_users_error'))
   } else {
     users.value = data
   }
@@ -242,12 +243,12 @@ const deleteUser = async () => {
       method: 'DELETE',
       body: { profileId: userToDelete.value.id },
     })
-    $toast.success('تم مسح الحساب نهائياً')
+    $toast.success(t('admin.users_page.delete_success'))
     closeDeleteModal()
     await fetchUsers()
   } catch (err: any) {
     console.error('Delete error:', err)
-    $toast.error(err?.data?.message || 'حدث خطأ أثناء المسح')
+    $toast.error(err?.data?.message || t('admin.users_page.delete_error'))
   } finally {
     deleting.value = false
   }

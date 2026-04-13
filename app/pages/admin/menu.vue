@@ -214,7 +214,7 @@
             <BaseInput
               v-model="newItem.prices[newItem.activeSize]"
               type="number"
-              :label="`سعر ${newItem.activeSize.toUpperCase()}`"
+              :label="`${$t('admin.price_word')} ${newItem.activeSize.toUpperCase()}`"
               oninput="
                 if (this.value.length > 5) this.value = this.value.slice(0, 5);
               "
@@ -267,7 +267,7 @@
             <input
               v-model="opt.price"
               type="number"
-              placeholder="السعر"
+              :placeholder="$t('admin.the_price')"
               class="w-20 py-3 px-3 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-orange-400 outline-none font-bold text-sm text-gray-800 transition-colors"
               oninput="
                 if (this.value.length > 5) this.value = this.value.slice(0, 5);
@@ -281,7 +281,7 @@
           <BaseInput
             v-model="newItem.fixedPrice"
             type="number"
-            label="السعر الثابت"
+            :label="$t('admin.fixed_price')"
             oninput="
               if (this.value.length > 5) this.value = this.value.slice(0, 5);
             "

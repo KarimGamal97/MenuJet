@@ -103,7 +103,47 @@
     "order_confirm_btn": "Complete Order",
     "status_available": "Available Now",
     "status_closed": "Closed Currently",
-    "choose_logo": "Choose Logo"
+    "choose_logo": "Choose Logo",
+    "users_page": {
+      "users_title": "Manage Users",
+      "users_subtitle": "You can upgrade users or modify their permissions here",
+      "add_user_title": "Add New User",
+      "add_user_msg": "A new account will be created directly",
+      "email": "Email",
+      "password": "Password",
+      "auto_link_msg": "📌 This account will be automatically linked to your current restaurant",
+      "create_account": "Create Account",
+      "creating_account": "Creating...",
+      "delete_user_title": "Delete User Permanently",
+      "delete_user_confirm_pt1": "Are you sure you want to permanently delete ",
+      "delete_user_confirm_pt2": " account? This will delete orders and data, and force logout.",
+      "deleting": "Deleting...",
+      "delete_account": "Delete Account",
+      "total": "Total: ",
+      "add_user": "Add User",
+      "user": "User",
+      "current_role": "Current Role",
+      "actions": "Actions",
+      "default_user": "User",
+      "delete": "Delete",
+      "no_users": "No users registered currently",
+      "email_pass_req": "Email and password are required",
+      "create_success": "Account created successfully!",
+      "create_error": "An error occurred during creation",
+      "fetch_users_error": "Failed to load users",
+      "delete_success": "Account permanently deleted",
+      "delete_error": "An error occurred while deleting"
+    },
+    "search_btn": "Search",
+    "copy_success": "Link copied successfully!",
+    "pricing_type": "Pricing Type",
+    "price_word": "Price",
+    "qty_pieces": "Quantity / Pieces",
+    "the_price": "Price",
+    "fixed_price": "Fixed Price",
+    "click_image": "Click to select image",
+    "example": "Example: ",
+    "piece": "Piece"
   },
   "cart": {
     "title": "Your Order",
@@ -128,6 +168,8 @@
     "total": "Total"
   },
   "menu": {
-    "no_items": "No items in this section"
+    "no_items": "No items in this section",
+    "restaurant_not_found": "Restaurant Not Found",
+    "restaurant_not_found_desc": "Sorry, we couldn't find a menu with this name. Please make sure you scanned the correct restaurant QR code."
   }
 }

@@ -316,6 +316,7 @@ definePageMeta({ layout: "admin", middleware: "auth" });
 
 const { userId } = useAuthUser();
 const { $toast } = useNuxtApp();
+const { t } = useI18n();
 
 // Composables
 const {
@@ -375,7 +376,7 @@ const qrUrl = computed(() => {
 
 const copyMenuUrl = () => {
   navigator.clipboard.writeText(menuUrl.value);
-  $toast.success("تم نسخ الرابط بنجاح!");
+  $toast.success(t("admin.copy_success"));
 };
 
 const downloadQr = async () => {

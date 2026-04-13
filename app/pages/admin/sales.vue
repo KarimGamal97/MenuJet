@@ -36,7 +36,7 @@
             :loading="loading"
             class="!h-[52px] !px-8 !bg-green-600 hover:!bg-green-700 shadow-lg shadow-green-100 transition-transform active:scale-95"
           >
-            بحث
+            {{ $t("admin.search_btn") }}
           </BaseButton>
         </div>
       </div>

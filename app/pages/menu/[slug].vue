@@ -115,10 +115,9 @@
         <div class="mb-6">
           <BaseIcon name="not-found" class="w-24 h-24 text-gray-200" />
         </div>
-        <h2 class="text-2xl font-black text-orange-600">المطعم غير موجود</h2>
+        <h2 class="text-2xl font-black text-orange-600">{{ $t('menu.restaurant_not_found') }}</h2>
         <p class="text-gray-400 mt-3 max-w-[280px] mx-auto leading-relaxed">
-          عذراً، لم نتمكن من العثور على منيو بهذا الاسم. يرجى التأكد من مسح كود
-          QR الصحيح للمطعم.
+          {{ $t('menu.restaurant_not_found_desc') }}
         </p>
       </div>
     </template>
