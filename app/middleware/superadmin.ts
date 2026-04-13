@@ -1,18 +1,24 @@
 // middleware/superadmin.ts
 export default defineNuxtRouteMiddleware(async (to, from) => {
-  const authStore = useAuthStore();
+  const user = useSupabaseUser();
 
-  const varPcb = useSupabaseUser();
-
-  if (!varPcb.value) {
-    return navigateTo("/login");
+  if (import.meta.server) {
+    const { auth } = useSupabaseClient();
+    const {
+      data: { session },
+    } = await auth.getSession();
+    if (!session) return navigateTo("/login");
+  } else {
+    if (!user.value) return navigateTo("/login");
   }
+
+  const authStore = useAuthStore();
 
   if (!authStore.profile) {
     await authStore.fetchUserProfile();
   }
 
   if (!authStore.isSuperAdmin) {
-    return navigateTo("/unauthorized");
+    return navigateTo("/admin/dashboard");
   }
 });

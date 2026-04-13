@@ -227,7 +227,7 @@ const decrease = () => {
 };
 
 const handleAdd = () => {
-  const itemInfo = { ...props.item, price: currentPrice.value };
+  const itemInfo = { ...props.item, price: currentPrice.value, size: undefined };
   if (pricingType.value === "size") itemInfo.size = selectedSize.value;
   if (pricingType.value === "count")
     itemInfo.size = selectedCount.value + " قطعة";

@@ -42,7 +42,7 @@
               @click="closeModal"
               class="flex-1 py-3 bg-gray-50 text-gray-400 rounded-2xl font-bold hover:bg-gray-100 transition-colors"
             >
-              {{ $t('admin.users_page.cancel') }}
+              {{ $t('admin.users_page_cancel') }}
             </button>
             <button
               @click="createUser"
@@ -72,7 +72,7 @@
               @click="closeDeleteModal"
               class="flex-1 py-3 bg-gray-50 text-gray-400 rounded-2xl font-bold hover:bg-gray-100 transition-colors"
             >
-              {{ $t('admin.users_page.cancel') }}
+              {{ $t('admin.users_page_cancel') }}ssssssssssss
             </button>
             <button
               @click="deleteUser"
@@ -128,7 +128,7 @@
                   <div class="font-bold text-gray-900">
                     {{ user.full_name || user.email?.split('@')[0] || $t('admin.users_page.default_user') }}
                   </div>
-                  <div class="text-xs text-gray-400">{{ user.business_name_ar || $t('admin.users_page.restaurant_not_found') }}</div>
+                  <div class="text-xs text-gray-400">{{ user.business_name_ar || users.find(u => u.role === 'super_admin')?.business_name_ar || $t('admin.users_page.restaurant_not_found') }}</div>
                 </div>
               </div>
             </td>

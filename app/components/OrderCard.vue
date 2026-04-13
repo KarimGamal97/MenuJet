@@ -54,10 +54,10 @@
           >
             {{ item.quantity }}
           </span>
-          <span class="font-bold text-gray-700 text-sm"
-            >{{ item.name }}
-            <span v-if="item.size">({{ item.size }})</span></span
-          >
+          <span class="flex flex-col leading-tight">
+            <span v-if="item.category" class="text-[10px] text-gray-400 font-bold">{{ item.category }}</span>
+            <span class="font-bold text-gray-700 text-sm">{{ item.name }}<span v-if="item.size"> ({{ item.size }})</span></span>
+          </span>
         </div>
         <span class="font-bold text-gray-900 text-sm">
           {{ item.price * item.quantity }}

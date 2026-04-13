@@ -18,6 +18,7 @@
     "success": "مرحباً بك مجدداً"
   },
   "admin": {
+    "users_page_cancel": "إلغاء",
     "dashboard": "الرئيسية",
     "menu": "قائمة الطعام",
     "settings": "الاعدادات",
@@ -175,7 +176,8 @@
       "create_error": "حدث خطأ أثناء الإنشاء",
       "fetch_users_error": "فشل تحميل المستخدمين",
       "delete_success": "تم مسح الحساب نهائياً",
-      "delete_error": "حدث خطأ أثناء المسح"
+      "delete_error": "حدث خطأ أثناء المسح",
+      "restaurant_not_found": "غير مرتبط بمطعم"
     },
     "search_btn": "بحث",
     "copy_success": "تم نسخ الرابط بنجاح!",
