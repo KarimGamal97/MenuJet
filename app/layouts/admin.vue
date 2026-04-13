@@ -88,9 +88,9 @@
             :class="isCollapsed ? 'text-xl' : 'text-lg'"
           >
             {{
-              isCollapsed && profile?.business_name
-                ? profile.business_name[0]
-                : profile?.business_name
+              isCollapsed && profileName
+                ? profileName[0]
+                : profileName
             }}
           </h1>
         </div>
@@ -143,6 +143,20 @@
           </NuxtLink>
 
           <NuxtLink
+            v-if="userRole === 'super_admin'"
+            to="/admin/sales"
+            class="flex items-center gap-3 p-4 rounded-2xl transition-all font-bold hover:bg-orange-50 text-gray-500 overflow-hidden group"
+            active-class="bg-orange-50 text-orange-600 shadow-sm shadow-orange-50"
+          >
+            <BaseIcon
+              name="chart"
+              class="w-6 h-6 shrink-0 group-hover:scale-110 transition-transform"
+            />
+            <span v-show="!isCollapsed" class="whitespace-nowrap">{{ $t("admin.sales") }}</span>
+          </NuxtLink>
+
+          <NuxtLink
+            v-if="userRole === 'super_admin'"
             to="/admin/settings"
             class="flex items-center gap-3 p-4 rounded-2xl transition-all font-bold hover:bg-orange-50 text-gray-500 overflow-hidden group"
             active-class="bg-orange-50 text-orange-600 shadow-sm shadow-orange-50"
@@ -156,8 +170,18 @@
             }}</span>
           </NuxtLink>
 
+          <NuxtLink
+            v-if="isSuperAdmin"
+            to="/admin/users"
+            class="flex items-center gap-3 p-4 rounded-2xl transition-all font-bold hover:bg-purple-50 text-gray-500 overflow-hidden group"
+            active-class="bg-purple-50 text-purple-600 shadow-sm"
+          >
+            <BaseIcon name="users" class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" />
+            <span v-show="!isCollapsed" class="whitespace-nowrap"> {{ $t("admin.users") }} </span>
+          </NuxtLink>
+
           <!-- Language Switcher Dropdown -->
-          <div class="relative">
+          <!-- <div class="relative">
             <button
               @click="isLangDropdownOpen = !isLangDropdownOpen"
               class="flex items-center gap-3 w-full p-4 text-gray-500 font-bold hover:bg-gray-50 rounded-2xl transition-all overflow-hidden"
@@ -179,8 +203,6 @@
                 {{ isLangDropdownOpen ? "▲" : "▼" }}
               </span>
             </button>
-
-            <!-- Language Dropdown Menu -->
             <transition
               enter-active-class="transition duration-100 ease-out"
               enter-from-class="transform scale-95 opacity-0"
@@ -213,7 +235,7 @@
                 </div>
               </div>
             </transition>
-          </div>
+          </div> -->
         </nav>
 
         <!-- Sidebar Footer -->
@@ -256,46 +278,69 @@
 </template>
 
 <script setup>
+const authStore = useAuthStore();
 const client = useSupabaseClient();
 const user = useSupabaseUser();
-const { locale, locales, setLocale } = useI18n();
+const { userRole } = useAuthUser();
 const { $toast } = useNuxtApp();
-const profile = ref(null);
-
-// UI States
 const isCollapsed = ref(false);
 const isMobileOpen = ref(false);
 const showLogoutModal = ref(false);
-const isLangDropdownOpen = ref(false);
 
-const fetchProfile = async () => {
-  if (!user.value) return;
-  const { data } = await client
-    .from("profiles")
-    .select("slug, business_name")
-    .eq("user_id", user.value.sub)
+// Local profile ref — direct fetch, no store dependency for display
+const localProfile = ref(null);
+
+const profileName = computed(() =>
+  localProfile.value?.business_name_ar ||
+  localProfile.value?.business_name_en ||
+  localProfile.value?.full_name ||
+  ''
+);
+
+const isSuperAdmin = computed(() => localProfile.value?.role === 'super_admin');
+
+const fetchProfile = async (userId) => {
+  const { data, error } = await client
+    .from('profiles')
+    .select('*')
+    .eq('user_id', userId)
     .single();
-  profile.value = data;
+
+  if (!error && data) {
+    // If this is a regular admin without a business name, fetch the owner's business name for display
+    if (data.role === 'admin' && data.owner_id && !data.business_name_ar) {
+      const { data: ownerData } = await client
+        .from('profiles')
+        .select('business_name_ar, business_name_en')
+        .eq('user_id', data.owner_id)
+        .single();
+        
+      if (ownerData) {
+        data.business_name_ar = ownerData.business_name_ar;
+        data.business_name_en = ownerData.business_name_en;
+      }
+    }
+
+    localProfile.value = data;
+    authStore.profile = data;
+  }
 };
 
-watch(
-  user,
-  (newUser) => {
-    if (newUser) fetchProfile();
-  },
-  { immediate: true },
-);
+// Use client.auth.getUser() — more reliable than useSupabaseUser() in layouts
+onMounted(async () => {
+  const { data: { user: authUser } } = await client.auth.getUser();
+  if (authUser?.id) {
+    await fetchProfile(authUser.id);
+  }
+});
 
 const handleLogout = async () => {
   showLogoutModal.value = false;
   await client.auth.signOut();
-  $toast.success($t("admin.logout_success"));
-  navigateTo("/login");
-};
-
-const changeLanguage = (code) => {
-  setLocale(code);
-  isLangDropdownOpen.value = false;
+  localProfile.value = null;
+  authStore.profile = null;
+  $toast.success('تم تسجيل الخروج بنجاح');
+  navigateTo('/login');
 };
 </script>
 

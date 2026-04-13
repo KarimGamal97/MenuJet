@@ -15,6 +15,7 @@ export const useOrders = () => {
 
   const fetchOrders = async (userId: string, page = 1, pageSize = 15) => {
     if (!userId) return;
+    console.log("Fetching orders for user/owner:", userId);
     loading.value = true;
 
     const start = (page - 1) * pageSize;
@@ -25,10 +26,15 @@ export const useOrders = () => {
         .from("orders")
         .select("*", { count: "exact" })
         .eq("user_id", userId)
+        .neq("status", "archived")
         .order("created_at", { ascending: false })
         .range(start, end);
 
-      if (error) throw error;
+      if (error) {
+        console.error("Supabase Error fetching orders:", error);
+        throw error;
+      }
+      console.log("Orders received:", data?.length || 0);
       orders.value = data || [];
       totalOrders.value = count || 0;
     } catch (err: any) {
@@ -63,10 +69,11 @@ export const useOrders = () => {
 
   const cleanupOrders = async (userId: string, type: string) => {
     if (!userId || !type) return;
-
     try {
-      let query = client.from("orders").delete().eq("user_id", userId);
-
+      let query = client
+        .from("orders")
+        .update({ status: "archived" })
+        .eq("user_id", userId);
       if (type === "completed") {
         query = query.eq("status", "completed");
       } else if (type === "old") {
@@ -74,10 +81,8 @@ export const useOrders = () => {
         cutoffDate.setDate(cutoffDate.getDate() - CLEANUP_DAYS_THRESHOLD);
         query = query.lt("created_at", cutoffDate.toISOString());
       }
-
       const { error } = await query;
       if (error) throw error;
-
       $toast.success(t("admin.cleanup_success"));
       return true;
     } catch (err: any) {

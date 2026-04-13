@@ -20,7 +20,7 @@ export interface OrderItem {
   quantity: number;
 }
 
-export type OrderStatus = "pending" | "completed";
+export type OrderStatus = "pending" | "completed" | "archived";
 
 export interface Order {
   id: number | string;

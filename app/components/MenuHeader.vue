@@ -1,6 +1,6 @@
 <template>
   <header
-    class="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100/50 transition-all duration-300 h-20"
+    class="sticky top-0 z-50 bg-orange-600 backdrop-blur-xl transition-all duration-300 h-20"
   >
     <div
       class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center h-full"
@@ -10,7 +10,7 @@
         <div
           class="flex items-center justify-center overflow-hidden transition-transform mb-1"
         >
-          <span class="text-orange-600 font-black capitalize">
+          <span class="text-white font-black capitalize">
             {{ restaurant.business_name }}
           </span>
         </div>

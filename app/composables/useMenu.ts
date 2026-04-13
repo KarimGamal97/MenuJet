@@ -13,23 +13,12 @@ export const useMenu = () => {
     if (!userId) return;
     pending.value = true;
     try {
-      let { data, error } = await client
+      const { data, error } = await client
         .from("menu_items")
         .select("*")
-        .eq("user_id", userId)
-        .order("created_at", { ascending: false });
+        .eq("user_id", userId);
 
-      if (error) {
-        // Fallback: try without ordering
-        const { data: fallbackData, error: fallbackError } = await client
-          .from("menu_items")
-          .select("*")
-          .eq("user_id", userId);
-
-        if (fallbackError) throw fallbackError;
-        data = fallbackData;
-      }
-
+      if (error) throw error;
       items.value = data || [];
     } catch (err: any) {
       console.error("Fetch Menu Error Details:", {

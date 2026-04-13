@@ -11,7 +11,12 @@ export default defineNuxtConfig({
     },
   },
   compatibilityDate: "2026-03-27",
-  modules: ["@nuxtjs/i18n", "@nuxtjs/supabase", "@nuxtjs/tailwindcss"],
+  modules: [
+    "@nuxtjs/i18n",
+    "@nuxtjs/supabase",
+    "@nuxtjs/tailwindcss",
+    "@pinia/nuxt",
+  ],
   i18n: {
     locales: [
       { code: "ar", iso: "ar-EG", name: "Arabic", file: "ar.json", dir: "rtl" },

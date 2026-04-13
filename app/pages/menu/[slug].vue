@@ -1,5 +1,8 @@
 <template>
-  <div class="min-h-screen bg-gray-50 flex flex-col max-w-full overflow-x-hidden" dir="rtl">
+  <div
+    class="min-h-screen bg-gray-50 flex flex-col max-w-full overflow-x-hidden"
+    dir="rtl"
+  >
     <template v-if="pending">
       <MenuSkeleton />
     </template>
@@ -8,7 +11,7 @@
       <MenuHeader :restaurant="restaurant" :locale="locale" />
 
       <nav
-        class="sticky top-20 z-40 bg-white/90 backdrop-blur-md border-b border-gray-100 flex py-3 shadow-sm"
+        class="sticky top-20 z-40 bg-orange-600 backdrop-blur-md border-b border-gray-100 flex py-3 shadow-sm"
       >
         <div
           class="flex flex-col md:flex-row items-center gap-3 px-4 mx-auto max-w-3xl w-full"
@@ -36,12 +39,17 @@
                 :key="cat"
                 @click="activeCategory = cat"
                 :class="[
-                  'px-6 py-2 rounded-2xl font-bold whitespace-nowrap text-sm transition-all duration-300 shrink-0 border-2',
+                  'px-7 py-2.5 rounded-2xl font-bold whitespace-nowrap text-sm transition-all duration-300 shrink-0 flex items-center gap-2 tracking-wide',
                   activeCategory === cat
-                    ? 'bg-orange-600 text-white border-orange-600 shadow-md shadow-orange-100'
-                    : 'bg-gray-50 text-gray-400 border-transparent hover:bg-gray-100',
+                    ? 'bg-white text-orange-600 shadow-2xl shadow-orange-900/30 -translate-y-0.5 scale-105'
+                    : 'bg-white/20 text-white/80 hover:bg-white/30 backdrop-blur-sm active:scale-95',
                 ]"
               >
+                <BaseIcon 
+                  v-if="activeCategory === cat" 
+                  name="check" 
+                  class="w-4 h-4 text-orange-600 animate-in zoom-in spin-in-12 duration-300" 
+                />
                 {{ cat }}
               </button>
             </div>

@@ -135,8 +135,9 @@
             :key="item.id"
             :item="item"
             :is-admin="true"
+            :user-role="userRole"
             @edit="openEditModal"
-            @delete="initiateDelete"
+            @delete="userRole !== 'admin' ? initiateDelete($event) : null"
             class="w-full md:w-[calc(50%-8px)] lg:w-[calc(33.333%-11px)]"
           />
         </div>
@@ -195,7 +196,7 @@
         <div v-if="newItem.pricingType === 'size'" class="space-y-2">
           <div class="flex gap-2">
             <button
-              v-for="size in ['sm', 'md', 'lg']"
+              v-for="size in ['s', 'md', 'lg']"
               :key="size"
               type="button"
               @click="newItem.activeSize = size"
@@ -221,7 +222,7 @@
           </div>
           <div class="flex gap-2 pt-1">
             <div
-              v-for="s in ['sm', 'md', 'lg']"
+              v-for="s in ['s', 'md', 'lg']"
               :key="s"
               class="flex-1 bg-gray-50 rounded-xl p-2 text-center border border-gray-100"
             >
@@ -442,7 +443,7 @@
 <script setup>
 definePageMeta({ layout: "admin", middleware: "auth" });
 
-const { user, userId } = useAuthUser();
+const { user, userId, ownerId, userRole } = useAuthUser();
 const { $toast } = useNuxtApp();
 
 // Composables
@@ -470,7 +471,7 @@ const imageUrl = ref("");
 const newItem = ref({
   name: "",
   pricingType: "size",
-  prices: { sm: "", md: "", lg: "" },
+  prices: { s: "", md: "", lg: "" },
   activeSize: "sm",
   countOptions: [
     { label: "", price: "" },
@@ -512,9 +513,9 @@ const detectPricingType = (prices) => {
   return "count";
 };
 
-// Data fetching watch
+// Fetch data using ownerId — admin sees their restaurant owner's items
 watch(
-  userId,
+  ownerId,
   (newVal) => {
     if (newVal) {
       fetchMenuItems(newVal);
@@ -683,7 +684,7 @@ const handleSaveItem = async () => {
   if (editingId.value) {
     result = await updateMenuItem(editingId.value, itemData);
   } else {
-    result = await addItemToMenu(itemData, userId.value);
+    result = await addItemToMenu(itemData, ownerId.value);
   }
 
   if (result) {

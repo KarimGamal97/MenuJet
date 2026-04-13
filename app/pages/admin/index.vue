@@ -21,8 +21,9 @@
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <!-- Total Items -->
-        <div
-          class="bg-orange-50 p-6 rounded-[2rem] border border-orange-100 group hover:shadow-lg transition-all duration-300"
+        <NuxtLink
+          to="/admin/menu"
+          class="bg-orange-50 p-6 rounded-[2rem] border border-orange-100 group hover:shadow-lg transition-all duration-300 block"
         >
           <div
             class="w-12 h-12 bg-orange-600/10 rounded-2xl flex items-center justify-center text-orange-600 group-hover:scale-110 transition-transform"
@@ -42,11 +43,12 @@
               }}</span>
             </div>
           </div>
-        </div>
+        </NuxtLink>
 
         <!-- Total Orders -->
-        <div
-          class="bg-blue-50 p-6 rounded-[2rem] border border-blue-100 group hover:shadow-lg transition-all duration-300"
+        <NuxtLink
+          to="/admin/orders"
+          class="bg-blue-50 p-6 rounded-[2rem] border border-blue-100 group hover:shadow-lg transition-all duration-300 block"
         >
           <div
             class="w-12 h-12 bg-blue-600/10 rounded-2xl flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform"
@@ -62,11 +64,13 @@
               $t("admin.visits_unit")
             }}</span>
           </p>
-        </div>
+        </NuxtLink>
 
         <!-- Total Revenue -->
-        <div
-          class="bg-green-50 p-6 rounded-[2rem] border border-green-100 group hover:shadow-lg transition-all duration-300"
+        <NuxtLink
+          v-if="userRole === 'super_admin'"
+          to="/admin/sales"
+          class="bg-green-50 p-6 rounded-[2rem] border border-green-100 group hover:shadow-lg transition-all duration-300 block"
         >
           <div
             class="w-12 h-12 bg-green-600/10 rounded-2xl flex items-center justify-center text-green-600 group-hover:scale-110 transition-transform"
@@ -82,7 +86,7 @@
               $t("currency")
             }}</span>
           </p>
-        </div>
+        </NuxtLink>
       </div>
     </template>
   </div>
@@ -90,31 +94,32 @@
 
 <script setup>
 const client = useSupabaseClient();
-const user = useSupabaseUser();
+const { ownerId, userRole } = useAuthUser();
 
 const { data: stats, pending } = useAsyncData(
   "admin-stats",
   async () => {
-    if (!user.value) return { items: 0, orders: 0, revenue: 0 };
-    const uId = user.value.id || user.value.sub;
+    const uId = ownerId.value;
+    if (!uId) return { items: 0, orders: 0, revenue: 0 };
 
-    // Get total items
+    const todayStart = new Date().toISOString().split('T')[0];
+
     const { count: itemsCount } = await client
       .from("menu_items")
       .select("*", { count: "exact", head: true })
       .eq("user_id", uId);
 
-    // Get total orders count
     const { count: ordersCount } = await client
       .from("orders")
       .select("*", { count: "exact", head: true })
-      .eq("user_id", uId);
+      .eq("user_id", uId)
+      .gte("created_at", todayStart);
 
-    // Get total revenue (sum of all orders)
     const { data: oData } = await client
       .from("orders")
       .select("total_price")
-      .eq("user_id", uId);
+      .eq("user_id", uId)
+      .gte("created_at", todayStart);
 
     const revenueCount =
       oData?.reduce((acc, current) => acc + (current.total_price || 0), 0) || 0;
@@ -127,9 +132,10 @@ const { data: stats, pending } = useAsyncData(
   },
   {
     lazy: true,
-    watch: [user],
+    watch: [ownerId],
   },
 );
+
 
 definePageMeta({ layout: "admin", middleware: "auth" });
 </script>

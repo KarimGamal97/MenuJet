@@ -88,14 +88,15 @@
           </div>
 
           <div class="flex gap-3" v-if="cart.length > 0">
-            <a
-              :href="whatsappLink"
-              target="_blank"
-              @click="handleWhatsappOrder"
-              class="flex-1 flex items-center justify-center py-4 bg-green-500 text-white rounded-2xl font-black text-[12px]"
-            >
-              {{ $t("cart.order_whatsapp") }}
-            </a>
+          <a
+            :href="whatsappLink"
+            target="_blank"
+            @click="handleWhatsappOrder"
+            class="flex-1 flex items-center justify-center gap-2 py-4 bg-white text-green-600 border border-gray-300 rounded-2xl font-black text-[12px] shadow-sm hover:shadow-md transition-all active:scale-95"
+          >
+            <BaseIcon name="whatsapp" class="w-5 h-5 fill-current" />
+            {{ $t("cart.order_whatsapp") }}
+          </a>
 
             <button
               @click="placeCashierOrder"

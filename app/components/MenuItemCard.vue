@@ -35,7 +35,7 @@
     <!-- Actions Area -->
     <div class="flex flex-col gap-2">
       <!-- Admin Mode: Edit/Delete -->
-      <div v-if="isAdmin" class="flex gap-2">
+      <div v-if="userRole === 'super_admin'" class="flex gap-2">
         <BaseButton
           @click.stop="emit('edit', item)"
           variant="outline"
@@ -50,8 +50,8 @@
         />
       </div>
 
-      <!-- Public Mode: Add to Cart -->
-      <div v-else>
+      <!-- Public Mode: Add to Cart (Only if NOT in admin dashboard) -->
+      <div v-else-if="!isAdmin">
         <BaseButton
           @click.stop="emit('select', item)"
           variant="outline"
@@ -83,14 +83,22 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  userRole: {
+    type: String,
+    default: null,
+  },
 });
 
 const emit = defineEmits(["edit", "delete", "select"]);
 
 const handleCardClick = () => {
   if (props.isAdmin) {
-    emit("edit", props.item);
+    // Only allow editing if the user is a super_admin
+    if (props.userRole === 'super_admin') {
+      emit("edit", props.item);
+    }
   } else {
+    // Public view: select item if available
     if (props.item.available !== false) {
       emit("select", props.item);
     }
