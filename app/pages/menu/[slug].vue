@@ -98,6 +98,7 @@
         :isOpen="showCart"
         :whatsappNumber="restaurant.whatsapp_number"
         :restaurantUserId="restaurant.user_id"
+        :deliveryAreas="restaurant.delivery_areas"
         @close="showCart = false"
       />
 

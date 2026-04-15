@@ -156,8 +156,27 @@
     "cashier_subtitle": "Please show your order number to the cashier",
     "items_count": "Total Items",
     "close": "Done, Thank you!",
-    "order_success": "Order placed successfully",
-    "order_error": "Error placing order"
+    "order_success": "Your order has been sent successfully",
+    "order_error": "An error occurred while sending your order",
+    "checkout_title": "Order Details",
+    "checkout_subtitle_whatsapp": "Please enter your details to send the order via WhatsApp",
+    "checkout_subtitle_cashier": "Please enter your phone number to confirm your order",
+    "name_label": "Name",
+    "name_placeholder": "Enter your name",
+    "phone_label": "Phone Number",
+    "phone_placeholder": "Enter your phone number",
+    "delivery_method": "Delivery Method",
+    "pickup_store": "Store Pickup",
+    "delivery": "Delivery",
+    "cancel": "Cancel",
+    "confirm_whatsapp": "Confirm & Send",
+    "confirm_order": "Confirm Order",
+    "err_name_required": "Name is required",
+    "err_name_length": "Name must be at least 4 letters",
+    "err_name_letters": "Name must contain letters only",
+    "err_phone_required": "Phone number is required",
+    "err_phone_length": "Please enter a valid phone number",
+    "err_phone_numbers": "Phone number must contain numbers only"
   },
   "history": {
     "title": "Previous Orders",
@@ -168,8 +187,10 @@
     "total": "Total"
   },
   "menu": {
-    "no_items": "No items in this section",
-    "restaurant_not_found": "Restaurant Not Found",
-    "restaurant_not_found_desc": "Sorry, we couldn't find a menu with this name. Please make sure you scanned the correct restaurant QR code."
+    "no_items": "No items in this category currently",
+    "restaurant_not_found": "Restaurant not found",
+    "restaurant_not_found_desc": "Sorry, we couldn't find a menu with this name. Please make sure you scanned the correct restaurant QR code.",
+    "notes": "Notes",
+    "notes_placeholder": "No sugar, extra sauce..."
   }
 }

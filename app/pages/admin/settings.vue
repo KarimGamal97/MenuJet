@@ -293,6 +293,63 @@
             </template>
           </div>
         </div>
+
+        <!-- Delivery Areas -->
+        <div class="md:col-span-2 pt-6 border-t border-gray-100 mt-4">
+          <div class="flex items-center gap-3 mb-4 px-1">
+            <div class="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center shrink-0">
+              <BaseIcon name="map-pin" class="w-5 h-5 text-green-600" />
+            </div>
+            <div>
+              <label class="text-sm font-bold text-gray-800 block">{{ $t("admin.delivery_areas_title") }}</label>
+              <span class="text-[10px] bg-green-50 text-green-600 px-2 py-0.5 mt-1 rounded font-bold inline-flex items-center gap-1"><BaseIcon name="check" class="w-2 h-2" /> {{ form.delivery_areas?.length || 0 }} {{ $t("admin.area_registered") }}</span>
+            </div>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-3 items-end bg-gray-50/50 p-4 rounded-2xl border border-gray-100">
+            <div class="flex-1 w-full">
+              <BaseInput v-model="newDeliveryArea.name" @keyup.enter="addDeliveryArea" :placeholder="$t('admin.area_name_placeholder')" />
+            </div>
+            <div class="w-full sm:w-32">
+              <BaseInput v-model.number="newDeliveryArea.price" @keyup.enter="addDeliveryArea" type="number" :placeholder="$t('admin.area_price_placeholder')" />
+            </div>
+            <BaseButton
+              variant="primary"
+              icon="plus"
+              @click="addDeliveryArea"
+              class="!w-14 !h-14 !p-0 shrink-0 mb-1 !bg-green-500 hover:!bg-green-600 !shadow-green-200"
+            />
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-6">
+            <div
+              v-for="(area, index) in form.delivery_areas"
+              :key="index"
+              class="bg-white p-4 rounded-2xl border-2 border-gray-50 shadow-sm flex items-center justify-between group hover:border-green-200 transition-all relative overflow-hidden"
+            >
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center shrink-0">
+                  <BaseIcon name="map-pin" class="w-5 h-5 text-green-600" />
+                </div>
+                <div>
+                  <p class="font-bold text-sm text-gray-800">{{ area.name }}</p>
+                  <p class="text-xs font-black text-green-600 mt-1 bg-green-50 px-2 py-0.5 rounded inline-block">{{ area.price }} {{ $t("admin.currency") }}</p>
+                </div>
+              </div>
+              <button
+                @click="removeDeliveryArea(index)"
+                class="w-8 h-8 rounded-xl bg-red-50 text-red-500 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0"
+              >
+                <BaseIcon name="trash" class="w-4 h-4" />
+              </button>
+            </div>
+            
+            <div v-if="!form.delivery_areas || form.delivery_areas.length === 0" class="col-span-full py-10 flex flex-col items-center justify-center text-gray-400 font-bold border-2 border-dashed border-gray-100 rounded-3xl text-sm bg-gray-50/30">
+              <BaseIcon name="map-pin" class="w-10 h-10 mb-3 opacity-20" />
+              {{ $t("admin.no_areas_msg") }}
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="mt-10">
@@ -332,11 +389,14 @@ const {
 const { deleteItemsByCategory, updateItemsCategory } = useMenu();
 
 const newCategory = ref("");
+const newDeliveryArea = ref({ name: "", price: "" });
+
 const form = ref({
   business_name: "",
   slug: "",
   whatsapp_number: "",
   categories: [],
+  delivery_areas: [],
   logo: "",
   is_active: true,
 });
@@ -351,6 +411,7 @@ onMounted(async () => {
         slug: data.slug || "",
         whatsapp_number: data.whatsapp_number || "",
         categories: data.categories || [],
+        delivery_areas: data.delivery_areas || [],
         logo: data.logo || "",
         is_active: data.is_active !== false,
       };
@@ -405,6 +466,28 @@ const addCategory = () => {
 
   form.value.categories.push(cat);
   newCategory.value = "";
+};
+
+const addDeliveryArea = () => {
+  const name = newDeliveryArea.value.name.trim();
+  const price = newDeliveryArea.value.price;
+  
+  if (!name || price === '' || price < 0) {
+    return $toast.error(t("admin.add_area_error"));
+  }
+  
+  if (!form.value.delivery_areas) form.value.delivery_areas = [];
+  
+  if (form.value.delivery_areas.some(a => a.name === name)) {
+    return $toast.error(t("admin.area_exists_error"));
+  }
+  
+  form.value.delivery_areas.push({ name, price: Number(price) });
+  newDeliveryArea.value = { name: '', price: '' };
+};
+
+const removeDeliveryArea = (index) => {
+  form.value.delivery_areas.splice(index, 1);
 };
 
 // Category Reordering & Editing Logic
@@ -506,12 +589,18 @@ const uploadLogo = async (event) => {
 const saveSettings = async () => {
   if (!userId.value) return;
 
+  // Be very specific about fields to update to avoid conflicts with triggers/RLS on other tables
   const settingsData = {
-    ...form.value,
+    business_name: form.value.business_name,
     slug: form.value.slug
       .toLowerCase()
       .replace(/[^a-z0-9]/g, "-")
       .replace(/-+/g, "-"),
+    whatsapp_number: form.value.whatsapp_number,
+    categories: [...form.value.categories],
+    delivery_areas: form.value.delivery_areas ? [...form.value.delivery_areas] : [],
+    logo: form.value.logo,
+    is_active: form.value.is_active !== false
   };
 
   await updateProfile(userId.value, settingsData);

@@ -128,6 +128,43 @@
               </div>
             </div>
 
+            <!-- Notes -->
+            <div class="bg-gray-50 rounded-2xl p-3">
+              <button 
+                @click="showNotes = !showNotes"
+                class="flex items-center justify-between w-full focus:outline-none"
+              >
+                <p class="text-sm font-bold text-gray-500">
+                  {{ $t('menu.notes') }}
+                </p>
+                <div class="w-8 h-8 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-gray-400 transition-colors">
+                  <BaseIcon 
+                    name="chevron-down" 
+                    class="w-4 h-4 transition-transform duration-300"
+                    :class="{ 'rotate-180': showNotes }"
+                  />
+                </div>
+              </button>
+              
+              <div v-show="showNotes" class="mt-3">
+                <textarea
+                  v-model="notes"
+                  :placeholder="$t('menu.notes_placeholder')"
+                  maxlength="50"
+                  class="w-full bg-white border border-gray-200 rounded-xl p-3 text-sm font-bold text-gray-700 focus:outline-none focus:border-orange-400 transition-colors resize-none"
+                  rows="2"
+                ></textarea>
+                <div class="text-left mt-1 px-1">
+                  <span 
+                    class="text-[10px] font-bold transition-colors" 
+                    :class="notes.length >= 50 ? 'text-red-500' : 'text-gray-400'"
+                  >
+                    {{ notes.length }} / 50
+                  </span>
+                </div>
+              </div>
+            </div>
+
             <!-- Total -->
             <div
               class="bg-orange-50 rounded-2xl p-3 border border-orange-100 flex items-center justify-between"
@@ -166,6 +203,8 @@ const { addToCart } = useCart();
 const qty = ref(1);
 const selectedSize = ref("sm");
 const selectedCount = ref(null);
+const notes = ref("");
+const showNotes = ref(false);
 
 // Detect pricing type from stored prices
 const pricingType = computed(() => {
@@ -196,6 +235,8 @@ watch(
   (val) => {
     if (val) {
       qty.value = 1;
+      notes.value = "";
+      showNotes.value = false;
       if (pricingType.value === "size") {
         selectedSize.value = availableSizes.value[0] || "sm";
       } else if (pricingType.value === "count") {
@@ -231,6 +272,8 @@ const handleAdd = () => {
   if (pricingType.value === "size") itemInfo.size = selectedSize.value;
   if (pricingType.value === "count")
     itemInfo.size = selectedCount.value + " قطعة";
+  if (notes.value.trim()) itemInfo.notes = notes.value.trim();
+  
   for (let i = 0; i < qty.value; i++) addToCart(itemInfo);
   emit("added");
   emit("close");

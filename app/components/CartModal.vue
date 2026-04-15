@@ -35,7 +35,7 @@
 
           <div
             v-for="item in cart"
-            :key="item.id"
+            :key="item.cartId || item.id"
             class="flex items-center gap-3 bg-gray-50 p-3 rounded-2xl"
           >
             <div
@@ -55,13 +55,14 @@
                   >({{ item.size }})</span
                 >
               </p>
+              <p v-if="item.notes" class="text-xs text-gray-500 truncate mt-0.5">{{ item.notes }}</p>
               <p class="text-orange-600 font-black text-sm mt-0.5">
                 {{ item.price * item.quantity }} {{ $t("currency") }}
               </p>
             </div>
             <div class="flex items-center gap-2">
               <button
-                @click="decreaseQty(item.id)"
+                @click="decreaseQty(item.cartId || item.id)"
                 class="w-7 h-7 rounded-full bg-white border border-gray-200 text-gray-500 font-black"
               >
                 <BaseIcon name="minus" class="w-4 h-4 mx-auto" />
@@ -70,7 +71,7 @@
                 item.quantity
               }}</span>
               <button
-                @click="increaseQty(item.id)"
+                @click="increaseQty(item.cartId || item.id)"
                 class="w-7 h-7 rounded-full bg-orange-500 text-white font-black"
               >
                 <BaseIcon name="plus" class="w-4 h-4 mx-auto" />
@@ -88,26 +89,19 @@
           </div>
 
           <div class="flex gap-3" v-if="cart.length > 0">
-          <a
-            :href="whatsappLink"
-            target="_blank"
-            @click="handleWhatsappOrder"
+          <button
+            @click="openWhatsappCheckout"
             class="flex-1 flex items-center justify-center gap-2 py-4 bg-white text-green-600 border border-gray-300 rounded-2xl font-black text-[12px] shadow-sm hover:shadow-md transition-all active:scale-95"
           >
             <BaseIcon name="whatsapp" class="w-5 h-5 fill-current" />
             {{ $t("cart.order_whatsapp") }}
-          </a>
+          </button>
 
             <button
-              @click="placeCashierOrder"
-              :disabled="isSubmitting"
-              class="flex-1 flex items-center justify-center py-4 bg-gray-900 text-white rounded-2xl font-black disabled:opacity-50 text-[12px]"
+              @click="openCashierCheckout"
+              class="flex-1 flex items-center justify-center py-4 bg-gray-900 text-white rounded-2xl font-black text-[12px]"
             >
-              <div
-                v-if="isSubmitting"
-                class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"
-              ></div>
-              <span v-else>{{ $t("cart.order_cashier") }}</span>
+              <span>{{ $t("cart.order_cashier") }}</span>
             </button>
           </div>
         </div>
@@ -163,6 +157,210 @@
       </div>
     </div>
   </Teleport>
+
+  <!-- Cashier Checkout Modal -->
+  <Teleport to="body">
+    <div
+      v-if="showCashierCheckout"
+      class="fixed inset-0 z-[400] flex items-center justify-center p-4"
+      dir="rtl"
+    >
+      <div
+        class="absolute inset-0 bg-black/60 backdrop-blur-md"
+        @click="showCashierCheckout = false"
+      />
+
+      <div
+        class="relative bg-white rounded-[2.5rem] w-full max-w-sm shadow-2xl z-10 overflow-hidden flex flex-col"
+      >
+        <div class="px-6 pt-8 pb-2">
+          <h2 class="text-2xl font-black text-gray-800 mb-1">{{ $t("cart.order_cashier") }}</h2>
+          <p class="text-xs text-gray-400 font-bold">{{ $t("cart.checkout_subtitle_cashier") }}</p>
+        </div>
+
+        <div class="px-6 py-4 space-y-4">
+          <div>
+            <label :class="['block text-[10px] font-black uppercase tracking-wider mb-1', errors.cashierPhone ? 'text-red-500' : 'text-gray-400']">{{ $t("cart.phone_label") }}</label>
+            <input
+              v-model="cashierPhone"
+              type="tel"
+              :placeholder="$t('cart.phone_placeholder')"
+              maxlength="12"
+              @input="cashierPhone = cashierPhone.replace(/[^0-9]/g, '')"
+              :class="['w-full p-4 bg-gray-50 border-2 rounded-2xl outline-none transition-all font-bold text-gray-800 text-sm shadow-sm', errors.cashierPhone ? 'border-red-400 focus:bg-white' : 'border-transparent focus:bg-white focus:border-green-500']"
+            />
+            <p v-if="errors.cashierPhone" class="text-xs text-red-500 font-bold mt-1.5 px-1">{{ errors.cashierPhone }}</p>
+          </div>
+        </div>
+
+        <div class="px-6 py-6 bg-gray-50 border-t border-gray-100 flex gap-3">
+          <button
+            @click="showCashierCheckout = false"
+            class="flex-1 py-4 bg-white text-gray-500 rounded-2xl font-black border border-gray-200 hover:bg-gray-100 transition-all"
+            :disabled="isSubmitting"
+          >
+            {{ $t("admin.cancel") }}
+          </button>
+          <button
+            @click="placeCashierOrder"
+            :disabled="isSubmitting"
+            class="flex-1 flex items-center justify-center py-4 bg-gray-900 text-white rounded-2xl font-black disabled:opacity-50 text-[12px]"
+          >
+            <div
+              v-if="isSubmitting"
+              class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"
+            ></div>
+            <span v-else>{{ $t("cart.confirm_order") }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </Teleport>
+
+  <!-- Whatsapp Checkout Modal -->
+  <Teleport to="body">
+    <div
+      v-if="showWhatsappCheckout"
+      class="fixed inset-0 z-[400] flex items-center justify-center p-4"
+      dir="rtl"
+    >
+      <div
+        class="absolute inset-0 bg-black/60 backdrop-blur-md"
+        @click="showWhatsappCheckout = false"
+      />
+
+      <div
+        class="relative bg-white rounded-[2.5rem] w-full max-w-sm shadow-2xl z-10 overflow-hidden flex flex-col"
+      >
+        <div class="px-6 pt-8 pb-2">
+          <h2 class="text-2xl font-black text-gray-800 mb-1">{{ $t("cart.checkout_title") }}</h2>
+          <p class="text-xs text-gray-400 font-bold">{{ $t("cart.checkout_subtitle_whatsapp") }}</p>
+        </div>
+
+        <div class="px-6 py-4 space-y-4">
+          <div>
+            <label :class="['block text-[10px] font-black uppercase tracking-wider mb-1', errors.name ? 'text-red-500' : 'text-gray-400']">{{ $t("cart.name_label") }}</label>
+            <input
+              v-model="customerForm.name"
+              type="text"
+              :placeholder="$t('cart.name_placeholder')"
+              maxlength="20"
+              @input="customerForm.name = customerForm.name.replace(/[^a-zA-Z\u0600-\u06FF\s]/g, '')"
+              :class="['w-full p-4 bg-gray-50 border-2 rounded-2xl outline-none transition-all font-bold text-gray-800 text-sm shadow-sm', errors.name ? 'border-red-400 focus:bg-white' : 'border-transparent focus:bg-white focus:border-green-500']"
+            />
+            <p v-if="errors.name" class="text-xs text-red-500 font-bold mt-1.5 px-1">{{ errors.name }}</p>
+          </div>
+          <div>
+            <label :class="['block text-[10px] font-black uppercase tracking-wider mb-1', errors.phone ? 'text-red-500' : 'text-gray-400']">{{ $t("cart.phone_label") }}</label>
+            <input
+              v-model="customerForm.phone"
+              type="tel"
+              :placeholder="$t('cart.phone_placeholder')"
+              maxlength="12"
+              @input="customerForm.phone = customerForm.phone.replace(/[^0-9]/g, '')"
+              :class="['w-full p-4 bg-gray-50 border-2 rounded-2xl outline-none transition-all font-bold text-gray-800 text-sm shadow-sm', errors.phone ? 'border-red-400 focus:bg-white' : 'border-transparent focus:bg-white focus:border-green-500']"
+            />
+            <p v-if="errors.phone" class="text-xs text-red-500 font-bold mt-1.5 px-1">{{ errors.phone }}</p>
+          </div>
+          
+          <div>
+            <label class="block text-[10px] font-black uppercase tracking-wider text-gray-400 mb-2 text-right">{{ $t("cart.delivery_method") }}</label>
+            <div class="flex gap-2">
+              <button 
+                @click="customerForm.method = 'توصيل'; selectedDeliveryArea = null;"
+                :class="[
+                  'flex-1 py-3.5 rounded-2xl font-black text-sm transition-all border-2',
+                  customerForm.method === 'توصيل' 
+                    ? 'border-green-500 bg-green-50 text-green-600 shadow-sm' 
+                    : 'border-transparent bg-gray-50 text-gray-400 hover:bg-gray-100'
+                ]"
+              >
+                {{ $t("cart.delivery") }}
+              </button>
+              <button 
+                @click="customerForm.method = 'استلام من المحل'"
+                :class="[
+                  'flex-1 py-3.5 rounded-2xl font-black text-sm transition-all border-2',
+                  customerForm.method === 'استلام من المحل' 
+                    ? 'border-green-500 bg-green-50 text-green-600 shadow-sm' 
+                    : 'border-transparent bg-gray-50 text-gray-400 hover:bg-gray-100'
+                ]"
+              >
+                {{ $t("cart.pickup_store") }}
+              </button>
+            </div>
+          </div>
+
+          <div v-if="customerForm.method === 'توصيل'" class="mt-4 pt-4 border-t border-gray-100 animate-in fade-in slide-in-from-top-2">
+            <div class="text-center mb-4">
+              <h3 class="font-black text-gray-800 text-lg">{{ $t("cart.delivery_select_title") }}</h3>
+              <p class="text-[10px] text-gray-400 font-bold mt-1">{{ $t("cart.delivery_select_subtitle") }}</p>
+            </div>
+            
+            <template v-if="deliveryAreas && deliveryAreas.length > 0">
+              <div class="relative mb-4">
+                <input 
+                  v-model="searchQuery" 
+                  :placeholder="$t('admin.search_placeholder')" 
+                  class="w-full bg-gray-50 border-none outline-none py-3 pr-10 pl-4 rounded-2xl text-sm font-bold text-gray-800 placeholder:text-gray-400 shadow-sm focus:ring-2 focus:ring-green-500 transition-all border-2 border-transparent focus:bg-white text-right"
+                />
+                <BaseIcon name="search" class="w-4 h-4 absolute right-4 top-1/2 -translate-y-1/2 text-gray-400" />
+              </div>
+
+              <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 max-h-56 overflow-y-auto p-1.5 no-scrollbar scroll-smooth">
+                <button
+                  v-for="area in filteredAreas"
+                  :key="area.name"
+                  @click="selectedDeliveryArea = area; errors.deliveryArea = ''"
+                  :class="[
+                    'p-3 rounded-2xl border-2 transition-all flex flex-col items-center justify-center gap-2 outline-none',
+                    selectedDeliveryArea?.name === area.name 
+                      ? 'border-green-600 bg-green-50/50 shadow-md scale-100 ring-2 ring-green-600/20' 
+                      : 'border-gray-100 bg-white hover:border-green-200 opacity-90 hover:opacity-100 focus:border-green-300'
+                  ]"
+                >
+                  <div :class="['w-8 h-8 rounded-full flex items-center justify-center mb-1 transition-colors', selectedDeliveryArea?.name === area.name ? 'bg-green-600 text-white shadow-lg shadow-green-200' : 'bg-gray-100 text-gray-500']">
+                    <BaseIcon name="map-pin" class="w-4 h-4" />
+                  </div>
+                  <div class="text-center">
+                    <p :class="['text-xs font-black mb-1', selectedDeliveryArea?.name === area.name ? 'text-green-800' : 'text-gray-700']">{{ area.name }}</p>
+                    <p :class="['text-[10px] font-black', selectedDeliveryArea?.name === area.name ? 'text-green-600' : 'text-gray-500']">{{ area.price }} {{ $t("admin.currency") }}</p>
+                  </div>
+                </button>
+                
+                <div v-if="filteredAreas.length === 0" class="col-span-full py-6 text-center text-gray-400 font-bold border-2 border-dashed border-gray-100 rounded-2xl text-sm bg-gray-50/50">
+                  {{ $t("cart.delivery_not_found") }}
+                </div>
+              </div>
+            </template>
+            
+            <div v-else class="py-8 px-4 text-center text-gray-400 font-bold border-2 border-dashed border-gray-100 rounded-3xl text-sm bg-gray-50/30">
+              <BaseIcon name="map-pin" class="w-10 h-10 mb-3 mx-auto opacity-20" />
+              {{ $t("cart.delivery_no_areas") }}
+            </div>
+
+            <p v-if="errors.deliveryArea" class="text-xs text-red-500 font-bold mt-3 text-center">{{ errors.deliveryArea }}</p>
+          </div>
+        </div>
+
+        <div class="px-6 py-6 bg-gray-50 border-t border-gray-100 flex gap-3">
+          <button
+            @click="handleWhatsappOrderFinal"
+            class="flex-1 flex items-center justify-center gap-2 py-4 bg-green-500 text-white rounded-2xl font-black shadow-lg shadow-green-200 hover:bg-green-600 transition-all active:scale-95"
+          >
+            <BaseIcon name="whatsapp" class="w-5 h-5 fill-current" />
+            {{ $t("cart.confirm_whatsapp") }}
+          </button>
+          <button
+            @click="showWhatsappCheckout = false"
+            class="flex-1 py-4 bg-white text-gray-500 rounded-2xl font-black border border-gray-200 hover:bg-gray-100 transition-all"
+          >
+            {{ $t("admin.cancel") }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </Teleport>
 </template>
 
 <script setup>
@@ -172,6 +370,7 @@ const props = defineProps({
   isOpen: Boolean,
   whatsappNumber: { type: String, default: "" },
   restaurantUserId: { type: String, default: "" },
+  deliveryAreas: { type: Array, default: () => [] }
 });
 
 const emit = defineEmits(["close"]);
@@ -183,11 +382,62 @@ const client = useSupabaseClient();
 const route = useRoute();
 
 const showCashierModal = ref(false);
+const showWhatsappCheckout = ref(false);
+const showCashierCheckout = ref(false);
 const isSubmitting = ref(false);
 const orderNumber = ref("");
+const cashierPhone = ref("");
+const searchQuery = ref("");
+const selectedDeliveryArea = ref(null);
+
+const filteredAreas = computed(() => {
+  if (!props.deliveryAreas || props.deliveryAreas.length === 0) return [];
+  if (!searchQuery.value) return props.deliveryAreas;
+  return props.deliveryAreas.filter((a) =>
+    a.name.toLowerCase().includes(searchQuery.value.trim().toLowerCase())
+  );
+});
+
+const customerForm = ref({
+  name: "",
+  phone: "",
+  method: "استلام من المحل"
+});
+
+const errors = ref({
+  name: "",
+  phone: "",
+  cashierPhone: "",
+  deliveryArea: ""
+});
+
+const openCashierCheckout = () => {
+  if (cart.value.length === 0) return;
+  errors.value.cashierPhone = "";
+  cashierPhone.value = "";
+  showCashierCheckout.value = true;
+};
 
 const placeCashierOrder = async () => {
   if (cart.value.length === 0 || isSubmitting.value) return;
+
+  errors.value.cashierPhone = "";
+  let hasError = false;
+
+  const phoneValue = cashierPhone.value.trim();
+  if (!phoneValue) {
+    errors.value.cashierPhone = t("cart.err_phone_required");
+    hasError = true;
+  } else if (!/^\d+$/.test(phoneValue)) {
+    errors.value.cashierPhone = t("cart.err_phone_numbers");
+    hasError = true;
+  } else if (phoneValue.length < 8) {
+    errors.value.cashierPhone = t("cart.err_phone_length");
+    hasError = true;
+  }
+
+  if (hasError) return;
+
   isSubmitting.value = true;
 
   try {
@@ -225,6 +475,7 @@ const placeCashierOrder = async () => {
         items: cart.value,
         total_price: totalPrice.value,
         status: "pending",
+        customer_phone: cashierPhone.value.trim()
       })
       .select("id")
       .single();
@@ -245,8 +496,10 @@ const placeCashierOrder = async () => {
       items: [...cart.value],
       total: totalPrice.value,
       type: "cashier",
+      customer: { phone: cashierPhone.value.trim() }
     });
 
+    showCashierCheckout.value = false;
     showCashierModal.value = true;
 
     setTimeout(() => {
@@ -262,17 +515,67 @@ const placeCashierOrder = async () => {
   }
 };
 
-const handleWhatsappOrder = () => {
+const openWhatsappCheckout = () => {
+  errors.value = { name: "", phone: "" };
+  showWhatsappCheckout.value = true;
+};
+
+const handleWhatsappOrderFinal = () => {
+  errors.value = { name: "", phone: "" };
+  let hasError = false;
+
+  const nameValue = customerForm.value.name.trim();
+  if (!nameValue) {
+    errors.value.name = t("cart.err_name_required");
+    hasError = true;
+  } else if (nameValue.length < 4) {
+    errors.value.name = t("cart.err_name_length");
+    hasError = true;
+  } else if (!/^[a-zA-Z\u0600-\u06FF\s]+$/.test(nameValue)) {
+    errors.value.name = t("cart.err_name_letters");
+    hasError = true;
+  }
+
+  const phoneValue = customerForm.value.phone.trim();
+  if (!phoneValue) {
+    errors.value.phone = t("cart.err_phone_required");
+    hasError = true;
+  } else if (!/^\d+$/.test(phoneValue)) {
+    errors.value.phone = t("cart.err_phone_numbers");
+    hasError = true;
+  } else if (phoneValue.length < 8) {
+    errors.value.phone = t("cart.err_phone_length");
+    hasError = true;
+  }
+
+  if (customerForm.value.method === "توصيل" && props.deliveryAreas && props.deliveryAreas.length > 0 && !selectedDeliveryArea.value) {
+    errors.value.deliveryArea = "يرجى اختيار منطقة التوصيل من القائمة";
+    hasError = true;
+  }
+
+  if (hasError) return;
+
+  // Save link before state clears
+  const link = whatsappLink.value;
+  
+  // Open WhatsApp in new tab
+  window.open(link, '_blank');
+
   // Save to local history before clearing
   addOrder({
     id: "WA-" + Date.now().toString().slice(-4),
     items: [...cart.value],
     total: totalPrice.value,
     type: "whatsapp",
+    customer: { ...customerForm.value }
   });
 
-  clearCart();
-  emit("close");
+  // Small delay before clearing Cart to ensure window opens without issues
+  setTimeout(() => {
+    clearCart();
+    showWhatsappCheckout.value = false;
+    emit("close");
+  }, 200);
 };
 
 const closeCashierModal = () => {
@@ -283,11 +586,51 @@ const closeCashierModal = () => {
 const whatsappLink = computed(() => {
   const items = cart.value
     .map(
-      (i) =>
-        `• ${i.name} x${i.quantity} = ${i.price * i.quantity} ${t("currency")}`,
+      (i, index) => {
+        let text = `${index + 1}. ${i.name} ${i.size ? `(${i.size})` : ''} x ${i.quantity} = ${i.price * i.quantity} ${t("currency")}`;
+        if (i.notes) text += `\n  - ملاحظات: ${i.notes}`;
+        return text;
+      }
     )
     .join("\n");
-  const msg = `${t("cart.whatsapp_msg_header")}:\n${items}\n\n${t("cart.total")}: ${totalPrice.value} ${t("currency")}`;
-  return `https://wa.me/${props.whatsappNumber}?text=${encodeURIComponent(msg)}`;
+    
+  let header = t("cart.whatsapp_msg_header");
+  if (!header || header === "cart.whatsapp_msg_header") {
+    header = "طلب جديد";
+  }
+
+  let msgText = `${header}
+
+الاسم: ${customerForm.value.name || "غير محدد"}
+الهاتف: ${customerForm.value.phone || "غير محدد"}
+
+تفاصيل الطلب:
+${items}
+`;
+
+  const baseTotal = totalPrice.value;
+  let finalTotalText = `${baseTotal} ${t("admin.currency")}`;
+
+  if (customerForm.value.method === "توصيل" && selectedDeliveryArea.value) {
+    msgText += `
+📍 الاستلام: توصيل (${selectedDeliveryArea.value.name})
+🚚 تكلفة التوصيل: ${selectedDeliveryArea.value.price} ${t("admin.currency")}
+
+💰 الإجمالي النهائي (مع التوصيل): *${baseTotal + Number(selectedDeliveryArea.value.price)} ${t("admin.currency")}*`;
+  } else {
+    msgText += `
+📍 الاستلام: ${customerForm.value.method}
+
+💰 الإجمالي: *${finalTotalText}*`;
+  }
+
+  // Use api.whatsapp.com as it is more stable for Web and desktop
+  let phoneStr = props.whatsappNumber || '';
+  if (phoneStr.startsWith('0') && phoneStr.length === 11) {
+    phoneStr = '2' + phoneStr; // Auto append Egypt country code if missing
+  }
+  phoneStr = phoneStr.replace(/\+/g, '').replace(/\s+/g, '');
+
+  return `https://api.whatsapp.com/send?phone=${phoneStr}&text=${encodeURIComponent(msgText)}`;
 });
 </script>
