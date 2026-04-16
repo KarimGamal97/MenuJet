@@ -29,6 +29,14 @@ body,
   background: #cbd5e1;
 }
 
+/* Hide browser default password reveal button */
+input::-ms-reveal,
+input::-ms-clear,
+input::-webkit-contacts-auto-fill-button,
+input::-webkit-credentials-auto-fill-button {
+  display: none !important;
+}
+
 /* List Transitions */
 .list-enter-active,
 .list-leave-active {
