@@ -58,8 +58,21 @@
       </nav>
 
       <main class="flex-grow max-w-3xl mx-auto w-full p-4 lg:p-6">
-        <div
-          v-if="filteredItems.length > 0"
+        <!-- 1. Skeleton Loading (While fetching or calculating initial category) -->
+        <div v-if="pending || isInitialLoading" class="flex flex-col gap-3">
+          <div v-for="i in 6" :key="i" class="bg-white p-4 rounded-[2rem] border border-gray-50 flex items-center gap-4 animate-pulse">
+            <div class="w-20 h-20 rounded-2xl bg-gray-100 flex-shrink-0"></div>
+            <div class="flex-grow space-y-3">
+              <div class="w-2/3 h-5 bg-gray-100 rounded-lg"></div>
+              <div class="w-1/2 h-3 bg-gray-50 rounded-lg"></div>
+              <div class="w-1/4 h-6 bg-gray-100 rounded-lg"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Items List -->
+        <div 
+          v-else-if="filteredItems.length > 0"
           class="flex flex-col gap-3"
           :class="cartCount > 0 ? 'pb-40' : 'pb-16'"
         >
@@ -70,6 +83,8 @@
             @select="openItemModal"
           />
         </div>
+
+        <!-- 3. No Results -->
         <div v-else class="text-center py-5">
           <div class="mb-4 flex justify-center">
             <BaseIcon name="boxes" class="w-16 h-16 opacity-20" />
@@ -167,6 +182,8 @@ const {
 const activeCategory = ref("");
 const searchQuery = ref("");
 
+const isInitialLoading = ref(true);
+
 const categories = computed(() => {
   return restaurant.value?.categories || [];
 });
@@ -175,32 +192,49 @@ watch(
   () => restaurant.value?.categories,
   (newCats) => {
     if (newCats && newCats.length > 0) {
-      // If no category is selected OR current selected category is not in the new list
       if (!activeCategory.value || !newCats.includes(activeCategory.value)) {
         activeCategory.value = newCats[0];
       }
+      // Data is ready and category is set
+      setTimeout(() => {
+        isInitialLoading.value = false;
+      }, 100);
     }
   },
   { immediate: true },
 );
 
+// If restaurant finishes loading but categories aren't set yet, keep loading
+watch(pending, (isPending) => {
+  if (!isPending && (!restaurant.value || !activeCategory.value)) {
+    // wait for the categories watch to fire
+  } else if (!isPending) {
+     // done
+  }
+});
+
 const filteredItems = computed(() => {
-  let items = (restaurant.value?.menu_items || []).filter(
+  // If we are still initializing or have no items, show nothing (trigger skeleton)
+  if (isInitialLoading.value || !restaurant.value?.menu_items || (categories.value.length > 0 && !activeCategory.value)) {
+    return [];
+  }
+
+  let items = restaurant.value.menu_items.filter(
     (i) => i.available !== false,
   );
 
-  // Search filter
   if (searchQuery.value) {
     const q = searchQuery.value.toLowerCase();
-    return items.filter((i) => (i.name || "").toLowerCase().includes(q));
+    return items.filter((i) => 
+      (i.name || "").toLowerCase().includes(q) || 
+      (i.description || "").toLowerCase().includes(q)
+    );
   }
 
-  // Filter by category - if category filter gives 0 results, show ALL items
   if (activeCategory.value) {
-    const categoryItems = items.filter(
-      (i) => !i.category || i.category === activeCategory.value,
+    return items.filter(
+      (i) => i.category === activeCategory.value
     );
-    return categoryItems.length > 0 ? categoryItems : items;
   }
 
   return items;

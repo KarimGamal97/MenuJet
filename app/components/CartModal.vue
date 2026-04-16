@@ -162,7 +162,7 @@
   <Teleport to="body">
     <div
       v-if="showCashierCheckout"
-      class="fixed inset-0 z-[400] flex items-center justify-center p-4"
+      class="fixed inset-0 z-[400] flex items-end sm:items-center justify-center sm:p-4"
       dir="rtl"
     >
       <div
@@ -171,16 +171,16 @@
       />
 
       <div
-        class="relative bg-white rounded-[2.5rem] w-full max-w-sm shadow-2xl z-10 overflow-hidden flex flex-col"
+        class="relative bg-white rounded-t-[2.5rem] sm:rounded-[2.5rem] w-full max-w-sm shadow-2xl z-10 max-h-[92vh] flex flex-col overflow-hidden"
       >
-        <div class="px-6 pt-8 pb-2">
+        <div class="px-6 pt-8 pb-4 border-b border-gray-50">
           <h2 class="text-2xl font-black text-gray-800 mb-1">{{ $t("cart.order_cashier") }}</h2>
           <p class="text-xs text-gray-400 font-bold">{{ $t("cart.checkout_subtitle_cashier") }}</p>
         </div>
 
-        <div class="px-6 py-4 space-y-4">
+        <div class="flex-1 overflow-y-auto px-6 py-6 space-y-5 custom-scrollbar">
           <div>
-            <label :class="['block text-[10px] font-black uppercase tracking-wider mb-1', errors.cashierPhone ? 'text-red-500' : 'text-gray-400']">{{ $t("cart.phone_label") }}</label>
+            <label :class="['block text-[10px] font-black uppercase tracking-wider mb-2', errors.cashierPhone ? 'text-red-500' : 'text-gray-400']">{{ $t("cart.phone_label") }}</label>
             <input
               v-model="cashierPhone"
               type="tel"
@@ -189,14 +189,14 @@
               @input="cashierPhone = cashierPhone.replace(/[^0-9]/g, '')"
               :class="['w-full p-4 bg-gray-50 border-2 rounded-2xl outline-none transition-all font-bold text-gray-800 text-sm shadow-sm', errors.cashierPhone ? 'border-red-400 focus:bg-white' : 'border-transparent focus:bg-white focus:border-green-500']"
             />
-            <p v-if="errors.cashierPhone" class="text-xs text-red-500 font-bold mt-1.5 px-1">{{ errors.cashierPhone }}</p>
+            <p v-if="errors.cashierPhone" class="text-xs text-red-500 font-bold mt-2 px-1">{{ errors.cashierPhone }}</p>
           </div>
         </div>
 
-        <div class="px-6 py-6 bg-gray-50 border-t border-gray-100 flex gap-3">
+        <div class="px-6 py-6 bg-white border-t border-gray-100 flex gap-3 pb-8 sm:pb-6">
           <button
             @click="showCashierCheckout = false"
-            class="flex-1 py-4 bg-white text-gray-500 rounded-2xl font-black border border-gray-200 hover:bg-gray-100 transition-all"
+            class="flex-1 py-4 bg-gray-50 text-gray-500 rounded-2xl font-black border border-gray-100 hover:bg-gray-100 transition-all"
             :disabled="isSubmitting"
           >
             {{ $t("admin.cancel") }}
@@ -204,7 +204,7 @@
           <button
             @click="placeCashierOrder"
             :disabled="isSubmitting"
-            class="flex-1 flex items-center justify-center py-4 bg-gray-900 text-white rounded-2xl font-black disabled:opacity-50 text-[12px]"
+            class="flex-1 flex items-center justify-center py-4 bg-gray-900 text-white rounded-2xl font-black disabled:opacity-50 text-[14px] shadow-lg shadow-gray-200"
           >
             <div
               v-if="isSubmitting"
@@ -221,7 +221,7 @@
   <Teleport to="body">
     <div
       v-if="showWhatsappCheckout"
-      class="fixed inset-0 z-[400] flex items-center justify-center p-4"
+      class="fixed inset-0 z-[400] flex items-end sm:items-center justify-center sm:p-4"
       dir="rtl"
     >
       <div
@@ -230,16 +230,16 @@
       />
 
       <div
-        class="relative bg-white rounded-[2.5rem] w-full max-w-sm shadow-2xl z-10 overflow-hidden flex flex-col"
+        class="relative bg-white rounded-t-[2.5rem] sm:rounded-[2.5rem] w-full max-w-md shadow-2xl z-10 max-h-[95vh] flex flex-col overflow-hidden"
       >
-        <div class="px-6 pt-8 pb-2">
+        <div class="px-8 pt-8 pb-4 border-b border-gray-50 sticky top-0 bg-white z-20">
           <h2 class="text-2xl font-black text-gray-800 mb-1">{{ $t("cart.checkout_title") }}</h2>
           <p class="text-xs text-gray-400 font-bold">{{ $t("cart.checkout_subtitle_whatsapp") }}</p>
         </div>
 
-        <div class="px-6 py-4 space-y-4">
+        <div class="flex-1 overflow-y-auto px-8 py-6 space-y-6 custom-scrollbar pb-10">
           <div>
-            <label :class="['block text-[10px] font-black uppercase tracking-wider mb-1', errors.name ? 'text-red-500' : 'text-gray-400']">{{ $t("cart.name_label") }}</label>
+            <label :class="['block text-[10px] font-black uppercase tracking-wider mb-2', errors.name ? 'text-red-500' : 'text-gray-400']">{{ $t("cart.name_label") }}</label>
             <input
               v-model="customerForm.name"
               type="text"
@@ -248,10 +248,11 @@
               @input="customerForm.name = customerForm.name.replace(/[^a-zA-Z\u0600-\u06FF\s]/g, '')"
               :class="['w-full p-4 bg-gray-50 border-2 rounded-2xl outline-none transition-all font-bold text-gray-800 text-sm shadow-sm', errors.name ? 'border-red-400 focus:bg-white' : 'border-transparent focus:bg-white focus:border-green-500']"
             />
-            <p v-if="errors.name" class="text-xs text-red-500 font-bold mt-1.5 px-1">{{ errors.name }}</p>
+            <p v-if="errors.name" class="text-xs text-red-500 font-bold mt-2 px-1">{{ errors.name }}</p>
           </div>
+
           <div>
-            <label :class="['block text-[10px] font-black uppercase tracking-wider mb-1', errors.phone ? 'text-red-500' : 'text-gray-400']">{{ $t("cart.phone_label") }}</label>
+            <label :class="['block text-[10px] font-black uppercase tracking-wider mb-2', errors.phone ? 'text-red-500' : 'text-gray-400']">{{ $t("cart.phone_label") }}</label>
             <input
               v-model="customerForm.phone"
               type="tel"
@@ -260,100 +261,102 @@
               @input="customerForm.phone = customerForm.phone.replace(/[^0-9]/g, '')"
               :class="['w-full p-4 bg-gray-50 border-2 rounded-2xl outline-none transition-all font-bold text-gray-800 text-sm shadow-sm', errors.phone ? 'border-red-400 focus:bg-white' : 'border-transparent focus:bg-white focus:border-green-500']"
             />
-            <p v-if="errors.phone" class="text-xs text-red-500 font-bold mt-1.5 px-1">{{ errors.phone }}</p>
+            <p v-if="errors.phone" class="text-xs text-red-500 font-bold mt-2 px-1">{{ errors.phone }}</p>
           </div>
           
           <div>
-            <label class="block text-[10px] font-black uppercase tracking-wider text-gray-400 mb-2 text-right">{{ $t("cart.delivery_method") }}</label>
-            <div class="flex gap-2">
+            <label class="block text-[10px] font-black uppercase tracking-wider text-gray-400 mb-3 text-right">{{ $t("cart.delivery_method") }}</label>
+            <div class="flex gap-3">
               <button 
                 @click="customerForm.method = 'توصيل'; selectedDeliveryArea = null;"
                 :class="[
-                  'flex-1 py-3.5 rounded-2xl font-black text-sm transition-all border-2',
+                  'flex-1 py-4 rounded-2xl font-black text-sm transition-all border-2 flex items-center justify-center gap-2',
                   customerForm.method === 'توصيل' 
-                    ? 'border-green-500 bg-green-50 text-green-600 shadow-sm' 
+                    ? 'border-green-500 bg-green-50 text-green-600 shadow-md ring-2 ring-green-500/10' 
                     : 'border-transparent bg-gray-50 text-gray-400 hover:bg-gray-100'
                 ]"
               >
+                <BaseIcon name="map-pin" class="w-4 h-4" />
                 {{ $t("cart.delivery") }}
               </button>
               <button 
                 @click="customerForm.method = 'استلام من المحل'"
                 :class="[
-                  'flex-1 py-3.5 rounded-2xl font-black text-sm transition-all border-2',
+                  'flex-1 py-4 rounded-2xl font-black text-sm transition-all border-2 flex items-center justify-center gap-2',
                   customerForm.method === 'استلام من المحل' 
-                    ? 'border-green-500 bg-green-50 text-green-600 shadow-sm' 
+                    ? 'border-green-500 bg-green-50 text-green-600 shadow-md ring-2 ring-green-500/10' 
                     : 'border-transparent bg-gray-50 text-gray-400 hover:bg-gray-100'
                 ]"
               >
+                <BaseIcon name="store" class="w-4 h-4" />
                 {{ $t("cart.pickup_store") }}
               </button>
             </div>
           </div>
 
-          <div v-if="customerForm.method === 'توصيل'" class="mt-4 pt-4 border-t border-gray-100 animate-in fade-in slide-in-from-top-2">
-            <div class="text-center mb-4">
+          <div v-if="customerForm.method === 'توصيل'" class="mt-4 pt-6 border-t border-gray-100 animate-in fade-in slide-in-from-top-4 duration-500">
+            <div class="text-right mb-5">
               <h3 class="font-black text-gray-800 text-lg">{{ $t("cart.delivery_select_title") }}</h3>
-              <p class="text-[10px] text-gray-400 font-bold mt-1">{{ $t("cart.delivery_select_subtitle") }}</p>
+              <p class="text-[11px] text-gray-400 font-bold mt-1">{{ $t("cart.delivery_select_subtitle") }}</p>
             </div>
             
             <template v-if="deliveryAreas && deliveryAreas.length > 0">
-              <div class="relative mb-4">
+              <div class="relative mb-5">
                 <input 
                   v-model="searchQuery" 
                   :placeholder="$t('admin.search_placeholder')" 
-                  class="w-full bg-gray-50 border-none outline-none py-3 pr-10 pl-4 rounded-2xl text-sm font-bold text-gray-800 placeholder:text-gray-400 shadow-sm focus:ring-2 focus:ring-green-500 transition-all border-2 border-transparent focus:bg-white text-right"
+                  class="w-full bg-gray-50 border-none outline-none py-4 pr-12 pl-4 rounded-2xl text-sm font-bold text-gray-800 placeholder:text-gray-400 shadow-sm focus:ring-2 focus:ring-green-500 transition-all border-2 border-transparent focus:bg-white text-right"
                 />
-                <BaseIcon name="search" class="w-4 h-4 absolute right-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                <BaseIcon name="search" class="w-5 h-5 absolute right-4 top-1/2 -translate-y-1/2 text-gray-400" />
               </div>
 
-              <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 max-h-56 overflow-y-auto p-1.5 no-scrollbar scroll-smooth">
+              <div class="grid grid-cols-2 gap-3 min-h-[120px] max-h-72 overflow-y-auto p-1 scroll-smooth">
                 <button
                   v-for="area in filteredAreas"
                   :key="area.name"
                   @click="selectedDeliveryArea = area; errors.deliveryArea = ''"
                   :class="[
-                    'p-3 rounded-2xl border-2 transition-all flex flex-col items-center justify-center gap-2 outline-none',
+                    'p-4 rounded-[1.5rem] border-2 transition-all flex flex-col items-center justify-center gap-2 outline-none',
                     selectedDeliveryArea?.name === area.name 
                       ? 'border-green-600 bg-green-50/50 shadow-md scale-100 ring-2 ring-green-600/20' 
                       : 'border-gray-100 bg-white hover:border-green-200 opacity-90 hover:opacity-100 focus:border-green-300'
                   ]"
                 >
-                  <div :class="['w-8 h-8 rounded-full flex items-center justify-center mb-1 transition-colors', selectedDeliveryArea?.name === area.name ? 'bg-green-600 text-white shadow-lg shadow-green-200' : 'bg-gray-100 text-gray-500']">
+                  <div :class="['w-9 h-9 rounded-full flex items-center justify-center mb-1 transition-colors', selectedDeliveryArea?.name === area.name ? 'bg-green-600 text-white shadow-lg shadow-green-200' : 'bg-gray-100 text-gray-400']">
                     <BaseIcon name="map-pin" class="w-4 h-4" />
                   </div>
                   <div class="text-center">
                     <p :class="['text-xs font-black mb-1', selectedDeliveryArea?.name === area.name ? 'text-green-800' : 'text-gray-700']">{{ area.name }}</p>
-                    <p :class="['text-[10px] font-black', selectedDeliveryArea?.name === area.name ? 'text-green-600' : 'text-gray-500']">{{ area.price }} {{ $t("admin.currency") }}</p>
+                    <p :class="['text-[11px] font-black', selectedDeliveryArea?.name === area.name ? 'text-green-600' : 'text-gray-500']">{{ area.price }} {{ $t("admin.currency") }}</p>
                   </div>
                 </button>
                 
-                <div v-if="filteredAreas.length === 0" class="col-span-full py-6 text-center text-gray-400 font-bold border-2 border-dashed border-gray-100 rounded-2xl text-sm bg-gray-50/50">
+                <div v-if="filteredAreas.length === 0" class="col-span-full py-10 text-center text-gray-400 font-bold border-2 border-dashed border-gray-100 rounded-3xl text-sm bg-gray-50/50">
                   {{ $t("cart.delivery_not_found") }}
                 </div>
               </div>
             </template>
             
-            <div v-else class="py-8 px-4 text-center text-gray-400 font-bold border-2 border-dashed border-gray-100 rounded-3xl text-sm bg-gray-50/30">
-              <BaseIcon name="map-pin" class="w-10 h-10 mb-3 mx-auto opacity-20" />
+            <div v-else class="py-12 px-4 text-center text-gray-400 font-bold border-2 border-dashed border-gray-100 rounded-[2rem] text-sm bg-gray-50/30">
+              <BaseIcon name="map-pin" class="w-12 h-12 mb-4 mx-auto opacity-20" />
               {{ $t("cart.delivery_no_areas") }}
             </div>
 
-            <p v-if="errors.deliveryArea" class="text-xs text-red-500 font-bold mt-3 text-center">{{ errors.deliveryArea }}</p>
+            <p v-if="errors.deliveryArea" class="text-xs text-red-500 font-bold mt-4 text-center bg-red-50 py-2 rounded-xl border border-red-100">{{ errors.deliveryArea }}</p>
           </div>
         </div>
 
-        <div class="px-6 py-6 bg-gray-50 border-t border-gray-100 flex gap-3">
+        <div class="px-8 py-6 bg-white border-t border-gray-100 flex gap-3 pb-10 sm:pb-8 sticky bottom-0 z-20">
           <button
             @click="handleWhatsappOrderFinal"
-            class="flex-1 flex items-center justify-center gap-2 py-4 bg-green-500 text-white rounded-2xl font-black shadow-lg shadow-green-200 hover:bg-green-600 transition-all active:scale-95"
+            class="flex-[2] flex items-center justify-center gap-2 py-4 bg-green-500 text-white rounded-2xl font-black shadow-lg shadow-green-200 hover:bg-green-600 transition-all active:scale-95 text-[15px]"
           >
-            <BaseIcon name="whatsapp" class="w-5 h-5 fill-current" />
+            <BaseIcon name="whatsapp" class="w-6 h-6 fill-current" />
             {{ $t("cart.confirm_whatsapp") }}
           </button>
           <button
             @click="showWhatsappCheckout = false"
-            class="flex-1 py-4 bg-white text-gray-500 rounded-2xl font-black border border-gray-200 hover:bg-gray-100 transition-all"
+            class="flex-1 py-4 bg-gray-50 text-gray-500 rounded-2xl font-black border border-gray-100 hover:bg-gray-100 transition-all text-[15px]"
           >
             {{ $t("admin.cancel") }}
           </button>
