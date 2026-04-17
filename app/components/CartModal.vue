@@ -62,7 +62,7 @@
                 </span>
               </div>
               <p class="text-orange-600 font-black text-sm mt-0.5">
-                {{ (item.basePrice || item.price) * item.quantity }} + {{ (item.price - (item.basePrice || item.price)) * item.quantity }} {{ $t("currency") }}
+                {{ (item.basePrice || item.price) * item.quantity }}<span v-if="item.selectedExtras?.length"> + {{ (item.price - (item.basePrice || item.price)) * item.quantity }}</span> {{ $t("currency") }}
               </p>
             </div>
             <div class="flex items-center gap-2">
