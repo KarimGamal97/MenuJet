@@ -1,6 +1,7 @@
 <template>
   <div
     class="min-h-screen bg-gray-50 flex flex-col max-w-full overflow-x-hidden"
+    :style="{ '--p-color': primaryColor }"
     dir="rtl"
   >
     <template v-if="pending">
@@ -11,7 +12,8 @@
       <MenuHeader :restaurant="restaurant" :locale="locale" />
 
       <nav
-        class="sticky top-20 z-40 bg-orange-600 backdrop-blur-md border-b border-gray-100 flex py-3 shadow-sm"
+        class="sticky top-20 z-40 backdrop-blur-md border-b border-gray-100 flex py-3 shadow-sm"
+        :style="{ backgroundColor: primaryColor }"
       >
         <div
           class="flex flex-col md:flex-row items-center gap-3 px-4 mx-auto max-w-3xl w-full"
@@ -38,17 +40,19 @@
                 v-for="cat in categories"
                 :key="cat"
                 @click="activeCategory = cat"
+                :style="activeCategory === cat ? { backgroundColor: 'white', color: primaryColor } : { backgroundColor: 'rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.8)' }"
                 :class="[
                   'px-7 py-2.5 rounded-2xl font-bold whitespace-nowrap text-sm transition-all duration-300 shrink-0 flex items-center gap-2 tracking-wide',
                   activeCategory === cat
-                    ? 'bg-white text-orange-600 shadow-2xl shadow-orange-900/30 -translate-y-0.5 scale-105'
-                    : 'bg-white/20 text-white/80 hover:bg-white/30 backdrop-blur-sm active:scale-95',
+                    ? 'shadow-2xl -translate-y-0.5 scale-105'
+                    : 'backdrop-blur-sm active:scale-95',
                 ]"
               >
                 <BaseIcon 
                   v-if="activeCategory === cat" 
                   name="check" 
-                  class="w-4 h-4 text-orange-600 animate-in zoom-in spin-in-12 duration-300" 
+                  class="w-4 h-4 animate-in zoom-in spin-in-12 duration-300" 
+                  :style="{ color: primaryColor }"
                 />
                 {{ cat }}
               </button>
@@ -149,11 +153,6 @@ const showCart = ref(false);
 const showItemModal = ref(false);
 const selectedItem = ref({});
 
-const openItemModal = (item) => {
-  selectedItem.value = item;
-  showItemModal.value = true;
-};
-
 const {
   data: restaurant,
   error,
@@ -178,6 +177,13 @@ const {
   },
   { lazy: true },
 );
+
+const primaryColor = computed(() => restaurant.value?.primary_color || '#ea580c');
+
+const openItemModal = (item) => {
+  selectedItem.value = item;
+  showItemModal.value = true;
+};
 
 const activeCategory = ref("");
 const searchQuery = ref("");
@@ -240,3 +246,17 @@ const filteredItems = computed(() => {
   return items;
 });
 </script>
+
+<style scoped>
+/* The Ultimate Brand Override */
+:deep(.bg-orange-600), :deep(.bg-orange-500) { background-color: var(--p-color) !important; }
+:deep(.text-orange-600), :deep(.text-orange-500) { color: var(--p-color) !important; }
+:deep(.border-orange-600), :deep(.border-orange-500) { border-color: var(--p-color) !important; }
+:deep(.ring-orange-600), :deep(.ring-orange-500) { --tw-ring-color: var(--p-color) !important; }
+
+/* Light variations using color-mix */
+:deep(.bg-orange-50) { background-color: color-mix(in srgb, var(--p-color), transparent 92%) !important; }
+:deep(.bg-orange-100) { background-color: color-mix(in srgb, var(--p-color), transparent 85%) !important; }
+:deep(.text-orange-100) { color: color-mix(in srgb, var(--p-color), white 80%) !important; }
+:deep(.bg-orange-900\/30) { background-color: color-mix(in srgb, var(--p-color), black 70%) !important; }
+</style>

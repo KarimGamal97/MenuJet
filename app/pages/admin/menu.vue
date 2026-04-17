@@ -196,7 +196,7 @@
         <div v-if="newItem.pricingType === 'size'" class="space-y-2">
           <div class="flex gap-2">
             <button
-              v-for="size in ['s', 'md', 'lg']"
+              v-for="size in ['sm', 'md', 'lg']"
               :key="size"
               type="button"
               @click="newItem.activeSize = size"
@@ -222,7 +222,7 @@
           </div>
           <div class="flex gap-2 pt-1">
             <div
-              v-for="s in ['s', 'md', 'lg']"
+              v-for="s in ['sm', 'md', 'lg']"
               :key="s"
               class="flex-1 bg-gray-50 rounded-xl p-2 text-center border border-gray-100"
             >
@@ -415,6 +415,53 @@
           v-model="newItem.available"
           :label="$t('admin.available')"
         />
+
+        <!-- Extras Section -->
+        <div class="mt-8 border-t border-gray-100 pt-6">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="text-sm font-black text-gray-800">{{ $t('admin.extras_label') }}</h3>
+              <p class="text-[10px] text-gray-400 font-bold mt-0.5">{{ $t('admin.extras_subtitle') }}</p>
+            </div>
+            <BaseButton 
+              size="sm" 
+              variant="outline" 
+              icon="plus" 
+              @click="addExtraField"
+              class="!text-[10px] !px-3 !py-1.5"
+            >
+              {{ $t('admin.add_extra_btn') }}
+            </BaseButton>
+          </div>
+
+          <div class="space-y-3">
+            <div v-for="(extra, i) in newItem.extras" :key="i" class="flex gap-2 items-center animate-in slide-in-from-right-2 duration-300">
+              <div class="flex-1 bg-gray-50 rounded-2xl flex items-center px-3 border-2 border-transparent focus-within:border-orange-400 transition-all">
+                <input 
+                  v-model="extra.name" 
+                  type="text" 
+                  :placeholder="$t('admin.extra_name_placeholder')"
+                  class="w-full py-3 bg-transparent outline-none font-bold text-xs text-gray-800"
+                />
+              </div>
+              <div class="w-20 bg-gray-50 rounded-2xl flex items-center px-3 border-2 border-transparent focus-within:border-orange-400 transition-all">
+                <input 
+                  v-model.number="extra.price" 
+                  type="number" 
+                  :placeholder="$t('admin.price')"
+                  class="w-full py-3 bg-transparent outline-none font-bold text-xs text-center text-orange-600"
+                />
+              </div>
+              <button @click="newItem.extras.splice(i, 1)" class="w-10 h-10 rounded-xl bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-100 transition-colors shrink-0">
+                <BaseIcon name="trash" class="w-4 h-4" />
+              </button>
+            </div>
+            
+            <div v-if="!newItem.extras?.length" class="text-center py-6 border-2 border-dashed border-gray-100 rounded-2xl">
+              <p class="text-[11px] text-gray-300 font-bold">{{ $t('admin.no_extras_msg') }}</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <template #footer>
@@ -471,7 +518,7 @@ const imageUrl = ref("");
 const newItem = ref({
   name: "",
   pricingType: "size",
-  prices: { s: "", md: "", lg: "" },
+  prices: { sm: "", md: "", lg: "" },
   activeSize: "sm",
   countOptions: [
     { label: "", price: "" },
@@ -482,6 +529,7 @@ const newItem = ref({
   category: "",
   available: true,
   description: "",
+  extras: [],
 });
 
 const searchQuery = ref("");
@@ -506,11 +554,13 @@ const pricingTypes = [
 ];
 
 const detectPricingType = (prices) => {
-  if (!prices || Object.keys(prices).length === 0) return "size";
-  if (Object.keys(prices).some((k) => ["sm", "md", "lg"].includes(k)))
+  if (!prices || typeof prices !== 'object') return "fixed";
+  const keys = Object.keys(prices).map(k => k.toLowerCase());
+  if (keys.some((k) => ["sm", "md", "lg", "s"].includes(k)))
     return "size";
-  if ("fixed" in prices) return "fixed";
-  return "count";
+  if (keys.includes("fixed")) return "fixed";
+  if (keys.length > 0) return "count";
+  return "fixed";
 };
 
 // Fetch data using ownerId — admin sees their restaurant owner's items
@@ -596,13 +646,28 @@ const openAddModal = () => {
     category: availableCategories.value[0],
     available: true,
     description: "",
+    extras: [],
   };
   imageUrl.value = "";
   isModalOpen.value = true;
 };
 
+const addExtraField = () => {
+  if (!newItem.value.extras) newItem.value.extras = [];
+  newItem.value.extras.push({ name: "", price: "" });
+};
+
 const openEditModal = (item) => {
   editingId.value = item.id;
+  
+  // Normalize prices to lowercase keys
+  const normPrices = {};
+  if (item.prices && typeof item.prices === 'object') {
+    Object.entries(item.prices).forEach(([k, v]) => {
+      normPrices[k.toLowerCase()] = v;
+    });
+  }
+
   const type = detectPricingType(item.prices);
   const countOptions = [
     { label: "", price: "" },
@@ -614,25 +679,24 @@ const openEditModal = (item) => {
       if (i < 3) countOptions[i] = { label, price: String(price) };
     });
   }
+  
   newItem.value = {
     name: item.name,
     pricingType: type,
-    prices:
-      type === "size"
-        ? {
-            sm: String(item.prices?.sm || ""),
-            md: String(item.prices?.md || ""),
-            lg: String(item.prices?.lg || ""),
-          }
-        : { sm: "", md: "", lg: "" },
+    prices: {
+      sm: String(normPrices.sm || normPrices.s || ""),
+      md: String(normPrices.md || ""),
+      lg: String(normPrices.lg || ""),
+    },
     activeSize: "sm",
     countOptions,
-    fixedPrice:
-      type === "fixed" ? String(item.prices?.fixed || item.price || "") : "",
+    fixedPrice: type === "fixed" ? String(item.prices?.fixed || item.price || "") : "",
     category: item.category,
     available: item.available !== false,
     description: item.description || "",
+    extras: Array.isArray(item.extras) ? JSON.parse(JSON.stringify(item.extras)) : [],
   };
+  
   imageUrl.value = item.image || "";
   isModalOpen.value = true;
 };
@@ -678,6 +742,7 @@ const handleSaveItem = async () => {
     image: imageUrl.value || null,
     prices: cleanPrices,
     price: displayPrice,
+    extras: newItem.value.extras?.filter(e => e.name && e.price !== "") || []
   };
 
   let result;

@@ -10,7 +10,7 @@
         <div
           class="flex items-center justify-center overflow-hidden transition-transform mb-1"
         >
-          <span class="text-white font-black capitalize">
+          <span class="text-white font-black capitalize text-lg">
             {{ restaurant.business_name }}
           </span>
         </div>
@@ -50,16 +50,16 @@
       <!-- History Icon  -->
       <button
         @click="showHistory = true"
-        class="flex items-center gap-2 px-5 py-2 bg-gray-50/50 hover:bg-orange-50 rounded-2xl transition-all active:scale-95 group border border-gray-100 shadow-sm pr-2"
+        class="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50/40 hover:bg-orange-50 rounded-2xl transition-all active:scale-95 group border border-gray-100/50 shadow-sm pr-1.5"
         aria-label="Previous Orders"
       >
         <div
-          class="w-9 h-9 bg-white rounded-xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform"
+          class="w-7 h-7 bg-white rounded-lg flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform"
         >
-          <BaseIcon name="history" class="w-5 h-5 text-orange-600" />
+          <BaseIcon name="history" class="w-4 h-4 text-orange-600" />
         </div>
         <div class="flex gap-1 items-start leading-none ml-1">
-          <span class="text-[11px] font-black text-gray-800">
+          <span class="text-[10px] font-black text-gray-800">
             {{ $t("history.title") }}</span
           >
         </div>

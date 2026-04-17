@@ -56,8 +56,13 @@
                 >
               </p>
               <p v-if="item.notes" class="text-xs text-gray-500 truncate mt-0.5">{{ item.notes }}</p>
+              <div v-if="item.selectedExtras?.length" class="flex flex-wrap gap-1 mt-1">
+                <span v-for="ex in item.selectedExtras" :key="ex.name" class="bg-orange-50 text-orange-600 text-[9px] font-bold px-1.5 py-0.5 rounded-lg border border-orange-100">
+                  + {{ ex.name }} (+{{ ex.price }} {{ $t("currency") }})
+                </span>
+              </div>
               <p class="text-orange-600 font-black text-sm mt-0.5">
-                {{ item.price * item.quantity }} {{ $t("currency") }}
+                {{ (item.basePrice || item.price) * item.quantity }} + {{ (item.price - (item.basePrice || item.price)) * item.quantity }} {{ $t("currency") }}
               </p>
             </div>
             <div class="flex items-center gap-2">
@@ -343,6 +348,17 @@
             </div>
 
             <p v-if="errors.deliveryArea" class="text-xs text-red-500 font-bold mt-4 text-center bg-red-50 py-2 rounded-xl border border-red-100">{{ errors.deliveryArea }}</p>
+
+            <div v-if="selectedDeliveryArea" class="mt-6 pt-6 border-t border-gray-100 animate-in fade-in slide-in-from-top-4 duration-500 text-right">
+              <label :class="['block text-[10px] font-black uppercase tracking-wider mb-2', errors.addressDetail ? 'text-red-500' : 'text-gray-400']">{{ $t("cart.address_detail_label") }}</label>
+              <textarea
+                v-model="customerForm.addressDetail"
+                :placeholder="$t('cart.address_detail_placeholder')"
+                rows="3"
+                :class="['w-full p-4 bg-gray-50 border-2 rounded-2xl outline-none transition-all font-bold text-gray-800 text-sm shadow-sm resize-none', errors.addressDetail ? 'border-red-400 focus:bg-white' : 'border-transparent focus:bg-white focus:border-green-500']"
+              ></textarea>
+              <p v-if="errors.addressDetail" class="text-xs text-red-500 font-bold mt-2 px-1">{{ errors.addressDetail }}</p>
+            </div>
           </div>
         </div>
 
@@ -404,14 +420,16 @@ const filteredAreas = computed(() => {
 const customerForm = ref({
   name: "",
   phone: "",
-  method: "استلام من المحل"
+  method: "استلام من المحل",
+  addressDetail: ""
 });
 
 const errors = ref({
   name: "",
   phone: "",
   cashierPhone: "",
-  deliveryArea: ""
+  deliveryArea: "",
+  addressDetail: ""
 });
 
 const openCashierCheckout = () => {
@@ -471,6 +489,46 @@ const placeCashierOrder = async () => {
 
     console.log("الـ ID اللي هيتبعت:", finalRestaurantId);
 
+    // Calculate Sequential Order Number
+    const calculateNextOrderNumber = async (restaurantId) => {
+      // 1. Fetch profile to get order_reset_type
+      const { data: profile } = await client
+        .from("profiles")
+        .select("order_reset_type")
+        .eq("user_id", restaurantId)
+        .single();
+      
+      const resetType = profile?.order_reset_type || 'none';
+      
+      // 2. Determine start date based on resetType
+      const now = new Date();
+      let startDate = new Date(0); // Default for 'none'
+      
+      if (resetType === 'daily') {
+        startDate = new Date(now.setHours(0, 0, 0, 0));
+      } else if (resetType === 'weekly') {
+        const day = now.getDay();
+        const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+        startDate = new Date(now.setDate(diff));
+        startDate.setHours(0, 0, 0, 0);
+      } else if (resetType === 'monthly') {
+        startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+      }
+
+      // 3. Fetch max order_number since startDate
+      const { data: lastOrders } = await client
+        .from("orders")
+        .select("order_number")
+        .eq("user_id", restaurantId)
+        .gt("created_at", startDate.toISOString())
+        .order("order_number", { ascending: false })
+        .limit(1);
+
+      return (lastOrders?.[0]?.order_number || 0) + 1;
+    };
+
+    const nextOrderNum = await calculateNextOrderNumber(finalRestaurantId);
+
     const { data: order, error: orderError } = await client
       .from("orders")
       .insert({
@@ -478,9 +536,10 @@ const placeCashierOrder = async () => {
         items: cart.value,
         total_price: totalPrice.value,
         status: "pending",
-        customer_phone: cashierPhone.value.trim()
+        customer_phone: cashierPhone.value.trim(),
+        order_number: nextOrderNum
       })
-      .select("id")
+      .select("id, order_number")
       .single();
 
     if (orderError) {
@@ -491,7 +550,7 @@ const placeCashierOrder = async () => {
       throw orderError;
     }
 
-    const orderNum = order.id.toString().padStart(4, "0");
+    const orderNum = (order.order_number || order.id).toString().padStart(4, "0");
     orderNumber.value = orderNum;
 
     addOrder({
@@ -519,12 +578,12 @@ const placeCashierOrder = async () => {
 };
 
 const openWhatsappCheckout = () => {
-  errors.value = { name: "", phone: "" };
+  errors.value = { name: "", phone: "", deliveryArea: "", addressDetail: "" };
   showWhatsappCheckout.value = true;
 };
 
 const handleWhatsappOrderFinal = () => {
-  errors.value = { name: "", phone: "" };
+  errors.value = { name: "", phone: "", deliveryArea: "", addressDetail: "" };
   let hasError = false;
 
   const nameValue = customerForm.value.name.trim();
@@ -551,9 +610,16 @@ const handleWhatsappOrderFinal = () => {
     hasError = true;
   }
 
-  if (customerForm.value.method === "توصيل" && props.deliveryAreas && props.deliveryAreas.length > 0 && !selectedDeliveryArea.value) {
-    errors.value.deliveryArea = "يرجى اختيار منطقة التوصيل من القائمة";
-    hasError = true;
+  if (customerForm.value.method === "توصيل") {
+    if (props.deliveryAreas && props.deliveryAreas.length > 0 && !selectedDeliveryArea.value) {
+      errors.value.deliveryArea = t("cart.err_delivery_required");
+      hasError = true;
+    }
+    
+    if (!customerForm.value.addressDetail.trim()) {
+      errors.value.addressDetail = t("cart.err_address_required");
+      hasError = true;
+    }
   }
 
   if (hasError) return;
@@ -590,7 +656,15 @@ const whatsappLink = computed(() => {
   const items = cart.value
     .map(
       (i, index) => {
-        let text = `${index + 1}. ${i.name} ${i.size ? `(${i.size})` : ''} x ${i.quantity} = ${i.price * i.quantity} ${t("currency")}`;
+        let basePrice = i.basePrice || i.price;
+        let text = `${index + 1}. ${i.name} ${i.size ? `(${i.size})` : ''} (${basePrice} ${t("currency")}) × ${i.quantity}`;
+        
+        if (i.selectedExtras?.length) {
+          const extrasText = i.selectedExtras.map(e => `${e.name} (+${e.price} ${t("currency")})`).join(', ');
+          text += `\n    + ${t('cart.whatsapp_extras_prefix')}: ${extrasText}`;
+        }
+        
+        text += `\n    = ${i.price * i.quantity} ${t("currency")}`;
         if (i.notes) text += `\n  - ملاحظات: ${i.notes}`;
         return text;
       }
@@ -617,9 +691,12 @@ ${items}
   if (customerForm.value.method === "توصيل" && selectedDeliveryArea.value) {
     msgText += `
 📍 الاستلام: توصيل (${selectedDeliveryArea.value.name})
-🚚 تكلفة التوصيل: ${selectedDeliveryArea.value.price} ${t("admin.currency")}
+🏠 العنوان: ${customerForm.value.addressDetail || "غير محدد"}
 
-💰 الإجمالي النهائي (مع التوصيل): *${baseTotal + Number(selectedDeliveryArea.value.price)} ${t("admin.currency")}*`;
+💰 ${t("cart.whatsapp_subtotal")}: ${baseTotal} ${t("admin.currency")}
+🚚 ${t("cart.whatsapp_delivery_cost")}: ${selectedDeliveryArea.value.price} ${t("admin.currency")}
+
+💰 ${t("cart.whatsapp_final_total")}: *${baseTotal + Number(selectedDeliveryArea.value.price)} ${t("admin.currency")}*`;
   } else {
     msgText += `
 📍 الاستلام: ${customerForm.value.method}

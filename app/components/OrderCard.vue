@@ -15,7 +15,7 @@
         >
         <div class="flex items-center gap-2">
           <h3 class="text-2xl font-bold text-orange-600">
-            #{{ order.id.toString().padStart(4, "0") }}
+            #{{ (order.order_number || order.id).toString().padStart(4, "0") }}
           </h3>
           <div
             v-if="order.status === 'pending'"
@@ -29,7 +29,7 @@
           <span class="text-xs font-black text-gray-600" dir="ltr">{{ order.customer_phone }}</span>
         </div>
       </div>
-      <div class="text-left">
+      <div class="text-left flex flex-col items-end">
         <span
           class="text-[10px] uppercase tracking-wider font-bold text-gray-400"
           >{{ $t("admin.order_time") || "Time" }}</span
@@ -42,6 +42,9 @@
             })
           }}
         </p>
+        <span v-if="order.status === 'pending'" class="text-[9px] font-black text-white mt-1 bg-orange-500 px-2 py-0.5 rounded-lg shadow-sm shadow-orange-100 animate-pulse">
+          {{ timeAgo === 'الآن' ? 'الآن' : 'منذ ' + timeAgo }}
+        </span>
       </div>
     </div>
 
@@ -61,11 +64,16 @@
           <span class="flex flex-col leading-tight">
             <span v-if="item.category" class="text-[10px] text-gray-400 font-bold">{{ item.category }}</span>
             <span class="font-bold text-gray-700 text-sm">{{ item.name }}<span v-if="item.size"> ({{ item.size }})</span></span>
+            <div v-if="item.selectedExtras?.length" class="flex flex-wrap gap-1 mt-1">
+              <span v-for="ex in item.selectedExtras" :key="ex.name" class="bg-blue-50 text-blue-600 text-[9px] font-bold px-1.5 py-0.5 rounded-lg border border-blue-100 ">
+                + {{ ex.name }}
+              </span>
+            </div>
             <span v-if="item.notes" class="text-[10px] text-orange-600 font-bold mt-1 bg-orange-100 px-2 py-0.5 rounded-md self-start border border-orange-200">{{ item.notes }}</span>
           </span>
         </div>
         <span class="font-bold text-gray-900 text-sm">
-          {{ item.price * item.quantity }}
+          {{ (item.basePrice || item.price) * item.quantity }}<span v-if="item.selectedExtras?.length" class="text-orange-600"> + {{ (item.price - (item.basePrice || item.price)) * item.quantity }}</span>
           <small class="text-[10px]">{{ $t("currency") }}</small>
         </span>
       </div>
@@ -108,7 +116,7 @@
 </template>
 
 <script setup>
-defineProps({
+const props = defineProps({
   order: {
     type: Object,
     required: true,
@@ -120,4 +128,27 @@ defineProps({
 });
 
 const emit = defineEmits(["update-status"]);
+
+const timeAgo = ref("");
+
+const calculateTimeAgo = () => {
+  const diff = Math.floor(
+    (new Date().getTime() - new Date(props.order.created_at).getTime()) / 60000
+  );
+  if (diff < 1) timeAgo.value = "الآن";
+  else if (diff === 1) timeAgo.value = "دقيقة واحدة";
+  else if (diff === 2) timeAgo.value = "دقيقتين";
+  else if (diff <= 10) timeAgo.value = `${diff} دقائق`;
+  else timeAgo.value = `${diff} دقيقة`;
+};
+
+let timer;
+onMounted(() => {
+  calculateTimeAgo();
+  timer = setInterval(calculateTimeAgo, 60000);
+});
+
+onUnmounted(() => {
+  if (timer) clearInterval(timer);
+});
 </script>

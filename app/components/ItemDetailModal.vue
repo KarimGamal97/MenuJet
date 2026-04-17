@@ -14,7 +14,7 @@
 
         <!-- Modal Sheet -->
         <div
-          class="relative w-full sm:max-w-sm bg-white rounded-t-[2.5rem] sm:rounded-[2rem] overflow-hidden shadow-2xl"
+          class="relative w-full sm:max-w-sm bg-white rounded-t-[2.5rem] sm:rounded-[2rem] overflow-hidden shadow-2xl max-h-[92vh] flex flex-col"
         >
           <!-- Item Image / Header -->
           <div class="relative h-52 bg-gray-100 overflow-hidden">
@@ -39,7 +39,7 @@
           </div>
 
           <!-- Content -->
-          <div class="p-6 space-y-3">
+          <div class="p-6 space-y-4 overflow-y-auto custom-scrollbar flex-1 pb-10">
             <!-- Name + Description -->
             <div class="pb-1">
               <h2 class="text-xl font-black text-gray-800">{{ item.name }}</h2>
@@ -128,6 +128,47 @@
               </div>
             </div>
 
+            <!-- Extras (Add-ons) -->
+            <div v-if="item.extras?.length" class="bg-gray-50 rounded-2xl p-3">
+              <button 
+                @click="showExtras = !showExtras"
+                class="flex items-center justify-between w-full focus:outline-none"
+              >
+                <p class="text-sm font-bold text-gray-500">
+                  {{ $t('cart.extras_title') }}
+                </p>
+                <div class="w-8 h-8 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-gray-400 transition-colors">
+                  <BaseIcon 
+                    name="chevron-down" 
+                    class="w-4 h-4 transition-transform duration-300"
+                    :class="{ 'rotate-180': showExtras }"
+                  />
+                </div>
+              </button>
+              
+              <div v-show="showExtras" class="mt-3 grid grid-cols-1 gap-2">
+                <button
+                  v-for="extra in item.extras"
+                  :key="extra.name"
+                  @click="toggleExtra(extra)"
+                  :class="[
+                    'flex items-center justify-between p-4 rounded-2xl border-2 transition-all active:scale-[0.98]',
+                    selectedExtras.some(e => e.name === extra.name)
+                      ? 'bg-orange-50 border-orange-500 shadow-sm'
+                      : 'bg-white border-gray-100 hover:border-orange-200'
+                  ]"
+                >
+                  <div class="flex items-center gap-3">
+                    <div :class="['w-6 h-6 rounded-lg flex items-center justify-center border-2 transition-all', selectedExtras.some(e => e.name === extra.name) ? 'bg-orange-600 border-orange-600 text-white' : 'border-gray-200 bg-white']">
+                      <BaseIcon v-if="selectedExtras.some(e => e.name === extra.name)" name="check" class="w-3.5 h-3.5" />
+                    </div>
+                    <span :class="['text-xs font-black', selectedExtras.some(e => e.name === extra.name) ? 'text-orange-900' : 'text-gray-700']">{{ extra.name }}</span>
+                  </div>
+                  <span class="text-xs font-black text-orange-600">+ {{ extra.price }} {{ $t("admin.currency") }}</span>
+                </button>
+              </div>
+            </div>
+
             <!-- Notes -->
             <div class="bg-gray-50 rounded-2xl p-3">
               <button 
@@ -205,6 +246,17 @@ const selectedSize = ref("sm");
 const selectedCount = ref(null);
 const notes = ref("");
 const showNotes = ref(false);
+const showExtras = ref(false);
+const selectedExtras = ref([]);
+
+const toggleExtra = (extra) => {
+  const index = selectedExtras.value.findIndex(e => e.name === extra.name);
+  if (index > -1) {
+    selectedExtras.value.splice(index, 1);
+  } else {
+    selectedExtras.value.push(extra);
+  }
+};
 
 // Detect pricing type from stored prices
 const pricingType = computed(() => {
@@ -237,6 +289,8 @@ watch(
       qty.value = 1;
       notes.value = "";
       showNotes.value = false;
+      showExtras.value = false;
+      selectedExtras.value = [];
       if (pricingType.value === "size") {
         selectedSize.value = availableSizes.value[0] || "sm";
       } else if (pricingType.value === "count") {
@@ -247,18 +301,23 @@ watch(
 );
 
 const currentPrice = computed(() => {
+  let basePrice = 0;
   if (pricingType.value === "size") {
-    return Number(
+    basePrice = Number(
       props.item.prices?.[selectedSize.value] || props.item.price || 0,
     );
-  }
-  if (pricingType.value === "count") {
+  } else if (pricingType.value === "count") {
     const entry = countEntries.value.find(
       (e) => e.label === selectedCount.value,
     );
-    return entry ? entry.price : 0;
+    basePrice = entry ? entry.price : 0;
+  } else {
+    basePrice = Number(props.item.prices?.fixed || props.item.price || 0);
   }
-  return Number(props.item.prices?.fixed || props.item.price || 0);
+
+  // Add extras prices
+  const extrasTotal = selectedExtras.value.reduce((acc, curr) => acc + Number(curr.price), 0);
+  return basePrice + extrasTotal;
 });
 
 const total = computed(() => (currentPrice.value * qty.value).toFixed(0));
@@ -268,7 +327,14 @@ const decrease = () => {
 };
 
 const handleAdd = () => {
-  const itemInfo = { ...props.item, price: currentPrice.value, size: undefined };
+  const itemInfo = { 
+    ...props.item, 
+    basePrice: currentPrice.value - selectedExtras.value.reduce((acc, curr) => acc + Number(curr.price), 0),
+    price: currentPrice.value, 
+    size: undefined,
+    selectedExtras: selectedExtras.value.length > 0 ? [...selectedExtras.value] : [] 
+  };
+  
   if (pricingType.value === "size") itemInfo.size = selectedSize.value;
   if (pricingType.value === "count")
     itemInfo.size = selectedCount.value + " قطعة";
