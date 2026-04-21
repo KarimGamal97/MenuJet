@@ -4,6 +4,7 @@ interface UserProfile {
   id: string;
   full_name: string | null;
   role: "super_admin" | "admin" | "user";
+  business_name?: string;
   business_name_ar?: string;
   business_name_en?: string;
   logo?: string;

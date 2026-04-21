@@ -1,7 +1,7 @@
 <template>
   <nav class="fixed w-full z-50 bg-white/80 backdrop-blur-md border-b border-gray-100" dir="rtl">
     <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-      <div class="text-2xl font-black text-orange-600">MenuJet</div>
+      <div class="text-2xl font-black text-orange-600">YummY - UPick - Yummi</div>
       
       <div class="hidden md:flex gap-8 items-center">
         <a href="#features" class="text-gray-600 hover:text-orange-600 transition">المميزات</a>

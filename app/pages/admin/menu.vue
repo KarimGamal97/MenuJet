@@ -626,6 +626,14 @@ const handleFileUpload = async (event) => {
   const file = event.target.files[0];
   if (!file || !userId.value) return;
 
+  // Check file size (5MB = 5 * 1024 * 1024 bytes)
+  const maxSize = 5 * 1024 * 1024;
+  if (file.size > maxSize) {
+    $toast.error("حجم الصورة كبير جداً، الحد الأقصى هو 5 ميجا");
+    event.target.value = ''; // Reset input to allow re-selection
+    return;
+  }
+
   const url = await uploadMenuImage(file, userId.value);
   if (url) imageUrl.value = url;
 };

@@ -90,11 +90,33 @@
             <BaseButton
               variant="danger"
               fullWidth
-              :loading="isCleaning"
               :disabled="!selectedCleanupType"
-              @click="handleCleanup"
+              @click="showConfirmModal = true"
             >
               {{ $t("admin.cleanup_btn") }}
+            </BaseButton>
+          </div>
+        </template>
+      </BaseModal>
+
+      <!-- Final Confirmation Modal -->
+      <BaseModal
+        :isOpen="showConfirmModal"
+        @close="showConfirmModal = false"
+        :title="$t('admin.cleanup_confirm')"
+      >
+        <template #footer>
+          <div class="flex gap-3">
+            <BaseButton variant="secondary" fullWidth @click="showConfirmModal = false">
+              {{ $t("admin.cancel") }}
+            </BaseButton>
+            <BaseButton
+              variant="danger"
+              fullWidth
+              :loading="isCleaning"
+              @click="handleCleanup"
+            >
+              {{ $t("admin.confirm_delete") }}
             </BaseButton>
           </div>
         </template>
@@ -161,7 +183,9 @@ const { ownerId, userRole } = useAuthUser();
 
 // Cleanup State
 const showCleanupModal = ref(false);
+const showConfirmModal = ref(false);
 const selectedCleanupType = ref(null);
+const isCleaning = ref(false);
 
 const cleanupOptions = [
   {
@@ -210,8 +234,11 @@ const changePage = (newPage) => {
 const handleCleanup = async () => {
   if (!ownerId.value || !selectedCleanupType.value) return;
 
+  isCleaning.value = true;
   const success = await cleanupOrders(ownerId.value, selectedCleanupType.value);
+  isCleaning.value = false;
   if (success) {
+    showConfirmModal.value = false;
     showCleanupModal.value = false;
     page.value = 1;
     await fetchOrders(ownerId.value, page.value, pageSize.value);

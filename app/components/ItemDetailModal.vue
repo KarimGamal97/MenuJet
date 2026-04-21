@@ -218,14 +218,18 @@
               </p>
             </div>
 
-            <!-- Add to Cart Button -->
+            <!-- Add to Cart Button or Closed Notice -->
             <button
+              v-if="!isClosed"
               @click="handleAdd"
               class="w-full py-4 bg-orange-600 text-white font-black rounded-2xl text-sm hover:bg-orange-700 active:scale-[0.98] transition-all shadow-lg shadow-orange-200 flex items-center justify-center gap-2"
             >
               <BaseIcon name="plus" class="w-4 h-4" />
               {{ $t("admin.add_to_cart") }}
             </button>
+            <div v-else class="w-full py-4 bg-gray-100 text-gray-400 font-bold rounded-2xl text-sm text-center border-2 border-dashed border-gray-200">
+              🔒 {{ $t('admin.status_closed') }}
+            </div>
           </div>
         </div>
       </div>
@@ -237,6 +241,7 @@
 const props = defineProps({
   isOpen: Boolean,
   item: { type: Object, default: () => ({}) },
+  isClosed: { type: Boolean, default: false },
 });
 
 const emit = defineEmits(["close", "added"]);

@@ -91,7 +91,7 @@
             <input
               v-model="form.slug"
               placeholder="my-restaurant"
-              class="flex-1 py-4 px-1 bg-transparent border-none outline-none font-bold placeholder:text-gray-300 text-sm"
+              class="flex-1 py-4 bg-transparent border-none outline-none font-bold placeholder:text-gray-300 text-sm"
             />
           </div>
           <p
@@ -230,12 +230,62 @@
         </div>
 
         <!-- Restaurant Status Toggle -->
-        <div class="md:col-span-2">
-          <BaseToggle
-            v-model="form.is_active"
-            :label="$t('admin.restaurant_status_label')"
-            class="!bg-orange-50/30 !border !border-orange-100/50"
-          />
+        <!-- Restaurant Availability Section -->
+        <div class="md:col-span-2 pt-6 border-t border-gray-100 mt-4">
+          <div class="flex items-center gap-3 mb-6 px-1">
+            <div class="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center shrink-0">
+              <BaseIcon name="clock" class="w-5 h-5 text-orange-600" />
+            </div>
+            <div>
+              <label class="text-sm font-bold text-gray-800 block">{{ $t('admin.availability_title') }}</label>
+              <p class="text-[10px] text-gray-400 font-bold mt-1">{{ $t('admin.availability_subtitle') }}</p>
+            </div>
+          </div>
+
+          <div class="space-y-4">
+            <!-- Manual Toggle -->
+            <BaseToggle
+              v-model="form.is_active"
+              :label="$t('admin.restaurant_status_label')"
+              class="!bg-white !border !border-gray-100 shadow-sm"
+            />
+
+            <!-- Automated Toggle -->
+            <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+              <BaseToggle
+                v-model="form.automated_hours_enabled"
+                :label="$t('admin.automated_hours_label')"
+                class="!bg-transparent"
+              />
+              
+              <div v-if="form.automated_hours_enabled" class="px-5 pb-5 pt-2 border-t border-gray-50 flex items-center gap-4 animate-in slide-in-from-top-2 duration-300" dir="ltr">
+                <div class="flex-1 flex flex-col gap-1.5">
+                  <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">{{ $t('admin.opening_time_label') }}</label>
+                  <input type="time" v-model="form.opening_time" class="bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm font-bold text-gray-700 outline-none focus:ring-2 focus:ring-orange-500 transition-all" />
+                </div>
+                <div class="flex-1 flex flex-col gap-1.5">
+                  <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">{{ $t('admin.closing_time_label') }}</label>
+                  <input type="time" v-model="form.closing_time" class="bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm font-bold text-gray-700 outline-none focus:ring-2 focus:ring-orange-500 transition-all" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Table Number & Queue Settings -->
+        <div class="md:col-span-2 pt-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <BaseToggle
+              v-model="form.show_table_number"
+              :label="$t('cart.table_number_setting_label')"
+              class="!bg-gray-50/50 !border !border-gray-100"
+            />
+            <BaseToggle
+              v-model="form.show_queue_number"
+              :label="$t('cart.queue_number_setting_label')"
+              class="!bg-gray-50/50 !border !border-gray-100"
+            />
+          </div>
         </div>
 
         <!-- Delete Category Confirmation Modal -->
@@ -476,6 +526,11 @@ const form = ref({
   is_active: true,
   order_reset_type: "none",
   primary_color: "#ea580c",
+  show_table_number: false,
+  show_queue_number: false,
+  automated_hours_enabled: false,
+  opening_time: "09:00",
+  closing_time: "23:00",
 });
 
 // Initialize Data
@@ -493,6 +548,11 @@ onMounted(async () => {
         is_active: data.is_active !== false,
         order_reset_type: data.order_reset_type || "none",
         primary_color: data.primary_color || "#ea580c",
+        show_table_number: data.show_table_number === true,
+        show_queue_number: data.show_queue_number === true,
+        automated_hours_enabled: data.automated_hours_enabled === true,
+        opening_time: data.opening_time || "09:00",
+        closing_time: data.closing_time || "23:00",
       };
     }
   }
@@ -661,6 +721,14 @@ const uploadLogo = async (event) => {
   const file = event.target.files[0];
   if (!file || !userId.value) return;
 
+  // Check file size (5MB limit)
+  const maxSize = 5 * 1024 * 1024;
+  if (file.size > maxSize) {
+    $toast.error("حجم الصورة كبير جداً، الحد الأقصى هو 5 ميجا");
+    event.target.value = '';
+    return;
+  }
+
   const url = await uploadLogoAction(file, userId.value);
   if (url) form.value.logo = url;
 };
@@ -671,6 +739,8 @@ const saveSettings = async () => {
   // Be very specific about fields to update to avoid conflicts with triggers/RLS on other tables
   const settingsData = {
     business_name: form.value.business_name,
+    // Sync with localized field to avoid ghosting old names
+    business_name_ar: form.value.business_name,
     slug: form.value.slug
       .toLowerCase()
       .replace(/[^a-z0-9]/g, "-")
@@ -681,10 +751,21 @@ const saveSettings = async () => {
     logo: form.value.logo,
     is_active: form.value.is_active !== false,
     order_reset_type: form.value.order_reset_type || "none",
-    primary_color: form.value.primary_color || "#ea580c"
+    primary_color: form.value.primary_color || "#ea580c",
+    show_table_number: form.value.show_table_number === true,
+    show_queue_number: form.value.show_queue_number === true,
+    automated_hours_enabled: form.value.automated_hours_enabled === true,
+    opening_time: form.value.opening_time,
+    closing_time: form.value.closing_time,
   };
 
-  await updateProfile(userId.value, settingsData);
+  const success = await updateProfile(userId.value, settingsData);
+  
+  if (success) {
+    // Update global auth store immediately for sidebar reactivity
+    const authStore = useAuthStore();
+    authStore.profile = { ...authStore.profile, ...settingsData };
+  }
 };
 </script>
 

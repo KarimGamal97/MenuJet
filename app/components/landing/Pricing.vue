@@ -39,7 +39,7 @@
               <span class="text-xl text-gray-400 font-normal">ج.م / شهر</span>
             </div>
             <p v-if="isAnnual" class="text-green-600 font-bold mt-2 animate-pulse">
-              الدفع سنوي (4,680 ج.م) + 3 شهور هدية
+              الدفع سنوي (4,680 ج.م) 
             </p>
             <p v-else class="text-gray-400 mt-2 font-medium">تجديد شهري مرن</p>
           </div>

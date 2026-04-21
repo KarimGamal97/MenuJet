@@ -196,6 +196,33 @@
             />
             <p v-if="errors.cashierPhone" class="text-xs text-red-500 font-bold mt-2 px-1">{{ errors.cashierPhone }}</p>
           </div>
+
+          <!-- Table Number Field -->
+          <div v-if="tableNumberEnabled">
+            <label :class="['block text-[10px] font-black uppercase tracking-wider mb-2', errors.tableNumber ? 'text-red-500' : 'text-gray-400']">{{ $t("cart.table_number_label") }}</label>
+            <input
+              v-model="tableNumber"
+              type="text"
+              inputmode="numeric"
+              :placeholder="$t('cart.table_number_placeholder')"
+              maxlength="3"
+              :class="['w-full p-4 bg-gray-50 border-2 rounded-2xl outline-none transition-all font-bold text-gray-800 text-sm shadow-sm', errors.tableNumber ? 'border-red-400 focus:bg-white' : 'border-transparent focus:bg-white focus:border-green-500']"
+            />
+            <p v-if="errors.tableNumber" class="text-xs text-red-500 font-bold mt-2 px-1">{{ errors.tableNumber }}</p>
+          </div>
+
+          <!-- Queue Number Field -->
+          <div v-if="queueNumberEnabled">
+            <label :class="['block text-[10px] font-black uppercase tracking-wider mb-2', errors.queueNumber ? 'text-red-500' : 'text-gray-400']">{{ $t("cart.queue_number_label") }}</label>
+            <input
+              v-model="queueNumber"
+              type="text"
+              :placeholder="$t('cart.queue_number_placeholder')"
+              maxlength="15"
+              :class="['w-full p-4 bg-gray-50 border-2 rounded-2xl outline-none transition-all font-bold text-gray-800 text-sm shadow-sm', errors.queueNumber ? 'border-red-400 focus:bg-white' : 'border-transparent focus:bg-white focus:border-green-500']"
+            />
+            <p v-if="errors.queueNumber" class="text-xs text-red-500 font-bold mt-2 px-1">{{ errors.queueNumber }}</p>
+          </div>
         </div>
 
         <div class="px-6 py-6 bg-white border-t border-gray-100 flex gap-3 pb-8 sm:pb-6">
@@ -389,7 +416,9 @@ const props = defineProps({
   isOpen: Boolean,
   whatsappNumber: { type: String, default: "" },
   restaurantUserId: { type: String, default: "" },
-  deliveryAreas: { type: Array, default: () => [] }
+  deliveryAreas: { type: Array, default: () => [] },
+  tableNumberEnabled: { type: Boolean, default: false },
+  queueNumberEnabled: { type: Boolean, default: false }
 });
 
 const emit = defineEmits(["close"]);
@@ -406,6 +435,8 @@ const showCashierCheckout = ref(false);
 const isSubmitting = ref(false);
 const orderNumber = ref("");
 const cashierPhone = ref("");
+const tableNumber = ref("");
+const queueNumber = ref("");
 const searchQuery = ref("");
 const selectedDeliveryArea = ref(null);
 
@@ -428,6 +459,8 @@ const errors = ref({
   name: "",
   phone: "",
   cashierPhone: "",
+  tableNumber: "",
+  queueNumber: "",
   deliveryArea: "",
   addressDetail: ""
 });
@@ -435,7 +468,11 @@ const errors = ref({
 const openCashierCheckout = () => {
   if (cart.value.length === 0) return;
   errors.value.cashierPhone = "";
+  errors.value.tableNumber = "";
+  errors.value.queueNumber = "";
   cashierPhone.value = "";
+  tableNumber.value = "";
+  queueNumber.value = "";
   showCashierCheckout.value = true;
 };
 
@@ -443,6 +480,8 @@ const placeCashierOrder = async () => {
   if (cart.value.length === 0 || isSubmitting.value) return;
 
   errors.value.cashierPhone = "";
+  errors.value.tableNumber = "";
+  errors.value.queueNumber = "";
   let hasError = false;
 
   const phoneValue = cashierPhone.value.trim();
@@ -454,6 +493,16 @@ const placeCashierOrder = async () => {
     hasError = true;
   } else if (phoneValue.length < 8) {
     errors.value.cashierPhone = t("cart.err_phone_length");
+    hasError = true;
+  }
+
+  if (props.tableNumberEnabled && !tableNumber.value.trim()) {
+    errors.value.tableNumber = t("cart.err_table_number_required");
+    hasError = true;
+  }
+
+  if (props.queueNumberEnabled && !queueNumber.value.trim()) {
+    errors.value.queueNumber = t("cart.err_queue_number_required");
     hasError = true;
   }
 
@@ -537,7 +586,9 @@ const placeCashierOrder = async () => {
         total_price: totalPrice.value,
         status: "pending",
         customer_phone: cashierPhone.value.trim(),
-        order_number: nextOrderNum
+        order_number: nextOrderNum,
+        table_number: props.tableNumberEnabled ? tableNumber.value.trim() || null : null,
+        queue_number: props.queueNumberEnabled ? queueNumber.value.trim() || null : null
       })
       .select("id, order_number")
       .single();

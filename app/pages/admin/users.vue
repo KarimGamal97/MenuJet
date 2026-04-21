@@ -128,7 +128,7 @@
                   <div class="font-bold text-gray-900">
                     {{ user.full_name || user.email?.split('@')[0] || $t('admin.users_page.default_user') }}
                   </div>
-                  <div class="text-xs text-gray-400">{{ user.business_name_ar || users.find(u => u.role === 'super_admin')?.business_name_ar || $t('admin.users_page.restaurant_not_found') }}</div>
+                  <div class="text-xs text-gray-400">{{ user.email || '—' }}</div>
                 </div>
               </div>
             </td>

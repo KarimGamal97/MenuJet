@@ -10,7 +10,30 @@
 
     <template v-else-if="restaurant">
       <MenuHeader :restaurant="restaurant" :locale="locale" />
-
+      
+      <!-- Closed Overlay -->
+      <div v-if="!isShopOpen" class="fixed inset-0 z-[100] bg-black/60 backdrop-blur-md flex items-center justify-center p-6 text-center animate-in fade-in duration-500">
+        <div class="bg-white p-8 rounded-[3rem] shadow-2xl max-w-xs w-full border-4 border-orange-500 animate-in zoom-in duration-300">
+          <div class="w-16 h-16 bg-orange-50 rounded-full flex items-center justify-center mx-auto mb-6">
+            <BaseIcon name="clock" class="w-8 h-8 text-orange-600" />
+          </div>
+          <h3 class="text-xl font-black text-gray-800 mb-2">{{ $t('admin.status_closed') }}</h3>
+          <p class="text-[11px] text-gray-500 font-bold mb-6 leading-relaxed px-2">
+            {{ closedMessage }}
+            <span v-if="restaurant.automated_hours_enabled" class="block mt-2 text-orange-600 dir-ltr text-lg">
+              {{ formatTime12h(restaurant.opening_time || '09:00') }} - {{ formatTime12h(restaurant.closing_time || '23:00') }}
+            </span>
+          </p>
+          <button 
+            @click="isShopOpenOverride = true" 
+            class="w-full py-3.5 px-4 text-white rounded-[1.5rem] font-bold text-sm transition-all shadow-lg active:scale-95"
+            :style="{ backgroundColor: primaryColor }"
+          >
+            تصفح المنيو فقط
+          </button>
+        </div>
+      </div>
+      
       <nav
         class="sticky top-20 z-40 backdrop-blur-md border-b border-gray-100 flex py-3 shadow-sm"
         :style="{ backgroundColor: primaryColor }"
@@ -99,8 +122,9 @@
         </div>
       </main>
 
-      <!-- Floating Cart Bar (Appears when cart is not empty) -->
+      <!-- Floating Cart Bar (Only when shop is actually open) -->
       <FloatingCartBar
+        v-if="isActuallyOpen"
         :whatsappNumber="restaurant.whatsapp_number"
         @openCart="showCart = true"
       />
@@ -109,6 +133,7 @@
       <ItemDetailModal
         :isOpen="showItemModal"
         :item="selectedItem"
+        :isClosed="!isActuallyOpen"
         @close="showItemModal = false"
       />
 
@@ -118,6 +143,8 @@
         :whatsappNumber="restaurant.whatsapp_number"
         :restaurantUserId="restaurant.user_id"
         :deliveryAreas="restaurant.delivery_areas"
+        :tableNumberEnabled="restaurant.show_table_number === true"
+        :queueNumberEnabled="restaurant.show_queue_number === true"
         @close="showCart = false"
       />
 
@@ -178,7 +205,58 @@ const {
   { lazy: true },
 );
 
-const primaryColor = computed(() => restaurant.value?.primary_color || '#ea580c');
+const primaryColor = computed(
+  () => restaurant.value?.primary_color || "#ea580c",
+);
+
+const isShopOpenOverride = ref(false);
+
+// isActuallyOpen: Real status (ignores browse-only override)
+const isActuallyOpen = computed(() => {
+  if (!restaurant.value) return true;
+
+  // 1. Manual toggle check
+  if (restaurant.value.is_active === false) return false;
+
+  // 2. Automated hours check
+  if (restaurant.value.automated_hours_enabled) {
+    const now = new Date();
+    const currentStr =
+      now.getHours().toString().padStart(2, "0") +
+      ":" +
+      now.getMinutes().toString().padStart(2, "0");
+
+    const start = restaurant.value.opening_time || "09:00";
+    const end = restaurant.value.closing_time || "23:00";
+
+    if (start <= end) {
+      return currentStr >= start && currentStr <= end;
+    } else {
+      return currentStr >= start || currentStr <= end;
+    }
+  }
+
+  return true;
+});
+
+// isShopOpen: Controls the overlay visibility only
+const isShopOpen = computed(() => isActuallyOpen.value || isShopOpenOverride.value);
+
+const closedMessage = computed(() => {
+  if (!restaurant.value) return "";
+  if (restaurant.value.is_active === false) {
+    return "المطعم مغلق حالياً. يرجى العودة لاحقاً.";
+  }
+  return "عذراً، المطعم مغلق حالياً. يرجى محاولة الطلب في مواعيد العمل:";
+});
+
+const formatTime12h = (timeStr) => {
+  if (!timeStr) return "";
+  let [hours, minutes] = timeStr.split(":").map(Number);
+  const period = hours >= 12 ? "م" : "ص";
+  hours = hours % 12 || 12; 
+  return `${hours}:${minutes.toString().padStart(2, "0")} ${period}`;
+};
 
 const openItemModal = (item) => {
   selectedItem.value = item;

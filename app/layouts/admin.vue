@@ -291,9 +291,10 @@ const showLogoutModal = ref(false);
 const localProfile = ref(null);
 
 const profileName = computed(() =>
-  localProfile.value?.business_name_ar ||
-  localProfile.value?.business_name_en ||
-  localProfile.value?.full_name ||
+  authStore.profile?.business_name ||
+  authStore.profile?.business_name_ar ||
+  authStore.profile?.business_name_en ||
+  authStore.profile?.full_name ||
   ''
 );
 
