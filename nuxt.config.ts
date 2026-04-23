@@ -27,6 +27,7 @@ export default defineNuxtConfig({
   // إعدادات الـ PWA الجديدة
   pwa: {
     registerType: "autoUpdate",
+    injectRegister: "auto",
     manifest: {
       name: "Neorder Smart Menu",
       short_name: "Neorder",
@@ -51,6 +52,12 @@ export default defineNuxtConfig({
     },
     client: {
       installPrompt: true,
+    },
+    devOptions: {
+      enabled: true,
+      suppressWarnings: true,
+      navigateFallbackAllowlist: [/^\/$/],
+      type: "module",
     },
   },
 
