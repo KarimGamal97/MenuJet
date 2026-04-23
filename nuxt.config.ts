@@ -21,7 +21,40 @@ export default defineNuxtConfig({
     "@nuxtjs/supabase",
     "@nuxtjs/tailwindcss",
     "@pinia/nuxt",
+    "@vite-pwa/nuxt", // تم إضافة موديل الـ PWA هنا
   ],
+
+  // إعدادات الـ PWA الجديدة
+  pwa: {
+    registerType: "autoUpdate",
+    manifest: {
+      name: "Neorder Smart Menu",
+      short_name: "Neorder",
+      description: "The Next Generation of Ordering",
+      theme_color: "#ffffff",
+      icons: [
+        {
+          src: "pwa-192x192.png",
+          sizes: "192x192",
+          type: "image/png",
+        },
+        {
+          src: "pwa-512x512.png",
+          sizes: "512x512",
+          type: "image/png",
+        },
+      ],
+    },
+    workbox: {
+      navigateFallback: "/",
+      // هنا بنحدد أنواع الملفات اللي البرنامج هيحفظها عنده عشان يفتح أوفلاين
+      globPatterns: ["**/*.{js,css,html,png,svg,ico}"],
+    },
+    client: {
+      installPrompt: true,
+    },
+  },
+
   i18n: {
     locales: [
       { code: "ar", iso: "ar-EG", name: "Arabic", file: "ar.json", dir: "rtl" },

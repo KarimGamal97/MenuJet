@@ -22,6 +22,7 @@
     "vue-sonner": "^2.0.9"
   },
   "devDependencies": {
-    "@nuxtjs/supabase": "^2.0.4"
+    "@nuxtjs/supabase": "^2.0.4",
+    "@vite-pwa/nuxt": "^1.1.1"
   }
 }
