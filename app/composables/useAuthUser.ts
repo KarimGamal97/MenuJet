@@ -17,13 +17,15 @@ export const useAuthUser = () => {
 
   const userId = computed(() => user.value?.id || user.value?.sub || null);
 
-  const ownerId = ref<string | null>(null);
-  const userRole = ref<string | null>(null);
+  // useState = shared state across all components (survives page navigation & refresh)
+  const ownerId = useState<string | null>('auth_owner_id', () => null);
+  const userRole = useState<string | null>('auth_user_role', () => null);
 
-  // Fetch profile to get owner_id and role
+  // Only fetch if we have a userId but ownerId is not set yet
   watchEffect(async () => {
     const uid = userId.value;
     if (!uid) return;
+    if (ownerId.value) return; // Already resolved, skip re-fetching
 
     const { data } = await client
       .from('profiles')
