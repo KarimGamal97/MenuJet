@@ -17,7 +17,7 @@
 
         <!-- Status Badge below Logo -->
         <div
-          v-if="restaurant.is_active"
+          v-if="isOpen !== false"
           class="flex items-center gap-1.5 bg-green-50 px-2 py-0.5 rounded-full"
         >
           <span class="relative flex h-1.5 w-1.5">
@@ -80,7 +80,7 @@
 </template>
 
 <script setup>
-defineProps(["restaurant", "locale"]);
+defineProps(["restaurant", "locale", "isOpen"]);
 const { setLocale } = useI18n();
 
 const { totalPrice, cartCount } = useCart();

@@ -54,9 +54,9 @@
       <div v-else-if="!isAdmin">
         <BaseButton
           @click.stop="emit('select', item)"
-          variant="outline"
+          variant="ghost"
           icon="plus"
-          class="!w-9 !h-9 !p-0 !rounded-xl text-orange-600 border-orange-100 hover:bg-orange-50 active:scale-95"
+          class="!w-9 !h-9 !p-0 !rounded-xl text-orange-600 hover:bg-orange-50 active:scale-95"
         />
       </div>
 

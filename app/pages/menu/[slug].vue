@@ -9,7 +9,7 @@
     </template>
 
     <template v-else-if="restaurant">
-      <MenuHeader :restaurant="restaurant" :locale="locale" />
+      <MenuHeader :restaurant="restaurant" :locale="locale" :isOpen="isActuallyOpen" />
       
       <!-- Closed Overlay -->
       <div v-if="!isShopOpen" class="fixed inset-0 z-[100] bg-black/60 backdrop-blur-md flex items-center justify-center p-6 text-center animate-in fade-in duration-500">
@@ -47,7 +47,7 @@
               v-model="searchQuery"
               type="text"
               :placeholder="$t('admin.search_placeholder')"
-              class="w-full py-3 pr-10 pl-4 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-orange-500 transition-all text-sm font-bold shadow-sm"
+              class="w-full py-3 pr-10 pl-4 bg-gray-50 border-none rounded-2xl outline-none transition-all text-sm font-bold shadow-sm"
             />
             <div
               class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
@@ -210,25 +210,44 @@ const primaryColor = computed(
 );
 
 const isShopOpenOverride = ref(false);
+const currentTimeStr = ref("");
+
+onMounted(() => {
+  const updateTime = () => {
+    const now = new Date();
+    currentTimeStr.value =
+      now.getHours().toString().padStart(2, "0") +
+      ":" +
+      now.getMinutes().toString().padStart(2, "0");
+  };
+  updateTime();
+  setInterval(updateTime, 60000); // Update every minute
+});
 
 // isActuallyOpen: Real status (ignores browse-only override)
 const isActuallyOpen = computed(() => {
   if (!restaurant.value) return true;
 
-  // 1. Manual toggle check
-  if (restaurant.value.is_active === false) return false;
+  // 1. If manual toggle is ON, it's ALWAYS OPEN (overrides everything)
+  if (restaurant.value.is_active === true) return true;
 
-  // 2. Automated hours check
+  // 2. If manual toggle is OFF, check automated hours
   if (restaurant.value.automated_hours_enabled) {
-    const now = new Date();
-    const currentStr =
-      now.getHours().toString().padStart(2, "0") +
-      ":" +
-      now.getMinutes().toString().padStart(2, "0");
+    if (!currentTimeStr.value) return true; // Wait for client hydration
 
-    const start = restaurant.value.opening_time || "09:00";
-    const end = restaurant.value.closing_time || "23:00";
+    const parseTime = (timeStr) => {
+      if (!timeStr) return "00:00";
+      let [time, modifier] = timeStr.trim().split(" ");
+      let [hours, minutes] = time.split(":");
+      hours = parseInt(hours, 10) || 0;
+      if (modifier && modifier.toUpperCase() === "PM" && hours < 12) hours += 12;
+      if (modifier && modifier.toUpperCase() === "AM" && hours === 12) hours = 0;
+      return `${hours.toString().padStart(2, "0")}:${minutes || "00"}`;
+    };
 
+    const currentStr = currentTimeStr.value;
+    const start = parseTime(restaurant.value.opening_time || "09:00");
+    const end = parseTime(restaurant.value.closing_time || "23:00");
     if (start <= end) {
       return currentStr >= start && currentStr <= end;
     } else {
@@ -236,7 +255,8 @@ const isActuallyOpen = computed(() => {
     }
   }
 
-  return true;
+  // 3. If both are OFF, then it's closed
+  return false;
 });
 
 // isShopOpen: Controls the overlay visibility only
@@ -244,7 +264,7 @@ const isShopOpen = computed(() => isActuallyOpen.value || isShopOpenOverride.val
 
 const closedMessage = computed(() => {
   if (!restaurant.value) return "";
-  if (restaurant.value.is_active === false) {
+  if (!restaurant.value.automated_hours_enabled) {
     return "المطعم مغلق حالياً. يرجى العودة لاحقاً.";
   }
   return "عذراً، المطعم مغلق حالياً. يرجى محاولة الطلب في مواعيد العمل:";
