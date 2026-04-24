@@ -496,7 +496,7 @@
 <script setup>
 definePageMeta({ layout: "admin", middleware: "auth" });
 
-const { userId } = useAuthUser();
+const { ownerId } = useAuthUser();
 const { $toast } = useNuxtApp();
 const { t } = useI18n();
 
@@ -534,29 +534,33 @@ const form = ref({
 });
 
 // Initialize Data
-onMounted(async () => {
-  if (userId.value) {
-    const data = await fetchProfile(userId.value);
-    if (data) {
-      form.value = {
-        business_name: data.business_name || "",
-        slug: data.slug || "",
-        whatsapp_number: data.whatsapp_number || "",
-        categories: data.categories || [],
-        delivery_areas: data.delivery_areas || [],
-        logo: data.logo || "",
-        is_active: data.is_active !== false,
-        order_reset_type: data.order_reset_type || "none",
-        primary_color: data.primary_color || "#ea580c",
-        show_table_number: data.show_table_number === true,
-        show_queue_number: data.show_queue_number === true,
-        automated_hours_enabled: data.automated_hours_enabled === true,
-        opening_time: data.opening_time || "09:00",
-        closing_time: data.closing_time || "23:00",
-      };
+watch(
+  ownerId,
+  async (newId) => {
+    if (newId) {
+      const data = await fetchProfile(newId);
+      if (data) {
+        form.value = {
+          business_name: data.business_name || "",
+          slug: data.slug || "",
+          whatsapp_number: data.whatsapp_number || "",
+          categories: data.categories || [],
+          delivery_areas: data.delivery_areas || [],
+          logo: data.logo || "",
+          is_active: data.is_active !== false,
+          order_reset_type: data.order_reset_type || "none",
+          primary_color: data.primary_color || "#ea580c",
+          show_table_number: data.show_table_number === true,
+          show_queue_number: data.show_queue_number === true,
+          automated_hours_enabled: data.automated_hours_enabled === true,
+          opening_time: data.opening_time || "09:00",
+          closing_time: data.closing_time || "23:00",
+        };
+      }
     }
-  }
-});
+  },
+  { immediate: true }
+);
 
 // QR Code Logic
 const menuUrl = computed(() => {
@@ -672,8 +676,8 @@ const saveCategoryName = async (index) => {
   cancelEditCategory();
 
   // If we have a user, update the menu items too (background)
-  if (userId.value) {
-    await updateItemsCategory(oldName, newName, userId.value);
+  if (ownerId.value) {
+    await updateItemsCategory(oldName, newName, ownerId.value);
   }
 };
 
@@ -697,8 +701,8 @@ const removeCategory = async (index) => {
   }
   const catName = form.value.categories[index];
   form.value.categories.splice(index, 1);
-  if (userId.value && catName) {
-    await deleteItemsByCategory(catName, userId.value);
+  if (ownerId.value && catName) {
+    await deleteItemsByCategory(catName, ownerId.value);
   }
 };
 
@@ -719,7 +723,7 @@ const confirmRemoveCategory = async () => {
 
 const uploadLogo = async (event) => {
   const file = event.target.files[0];
-  if (!file || !userId.value) return;
+  if (!file || !ownerId.value) return;
 
   // Check file size (5MB limit)
   const maxSize = 5 * 1024 * 1024;
@@ -729,12 +733,12 @@ const uploadLogo = async (event) => {
     return;
   }
 
-  const url = await uploadLogoAction(file, userId.value);
+  const url = await uploadLogoAction(file, ownerId.value);
   if (url) form.value.logo = url;
 };
 
 const saveSettings = async () => {
-  if (!userId.value) return;
+  if (!ownerId.value) return;
 
   // Be very specific about fields to update to avoid conflicts with triggers/RLS on other tables
   const settingsData = {
@@ -759,7 +763,7 @@ const saveSettings = async () => {
     closing_time: form.value.closing_time,
   };
 
-  const success = await updateProfile(userId.value, settingsData);
+  const success = await updateProfile(ownerId.value, settingsData);
   
   if (success) {
     // Update global auth store immediately for sidebar reactivity
