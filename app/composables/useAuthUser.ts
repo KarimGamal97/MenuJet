@@ -23,7 +23,6 @@ export const useAuthUser = () => {
 
   watchEffect(async () => {
     const uid = userId.value;
-    console.log('[useAuthUser] watchEffect fired. uid:', uid, '| ownerId:', ownerId.value);
 
     // User logged out → reset state
     if (!uid) {
@@ -32,23 +31,18 @@ export const useAuthUser = () => {
       return;
     }
 
-    if (ownerId.value) {
-      console.log('[useAuthUser] ownerId already set, skipping fetch:', ownerId.value);
-      return;
-    }
+    if (ownerId.value) return; // Already resolved, skip re-fetching
 
-    console.log('[useAuthUser] Fetching profile for uid:', uid);
-    const { data, error } = await client
+    // Query by user_id only (same as fetchProfile — avoids PGRST116 from bad .or().single())
+    const { data } = await client
       .from('profiles')
       .select('owner_id, role')
       .eq('user_id', uid)
       .maybeSingle();
 
-    console.log('[useAuthUser] Profile fetch result → data:', data, '| error:', error);
-
     userRole.value = data?.role || null;
+    // If admin has an owner, use that; otherwise use their own userId
     ownerId.value = data?.owner_id || uid;
-    console.log('[useAuthUser] ownerId set to:', ownerId.value);
   });
 
   return { user, userId, ownerId, userRole };

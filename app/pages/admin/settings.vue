@@ -537,11 +537,8 @@ const form = ref({
 watch(
   ownerId,
   async (newId) => {
-    console.log('[settings] watch(ownerId) fired. newId:', newId);
     if (newId) {
-      console.log('[settings] Calling fetchProfile with id:', newId);
       const data = await fetchProfile(newId);
-      console.log('[settings] fetchProfile returned:', data);
       if (data) {
         form.value = {
           business_name: data.business_name || "",
@@ -559,12 +556,7 @@ watch(
           opening_time: data.opening_time || "09:00",
           closing_time: data.closing_time || "23:00",
         };
-        console.log('[settings] Form populated successfully:', form.value.business_name);
-      } else {
-        console.warn('[settings] fetchProfile returned null for id:', newId);
       }
-    } else {
-      console.warn('[settings] watch fired with empty newId:', newId);
     }
   },
   { immediate: true }
