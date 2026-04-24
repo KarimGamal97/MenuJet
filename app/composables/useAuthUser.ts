@@ -21,17 +21,24 @@ export const useAuthUser = () => {
   const ownerId = useState<string | null>('auth_owner_id', () => null);
   const userRole = useState<string | null>('auth_user_role', () => null);
 
-  // Only fetch if we have a userId but ownerId is not set yet
   watchEffect(async () => {
     const uid = userId.value;
-    if (!uid) return;
+
+    // User logged out → reset state
+    if (!uid) {
+      ownerId.value = null;
+      userRole.value = null;
+      return;
+    }
+
     if (ownerId.value) return; // Already resolved, skip re-fetching
 
+    // Query by user_id only (same as fetchProfile — avoids PGRST116 from bad .or().single())
     const { data } = await client
       .from('profiles')
       .select('owner_id, role')
-      .or(`id.eq.${uid},user_id.eq.${uid}`)
-      .single();
+      .eq('user_id', uid)
+      .maybeSingle();
 
     userRole.value = data?.role || null;
     // If admin has an owner, use that; otherwise use their own userId
