@@ -11,9 +11,40 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 401, message: "يجب تسجيل الدخول أولاً" });
     }
 
-    // Check super_admin role from metadata
-    const callerRole =
-      requestingUser.user_metadata?.role || requestingUser.app_metadata?.role;
+    // Service role client — bypasses RLS for admin operations
+    const adminClient = serverSupabaseServiceRole(event);
+
+    const userId =
+      requestingUser.id ||
+      (requestingUser as any).sub ||
+      (requestingUser as any).user?.id;
+    if (!userId) {
+      throw createError({
+        statusCode: 401,
+        message: "لم يتم التعرف على هوية المستخدم. الرجاء تسجيل الدخول مجدداً.",
+      });
+    }
+
+    // Fetch the caller's profile to check their role and get restaurant data
+    const { data: callerProfile, error: profileFetchError } = await adminClient
+      .from("profiles")
+      .select(
+        "role, business_name, business_name_ar, business_name_en, slug, logo, whatsapp_number, categories, is_active",
+      )
+      .or(`user_id.eq.${userId},id.eq.${userId}`)
+      .limit(1)
+      .single();
+
+    if (profileFetchError) {
+      console.warn("Could not find caller profile:", profileFetchError.message);
+    }
+
+    const callerRole = (
+      callerProfile?.role ||
+      requestingUser?.user_metadata?.role ||
+      requestingUser?.app_metadata?.role ||
+      ""
+    ).toLowerCase();
 
     if (callerRole !== "super_admin") {
       throw createError({
@@ -22,27 +53,7 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Service role client — bypasses RLS for admin operations
-    const adminClient = serverSupabaseServiceRole(event);
-
-    // Fetch the super admin's restaurant profile to copy to the new admin
-    // We try to find by user_id or id
-    const { data: superAdminProfile, error: profileFetchError } =
-      await adminClient
-        .from("profiles")
-        .select(
-          "business_name_ar, business_name_en, slug, logo, whatsapp_number, categories, is_active",
-        )
-        .or(`user_id.eq.${requestingUser.id},id.eq.${requestingUser.id}`)
-        .limit(1)
-        .single();
-
-    if (profileFetchError) {
-      console.warn(
-        "Could not find super admin profile:",
-        profileFetchError.message,
-      );
-    }
+    const superAdminProfile = callerProfile;
 
     // Get the new user data from the request body
     const body = await readBody(event);
@@ -89,11 +100,12 @@ export default defineEventHandler(async (event) => {
         user_id: newUser.user.id,
         email: email,
         role: role || "admin",
-        owner_id: requestingUser.id,
+        owner_id: userId,
+        business_name: superAdminProfile?.business_name || null,
         business_name_ar:
           superAdminProfile?.business_name_ar || body.business_name_ar || null,
         business_name_en: superAdminProfile?.business_name_en || null,
-        slug: superAdminProfile?.slug || null,
+        slug: null, // Sub-admins don't need the restaurant's unique slug
         logo: superAdminProfile?.logo || null,
         whatsapp_number: superAdminProfile?.whatsapp_number || null,
         categories: superAdminProfile?.categories || null,
@@ -104,7 +116,12 @@ export default defineEventHandler(async (event) => {
 
     if (profileError) {
       console.error("Profile Upsert Error:", profileError);
-      // We don't throw yet, as the user is already created in Auth
+      // Clean up the auth user if profile creation fails so it doesn't get orphaned
+      await adminClient.auth.admin.deleteUser(newUser.user.id);
+      throw createError({
+        statusCode: 500,
+        message: `فشل إنشاء بيانات الملف الشخصي: ${profileError.message}`,
+      });
     }
 
     return {

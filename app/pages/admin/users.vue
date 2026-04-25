@@ -219,18 +219,14 @@ const createUser = async () => {
   }
 }
 
-// Fetch users from profiles table
+// Fetch users via secure API (bypasses RLS to ensure accurate fetching)
 const fetchUsers = async () => {
-  const { data, error } = await client
-    .from('profiles')
-    .select('*')
-    .order('full_name', { ascending: true })
-
-  if (error) {
-    console.error(error)
+  try {
+    const data = await $fetch<any[]>('/api/get-users')
+    users.value = data || []
+  } catch (err: any) {
+    console.error('Fetch users error:', err)
     $toast.error(t('admin.users_page.fetch_users_error'))
-  } else {
-    users.value = data
   }
 }
 

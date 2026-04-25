@@ -10,11 +10,26 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, message: "Unauthorized" });
   }
 
-  const callerRole =
-    requestingUser.user_metadata?.role || requestingUser.app_metadata?.role;
+  const userId = requestingUser.id || (requestingUser as any).sub || (requestingUser as any).user?.id;
+  if (!userId) {
+    throw createError({ statusCode: 401, message: "لم يتم التعرف على هوية المستخدم" });
+  }
+
+  // Use service role to bypass RLS + Auth permissions
+  const adminClient = serverSupabaseServiceRole(event);
+
+  // Fetch the caller's profile to check their role
+  const { data: callerProfile } = await adminClient
+    .from("profiles")
+    .select("role")
+    .or(`user_id.eq.${userId},id.eq.${userId}`)
+    .limit(1)
+    .single();
+
+  const callerRole = (callerProfile?.role || requestingUser.user_metadata?.role || requestingUser.app_metadata?.role || "").toLowerCase();
 
   if (callerRole !== "super_admin") {
-    throw createError({ statusCode: 403, message: "Forbidden: Super admin only" });
+    throw createError({ statusCode: 403, message: "عذراً، هذه الصلاحية للمدير العام فقط" });
   }
 
   const { profileId } = await readBody(event);
@@ -22,9 +37,6 @@ export default defineEventHandler(async (event) => {
   if (!profileId) {
     throw createError({ statusCode: 400, message: "profileId is required" });
   }
-
-  // Use service role to bypass RLS + Auth permissions
-  const adminClient = serverSupabaseServiceRole(event);
 
   // Get the user's auth ID (user_id) from the profile
   const { data: profileData, error: profileError } = await adminClient
