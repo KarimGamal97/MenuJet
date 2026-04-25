@@ -95,6 +95,7 @@
 
           <div class="flex gap-3" v-if="cart.length > 0">
           <button
+            v-if="whatsappOrderingEnabled !== false"
             @click="openWhatsappCheckout"
             class="flex-1 flex items-center justify-center gap-2 py-4 bg-white text-green-600 border border-gray-300 rounded-2xl font-black text-[12px] shadow-sm hover:shadow-md transition-all active:scale-95"
           >
@@ -192,7 +193,7 @@
               :placeholder="$t('cart.phone_placeholder')"
               maxlength="12"
               @input="cashierPhone = cashierPhone.replace(/[^0-9]/g, '')"
-              :class="['w-full p-4 bg-gray-50 border-2 rounded-2xl outline-none transition-all font-bold text-gray-800 text-sm shadow-sm', errors.cashierPhone ? 'border-red-400 focus:bg-white' : 'border-transparent focus:bg-white focus:border-green-500']"
+              :class="['w-full p-4 bg-gray-50 border-2 rounded-2xl outline-none transition-all font-bold text-gray-800 text-sm shadow-sm text-right', errors.cashierPhone ? 'border-red-400 focus:bg-white' : 'border-transparent focus:bg-white focus:border-green-500']"
             />
             <p v-if="errors.cashierPhone" class="text-xs text-red-500 font-bold mt-2 px-1">{{ errors.cashierPhone }}</p>
           </div>
@@ -206,7 +207,7 @@
               inputmode="numeric"
               :placeholder="$t('cart.table_number_placeholder')"
               maxlength="3"
-              :class="['w-full p-4 bg-gray-50 border-2 rounded-2xl outline-none transition-all font-bold text-gray-800 text-sm shadow-sm', errors.tableNumber ? 'border-red-400 focus:bg-white' : 'border-transparent focus:bg-white focus:border-green-500']"
+              :class="['w-full p-4 bg-gray-50 border-2 rounded-2xl outline-none transition-all font-bold text-gray-800 text-sm shadow-sm text-right', errors.tableNumber ? 'border-red-400 focus:bg-white' : 'border-transparent focus:bg-white focus:border-green-500']"
             />
             <p v-if="errors.tableNumber" class="text-xs text-red-500 font-bold mt-2 px-1">{{ errors.tableNumber }}</p>
           </div>
@@ -219,7 +220,7 @@
               type="text"
               :placeholder="$t('cart.queue_number_placeholder')"
               maxlength="15"
-              :class="['w-full p-4 bg-gray-50 border-2 rounded-2xl outline-none transition-all font-bold text-gray-800 text-sm shadow-sm', errors.queueNumber ? 'border-red-400 focus:bg-white' : 'border-transparent focus:bg-white focus:border-green-500']"
+              :class="['w-full p-4 bg-gray-50 border-2 rounded-2xl outline-none transition-all font-bold text-gray-800 text-sm shadow-sm text-right', errors.queueNumber ? 'border-red-400 focus:bg-white' : 'border-transparent focus:bg-white focus:border-green-500']"
             />
             <p v-if="errors.queueNumber" class="text-xs text-red-500 font-bold mt-2 px-1">{{ errors.queueNumber }}</p>
           </div>
@@ -278,7 +279,7 @@
               :placeholder="$t('cart.name_placeholder')"
               maxlength="20"
               @input="customerForm.name = customerForm.name.replace(/[^a-zA-Z\u0600-\u06FF\s]/g, '')"
-              :class="['w-full p-4 bg-gray-50 border-2 rounded-2xl outline-none transition-all font-bold text-gray-800 text-sm shadow-sm', errors.name ? 'border-red-400 focus:bg-white' : 'border-transparent focus:bg-white focus:border-green-500']"
+              :class="['w-full p-4 bg-gray-50 border-2 rounded-2xl outline-none transition-all font-bold text-gray-800 text-sm shadow-sm text-right', errors.name ? 'border-red-400 focus:bg-white' : 'border-transparent focus:bg-white focus:border-green-500']"
             />
             <p v-if="errors.name" class="text-xs text-red-500 font-bold mt-2 px-1">{{ errors.name }}</p>
           </div>
@@ -291,7 +292,7 @@
               :placeholder="$t('cart.phone_placeholder')"
               maxlength="12"
               @input="customerForm.phone = customerForm.phone.replace(/[^0-9]/g, '')"
-              :class="['w-full p-4 bg-gray-50 border-2 rounded-2xl outline-none transition-all font-bold text-gray-800 text-sm shadow-sm', errors.phone ? 'border-red-400 focus:bg-white' : 'border-transparent focus:bg-white focus:border-green-500']"
+              :class="['w-full p-4 bg-gray-50 border-2 rounded-2xl outline-none transition-all font-bold text-gray-800 text-sm shadow-sm text-right', errors.phone ? 'border-red-400 focus:bg-white' : 'border-transparent focus:bg-white focus:border-green-500']"
             />
             <p v-if="errors.phone" class="text-xs text-red-500 font-bold mt-2 px-1">{{ errors.phone }}</p>
           </div>
@@ -382,7 +383,7 @@
                 v-model="customerForm.addressDetail"
                 :placeholder="$t('cart.address_detail_placeholder')"
                 rows="3"
-                :class="['w-full p-4 bg-gray-50 border-2 rounded-2xl outline-none transition-all font-bold text-gray-800 text-sm shadow-sm resize-none', errors.addressDetail ? 'border-red-400 focus:bg-white' : 'border-transparent focus:bg-white focus:border-green-500']"
+                :class="['w-full p-4 bg-gray-50 border-2 rounded-2xl outline-none transition-all font-bold text-gray-800 text-sm shadow-sm resize-none text-right', errors.addressDetail ? 'border-red-400 focus:bg-white' : 'border-transparent focus:bg-white focus:border-green-500']"
               ></textarea>
               <p v-if="errors.addressDetail" class="text-xs text-red-500 font-bold mt-2 px-1">{{ errors.addressDetail }}</p>
             </div>
@@ -418,7 +419,8 @@ const props = defineProps({
   restaurantUserId: { type: String, default: "" },
   deliveryAreas: { type: Array, default: () => [] },
   tableNumberEnabled: { type: Boolean, default: false },
-  queueNumberEnabled: { type: Boolean, default: false }
+  queueNumberEnabled: { type: Boolean, default: false },
+  whatsappOrderingEnabled: { type: Boolean, default: true }
 });
 
 const emit = defineEmits(["close"]);

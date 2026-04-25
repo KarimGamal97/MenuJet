@@ -272,7 +272,7 @@
           </div>
         </div>
 
-        <!-- Table Number & Queue Settings -->
+        <!-- Store Features Settings -->
         <div class="md:col-span-2 pt-4">
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <BaseToggle
@@ -283,6 +283,11 @@
             <BaseToggle
               v-model="form.show_queue_number"
               :label="$t('cart.queue_number_setting_label')"
+              class="!bg-gray-50/50 !border !border-gray-100"
+            />
+            <BaseToggle
+              v-model="form.whatsapp_ordering_enabled"
+              label="تفعيل الطلب عبر الواتساب"
               class="!bg-gray-50/50 !border !border-gray-100"
             />
           </div>
@@ -528,6 +533,7 @@ const form = ref({
   primary_color: "#ea580c",
   show_table_number: false,
   show_queue_number: false,
+  whatsapp_ordering_enabled: true,
   automated_hours_enabled: false,
   opening_time: "09:00",
   closing_time: "23:00",
@@ -552,6 +558,7 @@ watch(
           primary_color: data.primary_color || "#ea580c",
           show_table_number: data.show_table_number === true,
           show_queue_number: data.show_queue_number === true,
+          whatsapp_ordering_enabled: data.whatsapp_ordering_enabled !== false,
           automated_hours_enabled: data.automated_hours_enabled === true,
           opening_time: data.opening_time || "09:00",
           closing_time: data.closing_time || "23:00",
@@ -758,6 +765,7 @@ const saveSettings = async () => {
     primary_color: form.value.primary_color || "#ea580c",
     show_table_number: form.value.show_table_number === true,
     show_queue_number: form.value.show_queue_number === true,
+    whatsapp_ordering_enabled: form.value.whatsapp_ordering_enabled !== false,
     automated_hours_enabled: form.value.automated_hours_enabled === true,
     opening_time: form.value.opening_time,
     closing_time: form.value.closing_time,
