@@ -14,7 +14,18 @@
         <a href="#demo" class="bg-white text-gray-900 border-2 border-gray-200 px-10 py-4 rounded-xl text-lg font-bold hover:bg-gray-50 transition">
           شوف الفيديو التعريفي
         </a>
+        <button
+          v-if="isInstallable"
+          @click="triggerInstall"
+          class="bg-green-600 text-white px-10 py-4 rounded-xl text-lg font-bold shadow-lg shadow-green-200 hover:scale-105 transition flex items-center gap-2 justify-center"
+        >
+          ⬇️ تحميل التطبيق
+        </button>
       </div>
     </div>
   </section>
 </template>
+
+<script setup>
+const { isInstallable, triggerInstall } = usePwaInstall()
+</script>

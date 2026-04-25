@@ -29,9 +29,9 @@ export default defineNuxtConfig({
     registerType: "autoUpdate",
     injectRegister: "auto",
     manifest: {
-      name: "Neorder Smart Menu",
-      short_name: "Neorder",
-      description: "The Next Generation of Ordering",
+      name: "MenuJet Smart Menu",
+      short_name: "MenuJet",
+      description: "The Next Generation Of Smart Menus",
       theme_color: "#ffffff",
       icons: [
         {
