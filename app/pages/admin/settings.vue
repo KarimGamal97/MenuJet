@@ -290,6 +290,11 @@
               label="تفعيل الطلب عبر الواتساب"
               class="!bg-gray-50/50 !border !border-gray-100"
             />
+            <BaseToggle
+              v-model="form.show_phone_number"
+              label="تفعيل رقم الهاتف"
+              class="!bg-gray-50/50 !border !border-gray-100"
+            />
           </div>
         </div>
 
@@ -534,6 +539,7 @@ const form = ref({
   show_table_number: false,
   show_queue_number: false,
   whatsapp_ordering_enabled: true,
+  show_phone_number: true,
   automated_hours_enabled: false,
   opening_time: "09:00",
   closing_time: "23:00",
@@ -559,6 +565,7 @@ watch(
           show_table_number: data.show_table_number === true,
           show_queue_number: data.show_queue_number === true,
           whatsapp_ordering_enabled: data.whatsapp_ordering_enabled !== false,
+          show_phone_number: data.show_phone_number !== false,
           automated_hours_enabled: data.automated_hours_enabled === true,
           opening_time: data.opening_time || "09:00",
           closing_time: data.closing_time || "23:00",
@@ -766,6 +773,7 @@ const saveSettings = async () => {
     show_table_number: form.value.show_table_number === true,
     show_queue_number: form.value.show_queue_number === true,
     whatsapp_ordering_enabled: form.value.whatsapp_ordering_enabled !== false,
+    show_phone_number: form.value.show_phone_number !== false,
     automated_hours_enabled: form.value.automated_hours_enabled === true,
     opening_time: form.value.opening_time,
     closing_time: form.value.closing_time,

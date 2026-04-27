@@ -146,6 +146,7 @@
         :tableNumberEnabled="restaurant.show_table_number === true"
         :queueNumberEnabled="restaurant.show_queue_number === true"
         :whatsappOrderingEnabled="restaurant.whatsapp_ordering_enabled !== false"
+        :phoneNumberEnabled="restaurant.show_phone_number !== false"
         @close="showCart = false"
       />
 

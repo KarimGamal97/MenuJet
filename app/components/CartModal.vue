@@ -185,7 +185,7 @@
         </div>
 
         <div class="flex-1 overflow-y-auto px-6 py-6 space-y-5 custom-scrollbar">
-          <div>
+          <div v-if="phoneNumberEnabled">
             <label :class="['block text-[10px] font-black uppercase tracking-wider mb-2', errors.cashierPhone ? 'text-red-500' : 'text-gray-400']">{{ $t("cart.phone_label") }}</label>
             <input
               v-model="cashierPhone"
@@ -284,7 +284,7 @@
             <p v-if="errors.name" class="text-xs text-red-500 font-bold mt-2 px-1">{{ errors.name }}</p>
           </div>
 
-          <div>
+          <div v-if="phoneNumberEnabled">
             <label :class="['block text-[10px] font-black uppercase tracking-wider mb-2', errors.phone ? 'text-red-500' : 'text-gray-400']">{{ $t("cart.phone_label") }}</label>
             <input
               v-model="customerForm.phone"
@@ -420,7 +420,8 @@ const props = defineProps({
   deliveryAreas: { type: Array, default: () => [] },
   tableNumberEnabled: { type: Boolean, default: false },
   queueNumberEnabled: { type: Boolean, default: false },
-  whatsappOrderingEnabled: { type: Boolean, default: true }
+  whatsappOrderingEnabled: { type: Boolean, default: true },
+  phoneNumberEnabled: { type: Boolean, default: true }
 });
 
 const emit = defineEmits(["close"]);
@@ -486,16 +487,18 @@ const placeCashierOrder = async () => {
   errors.value.queueNumber = "";
   let hasError = false;
 
-  const phoneValue = cashierPhone.value.trim();
-  if (!phoneValue) {
-    errors.value.cashierPhone = t("cart.err_phone_required");
-    hasError = true;
-  } else if (!/^\d+$/.test(phoneValue)) {
-    errors.value.cashierPhone = t("cart.err_phone_numbers");
-    hasError = true;
-  } else if (phoneValue.length < 8) {
-    errors.value.cashierPhone = t("cart.err_phone_length");
-    hasError = true;
+  if (props.phoneNumberEnabled) {
+    const phoneValue = cashierPhone.value.trim();
+    if (!phoneValue) {
+      errors.value.cashierPhone = t("cart.err_phone_required");
+      hasError = true;
+    } else if (!/^\d+$/.test(phoneValue)) {
+      errors.value.cashierPhone = t("cart.err_phone_numbers");
+      hasError = true;
+    } else if (phoneValue.length < 8) {
+      errors.value.cashierPhone = t("cart.err_phone_length");
+      hasError = true;
+    }
   }
 
   if (props.tableNumberEnabled && !tableNumber.value.trim()) {
@@ -651,16 +654,18 @@ const handleWhatsappOrderFinal = () => {
     hasError = true;
   }
 
-  const phoneValue = customerForm.value.phone.trim();
-  if (!phoneValue) {
-    errors.value.phone = t("cart.err_phone_required");
-    hasError = true;
-  } else if (!/^\d+$/.test(phoneValue)) {
-    errors.value.phone = t("cart.err_phone_numbers");
-    hasError = true;
-  } else if (phoneValue.length < 8) {
-    errors.value.phone = t("cart.err_phone_length");
-    hasError = true;
+  if (props.phoneNumberEnabled) {
+    const phoneValue = customerForm.value.phone.trim();
+    if (!phoneValue) {
+      errors.value.phone = t("cart.err_phone_required");
+      hasError = true;
+    } else if (!/^\d+$/.test(phoneValue)) {
+      errors.value.phone = t("cart.err_phone_numbers");
+      hasError = true;
+    } else if (phoneValue.length < 8) {
+      errors.value.phone = t("cart.err_phone_length");
+      hasError = true;
+    }
   }
 
   if (customerForm.value.method === "توصيل") {
@@ -729,11 +734,12 @@ const whatsappLink = computed(() => {
     header = "طلب جديد";
   }
 
+  let phoneLine = props.phoneNumberEnabled ? `الهاتف: ${customerForm.value.phone || "غير محدد"}\n` : '';
+
   let msgText = `${header}
 
 الاسم: ${customerForm.value.name || "غير محدد"}
-الهاتف: ${customerForm.value.phone || "غير محدد"}
-
+${phoneLine}
 تفاصيل الطلب:
 ${items}
 `;
