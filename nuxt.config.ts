@@ -21,10 +21,9 @@ export default defineNuxtConfig({
     "@nuxtjs/supabase",
     "@nuxtjs/tailwindcss",
     "@pinia/nuxt",
-    "@vite-pwa/nuxt", // تم إضافة موديل الـ PWA هنا
+    "@vite-pwa/nuxt",
   ],
 
-  // إعدادات الـ PWA الجديدة
   pwa: {
     registerType: "autoUpdate",
     injectRegister: "auto",
@@ -33,6 +32,8 @@ export default defineNuxtConfig({
       short_name: "MenuJet",
       description: "The Next Generation Of Smart Menus",
       theme_color: "#ffffff",
+      display: "standalone",
+      orientation: "portrait",
       icons: [
         {
           src: "/pwa-192x192.png",
@@ -43,6 +44,22 @@ export default defineNuxtConfig({
           src: "/pwa-512x512.png",
           sizes: "512x512",
           type: "image/png",
+          purpose: "any maskable",
+        },
+      ],
+      screenshots: [
+        {
+          src: "/screenshots/mobile-preview.png",
+          sizes: "750x1334",
+          type: "image/png",
+          label: "واجهة منيو الموبايل الذكية",
+        },
+        {
+          src: "/screenshots/desktop-preview.png",
+          sizes: "1920x1080",
+          type: "image/png",
+          form_factor: "wide",
+          label: "لوحة تحكم منيو جت",
         },
       ],
     },
