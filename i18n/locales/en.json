@@ -58,6 +58,8 @@
     "item_price": "Price",
     "choose_category": "Choose Category",
     "item_image": "Item Image (Optional)",
+    "item_badge": "Badge (e.g. New, Best Seller)",
+    "item_badge_placeholder": "Optional",
     "uploading_image": "Uploading image...",
     "upload_success": "Image uploaded successfully",
     "save": "Save",
@@ -149,7 +151,11 @@
     "fixed_price": "Fixed Price",
     "click_image": "Click to select image",
     "example": "Example: ",
-    "piece": "Piece"
+    "piece": "Piece",
+    "by_patty": "By Patty",
+    "patty_single": "Single",
+    "patty_double": "Double",
+    "patty_triple": "Triple"
   },
   "cart": {
     "title": "Your Order",

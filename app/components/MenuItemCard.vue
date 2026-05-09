@@ -1,8 +1,16 @@
 <template>
   <div
-    class="bg-white p-4 border-b border-gray-100 flex justify-between items-center cursor-pointer active:scale-[0.98] rounded-[2rem]"
+    class="relative bg-white p-4 border-b border-gray-100 flex justify-between items-center cursor-pointer active:scale-[0.98] rounded-[2rem]"
     @click="handleCardClick"
   >
+    <!-- Badge on top left -->
+    <span
+      v-if="item.badge"
+      class="absolute top-0 left-0 bg-red-600 text-white text-[10px] font-black px-4 py-1.5 rounded-tl-[2rem] rounded-br-2xl uppercase tracking-wider shadow-sm z-10 pointer-events-none"
+    >
+      {{ item.badge }}
+    </span>
+
     <div class="flex items-center gap-4 text-right">
       <img
         v-if="item.image"
@@ -18,7 +26,7 @@
 
       <div class="min-w-0">
         <h3
-          class="font-bold text-gray-800 mt-1 line-clamp-1 truncate min-w-0 text-sm"
+          class="font-bold text-gray-800 line-clamp-1 truncate min-w-0 text-sm mt-1"
         >
           {{ item.name }}
           <!-- <span class="text-orange-600 text-xs"> ({{ item.size }})</span> -->

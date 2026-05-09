@@ -276,6 +276,51 @@
           </div>
         </div>
 
+        <!-- By Patty (single/double/triple) -->
+        <div v-else-if="newItem.pricingType === 'patty'" class="space-y-2">
+          <div class="flex gap-2">
+            <button
+              v-for="p in ['single', 'double', 'triple']"
+              :key="p"
+              type="button"
+              @click="newItem.activePatty = p"
+              :class="[
+                'flex-1 py-3 rounded-2xl font-bold text-sm transition-all border-2',
+                newItem.activePatty === p
+                  ? 'bg-orange-600 text-white border-orange-600 shadow-md shadow-orange-100'
+                  : 'bg-gray-50 text-gray-400 border-transparent hover:border-orange-200 hover:text-orange-600',
+              ]"
+            >
+              {{ $t(`admin.patty_${p}`) }}
+            </button>
+          </div>
+          <div class="pt-1">
+            <BaseInput
+              v-model="newItem.pattyPrices[newItem.activePatty]"
+              type="number"
+              :label="`${$t('admin.price_word')} ${$t('admin.patty_' + newItem.activePatty)}`"
+              oninput="if (this.value.length > 5) this.value = this.value.slice(0, 5);"
+            />
+          </div>
+          <div class="flex gap-2 pt-1">
+            <div
+              v-for="p in ['single', 'double', 'triple']"
+              :key="p"
+              class="flex-1 bg-gray-50 rounded-xl p-2 text-center border border-gray-100"
+            >
+              <p class="text-[9px] font-black text-gray-400 uppercase mb-0.5">
+                {{ $t(`admin.patty_${p}`) }}
+              </p>
+              <p
+                class="text-xs font-black"
+                :class="newItem.pattyPrices[p] ? 'text-gray-700' : 'text-gray-300'"
+              >
+                {{ newItem.pattyPrices[p] || "—" }}
+              </p>
+            </div>
+          </div>
+        </div>
+
         <!-- Fixed Price -->
         <div v-else class="space-y-2">
           <BaseInput
@@ -347,19 +392,29 @@
             <span>{{ $t("admin.item_description") }}</span>
             <span
               :class="
-                newItem.description.length >= 30
+                newItem.description.length >= 100
                   ? 'text-red-400'
                   : 'text-gray-300'
               "
-              >{{ newItem.description.length }}/30</span
+              >{{ newItem.description.length }}/100</span
             >
           </label>
           <textarea
             v-model="newItem.description"
             :placeholder="$t('admin.item_description_placeholder')"
-            :maxlength="30"
+            :maxlength="100"
             rows="2"
             class="w-full p-4 bg-white border-2 border-gray-200 rounded-2xl outline-none focus:border-orange-500 transition-all text-sm font-bold text-gray-800 resize-none"
+          />
+        </div>
+
+        <!-- Badge -->
+        <div class="space-y-2">
+          <BaseInput 
+            v-model="newItem.badge" 
+            :label="$t('admin.item_badge')" 
+            :placeholder="$t('admin.item_badge_placeholder')"
+            :maxlength="20"
           />
         </div>
 
@@ -526,7 +581,10 @@ const newItem = ref({
     { label: "", price: "" },
   ],
   fixedPrice: "",
+  pattyPrices: { single: "", double: "", triple: "" },
+  activePatty: "single",
   category: "",
+  badge: "",
   available: true,
   description: "",
   extras: [],
@@ -551,11 +609,14 @@ const pricingTypes = [
   { value: "size", label: $t("admin.by_size") },
   { value: "count", label: $t("admin.by_count") },
   { value: "fixed", label: $t("admin.by_fixed") },
+  { value: "patty", label: $t("admin.by_patty") },
 ];
 
 const detectPricingType = (prices) => {
   if (!prices || typeof prices !== 'object') return "fixed";
   const keys = Object.keys(prices).map(k => k.toLowerCase());
+  if (keys.some((k) => ["single", "double", "triple"].includes(k)))
+    return "patty";
   if (keys.some((k) => ["sm", "md", "lg", "s"].includes(k)))
     return "size";
   if (keys.includes("fixed")) return "fixed";
@@ -651,7 +712,10 @@ const openAddModal = () => {
       { label: "", price: "" },
     ],
     fixedPrice: "",
+    pattyPrices: { single: "", double: "", triple: "" },
+    activePatty: "single",
     category: availableCategories.value[0],
+    badge: "",
     available: true,
     description: "",
     extras: [],
@@ -688,6 +752,13 @@ const openEditModal = (item) => {
     });
   }
   
+  const pattyPrices = { single: "", double: "", triple: "" };
+  if (type === "patty" && item.prices) {
+    for (const p of ["single", "double", "triple"]) {
+      if (item.prices[p]) pattyPrices[p] = String(item.prices[p]);
+    }
+  }
+
   newItem.value = {
     name: item.name,
     pricingType: type,
@@ -699,7 +770,10 @@ const openEditModal = (item) => {
     activeSize: "sm",
     countOptions,
     fixedPrice: type === "fixed" ? String(item.prices?.fixed || item.price || "") : "",
+    pattyPrices,
+    activePatty: "single",
     category: item.category,
+    badge: item.badge || "",
     available: item.available !== false,
     description: item.description || "",
     extras: Array.isArray(item.extras) ? JSON.parse(JSON.stringify(item.extras)) : [],
@@ -724,6 +798,12 @@ const handleSaveItem = async () => {
     }
     hasPrices = Object.keys(cleanPrices).length > 0;
     if (hasPrices) displayPrice = Math.min(...Object.values(cleanPrices));
+  } else if (pricingType === "patty") {
+    for (const p of ["single", "double", "triple"]) {
+      if (newItem.value.pattyPrices[p]) cleanPrices[p] = Number(newItem.value.pattyPrices[p]);
+    }
+    hasPrices = Object.keys(cleanPrices).length > 0;
+    if (hasPrices) displayPrice = Math.min(...Object.values(cleanPrices));
   } else if (pricingType === "count") {
     for (const opt of countOptions) {
       if (opt.label && opt.price) cleanPrices[opt.label] = Number(opt.price);
@@ -745,6 +825,7 @@ const handleSaveItem = async () => {
   const itemData = {
     name,
     category,
+    badge: newItem.value.badge || null,
     available: newItem.value.available,
     description: newItem.value.description,
     image: imageUrl.value || null,

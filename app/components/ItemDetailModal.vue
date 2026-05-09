@@ -103,6 +103,31 @@
               </div>
             </div>
 
+            <!-- Patty Selector -->
+            <div
+              v-else-if="pricingType === 'patty'"
+              class="bg-gray-50 rounded-2xl p-3"
+            >
+              <p class="text-sm font-bold text-gray-500 mb-2">
+                {{ $t("admin.by_patty") }}
+              </p>
+              <div class="flex gap-2">
+                <button
+                  v-for="p in availablePatties"
+                  :key="p"
+                  @click="selectedPatty = p"
+                  :class="[
+                    'flex-1 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all border-2 active:scale-95',
+                    selectedPatty === p
+                      ? 'bg-orange-600 text-white border-orange-600 shadow-md shadow-orange-200'
+                      : 'bg-white text-gray-400 border-gray-200 hover:border-orange-300 hover:text-orange-500',
+                  ]"
+                >
+                  {{ $t(`admin.patty_${p}`) }}
+                </button>
+              </div>
+            </div>
+
             <!-- Count Selector (for 'count' type, e.g. 10P / 15P / 25P) -->
             <div
               v-else-if="pricingType === 'count'"
@@ -248,6 +273,7 @@ const emit = defineEmits(["close", "added"]);
 const { addToCart } = useCart();
 const qty = ref(1);
 const selectedSize = ref("sm");
+const selectedPatty = ref("single");
 const selectedCount = ref(null);
 const notes = ref("");
 const showNotes = ref(false);
@@ -267,6 +293,7 @@ const toggleExtra = (extra) => {
 const pricingType = computed(() => {
   const p = props.item.prices;
   if (!p || Object.keys(p).length === 0) return "fixed";
+  if (Object.keys(p).some((k) => ["single", "double", "triple"].includes(k))) return "patty";
   if (Object.keys(p).some((k) => ["sm", "md", "lg"].includes(k))) return "size";
   if ("fixed" in p) return "fixed";
   return "count";
@@ -275,6 +302,10 @@ const pricingType = computed(() => {
 // Only show sizes that have a price
 const availableSizes = computed(() =>
   ["sm", "md", "lg"].filter((s) => props.item.prices?.[s]),
+);
+
+const availablePatties = computed(() =>
+  ["single", "double", "triple"].filter((p) => props.item.prices?.[p]),
 );
 
 // Parse count entries from prices object
@@ -298,6 +329,8 @@ watch(
       selectedExtras.value = [];
       if (pricingType.value === "size") {
         selectedSize.value = availableSizes.value[0] || "sm";
+      } else if (pricingType.value === "patty") {
+        selectedPatty.value = availablePatties.value[0] || "single";
       } else if (pricingType.value === "count") {
         selectedCount.value = countEntries.value[0]?.label || null;
       }
@@ -310,6 +343,10 @@ const currentPrice = computed(() => {
   if (pricingType.value === "size") {
     basePrice = Number(
       props.item.prices?.[selectedSize.value] || props.item.price || 0,
+    );
+  } else if (pricingType.value === "patty") {
+    basePrice = Number(
+      props.item.prices?.[selectedPatty.value] || props.item.price || 0,
     );
   } else if (pricingType.value === "count") {
     const entry = countEntries.value.find(
@@ -341,6 +378,7 @@ const handleAdd = () => {
   };
   
   if (pricingType.value === "size") itemInfo.size = selectedSize.value;
+  if (pricingType.value === "patty") itemInfo.size = $t(`admin.patty_${selectedPatty.value}`);
   if (pricingType.value === "count")
     itemInfo.size = selectedCount.value + " قطعة";
   if (notes.value.trim()) itemInfo.notes = notes.value.trim();
