@@ -1,4 +1,78 @@
 {
+  "hero": {
+    "title_part1": "Turn your restaurant menu into a",
+    "title_part2": "Smart Experience",
+    "subtitle": "Save printing costs, update your prices in seconds, and impress your customers with the fastest QR menu.",
+    "cta_start": "Start Your Free Week",
+    "cta_demo": "Watch Demo Video",
+    "cta_download": "Download App",
+    "badges": {
+      "setup": "Setup in minutes",
+      "no_credit": "No credit card required",
+      "support": "24/7 Support"
+    }
+  },
+  "features": {
+    "instant_edit": {
+      "title": "Instant Editing",
+      "desc": "Change prices and items from your phone in seconds, and customers will see the updates instantly."
+    },
+    "attractive_photos": {
+      "title": "Attractive Photos",
+      "desc": "Display your dishes in high quality and video. Encourage customers to order more just by looking at the picture."
+    },
+    "brand_custom": {
+      "title": "Your Brand Identity",
+      "desc": "Fully customize your menu's colors, logo, and layout to perfectly match your restaurant's unique style."
+    },
+    "real_savings": {
+      "title": "Real Savings",
+      "desc": "Save thousands of pounds wasted on printing paper menus every time a price changes."
+    }
+  },
+  "pricing": {
+    "title": "Plans That Fit Your Ambition",
+    "subtitle": "Choose the payment plan that suits you and start your restaurant's transformation today with a fully free week!",
+    "currency_month": "EGP / month",
+    "plan_1": {
+      "title": "1 Month Subscription",
+      "subtitle": "Flexible monthly renewal (Total 490 EGP)",
+      "feat_1": "Digital menu with unlimited items",
+      "feat_2": "Direct WhatsApp order reception",
+      "feat_3": "High-quality print-ready QR code",
+      "feat_4": "Advanced menu visitor analytics",
+      "cta": "Subscribe Now"
+    },
+    "plan_3": {
+      "badge": "Most Popular 🔥",
+      "title": "3 Months Subscription",
+      "subtitle": "Save 120 EGP (Total 1,350 EGP)",
+      "feat_1": "All monthly plan features",
+      "feat_2": "Advanced dashboard and profit analytics",
+      "feat_3": "Priority WhatsApp technical support",
+      "feat_4": "Ability to add an extra branch",
+      "cta": "Start Free Trial"
+    },
+    "plan_6": {
+      "badge": "Best Value 💰",
+      "title": "6 Months Subscription",
+      "subtitle": "Save 600 EGP (Total 2,340 EGP)",
+      "feat_1": "All 3-months plan features",
+      "feat_2": "Custom colors and logo for your brand",
+      "feat_3": "Dedicated account manager",
+      "feat_4": "Unlimited branches",
+      "cta": "Select Plan"
+    },
+    "footer_note": "🎁 All plans include a 7-day completely free trial - cancel anytime with zero fees!"
+  },
+  "contact": {
+    "title": "Ready to upgrade your restaurant?",
+    "subtitle": "Leave your details and we'll contact you to activate your free account immediately.",
+    "name_placeholder": "Name",
+    "restaurant_placeholder": "Restaurant Name",
+    "cta": "Request Demo on WhatsApp",
+    "msg_template": "Hello MenuJet, I am {name}, owner of {restaurant}, and I would like to try the free digital menu."
+  },
   "welcome": "Welcome to",
   "order_now": "Order now via WhatsApp",
   "no_description": "No description available",

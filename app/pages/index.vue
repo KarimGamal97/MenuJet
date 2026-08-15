@@ -1,13 +1,11 @@
 <template>
   <div class="landing-page">
     <LandingTheNavbar />
-    
     <main>
       <LandingHeroSection />
       <LandingFeatures />
-      
+      <LandingHowItWorks />
       <LandingDemoVideo />
-
       <LandingPricing />
       <LandingContactForm />
     </main>

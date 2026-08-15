@@ -1,8 +1,8 @@
 <template>
-  <footer class="py-10 bg-white border-t border-gray-100">
-    <div class="container mx-auto px-6 text-center text-gray-400">
-      <div class="text-xl font-black text-orange-600 mb-4">MenuJet</div>
-      <p>© 2026 جميع الحقوق محفوظة</p>
+  <footer class="py-3 bg-white border-t border-gray-100">
+    <div class="flex justify-center items-center gap-4">
+      <div class="text-xl font-black text-orange-600">MenuJet</div>
+      <p>© {{ new Date().getFullYear() }} جميع الحقوق محفوظة</p>
     </div>
   </footer>
 </template>
