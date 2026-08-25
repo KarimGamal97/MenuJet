@@ -33,35 +33,37 @@
   "pricing": {
     "title": "Plans That Fit Your Ambition",
     "subtitle": "Choose the payment plan that suits you and start your restaurant's transformation today with a fully free week!",
-    "currency_month": "EGP / month",
-    "plan_1": {
-      "title": "1 Month Subscription",
-      "subtitle": "Flexible monthly renewal (Total 490 EGP)",
-      "feat_1": "Digital menu with unlimited items",
-      "feat_2": "Direct WhatsApp order reception",
-      "feat_3": "High-quality print-ready QR code",
-      "feat_4": "Advanced menu visitor analytics",
-      "cta": "Subscribe Now"
-    },
-    "plan_3": {
-      "badge": "Most Popular 🔥",
-      "title": "3 Months Subscription",
-      "subtitle": "Save 120 EGP (Total 1,350 EGP)",
-      "feat_1": "All monthly plan features",
-      "feat_2": "Advanced dashboard and profit analytics",
-      "feat_3": "Priority WhatsApp technical support",
-      "feat_4": "Ability to add an extra branch",
+    "free_trial": {
+      "title": "Free Trial",
+      "price": "Free",
+      "subtitle": "Valid for a full week (7 days)",
+      "feat_1": "Full dashboard access",
+      "feat_2": "Try all available features",
+      "feat_3": "No financial commitment",
       "cta": "Start Free Trial"
     },
-    "plan_6": {
-      "badge": "Best Value 💰",
-      "title": "6 Months Subscription",
-      "subtitle": "Save 600 EGP (Total 2,340 EGP)",
-      "feat_1": "All 3-months plan features",
-      "feat_2": "Custom colors and logo for your brand",
-      "feat_3": "Dedicated account manager",
-      "feat_4": "Unlimited branches",
-      "cta": "Select Plan"
+    "plan_semi_annual": {
+      "title": "Semi-Annual Plan",
+      "price": "9,000",
+      "currency": "EGP",
+      "duration": "6 months subscription",
+      "rate": "(Equivalent to 1,500 EGP/month)",
+      "feat_1": "Custom QR code design",
+      "feat_2": "Continuous tech support",
+      "feat_3": "Free system updates",
+      "cta": "Subscribe Now"
+    },
+    "plan_annual": {
+      "badge": "Best Choice",
+      "title": "Annual Plan\n(Best Choice)",
+      "price": "15,600",
+      "currency": "EGP",
+      "duration": "12 months subscription",
+      "rate": "(Equivalent to 1,300 EGP/month)",
+      "feat_1": "Top priority in technical support",
+      "feat_2": "All system features included",
+      "saving": "Save 2,400 EGP compared to monthly",
+      "cta": "Subscribe Now"
     },
     "footer_note": "🎁 All plans include a 7-day completely free trial - cancel anytime with zero fees!"
   },
