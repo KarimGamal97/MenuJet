@@ -36,7 +36,7 @@
           </div>
 
           <div class="mt-4">
-            <SecondaryButton href="#contact" class="w-full !rounded-2xl !py-3.5 font-bold">
+            <SecondaryButton href="#contact" @click.prevent="scrollToSection('contact')" class="w-full !rounded-2xl !py-3.5 font-bold">
               {{ $t('pricing.free_trial.cta') }}
             </SecondaryButton>
           </div>
@@ -72,7 +72,7 @@
           </div>
 
           <div class="mt-4">
-            <SecondaryButton href="#contact" class="w-full !rounded-2xl !py-3.5 font-bold">
+            <SecondaryButton href="#contact" @click.prevent="scrollToSection('contact')" class="w-full !rounded-2xl !py-3.5 font-bold">
               {{ $t('pricing.plan_semi_annual.cta') }}
             </SecondaryButton>
           </div>
@@ -110,7 +110,7 @@
             <div class="bg-orange-100/70 text-orange-600 font-black py-3 px-4 rounded-xl text-center mb-6 text-base tracking-wide border border-orange-200/50">
               {{ $t('pricing.plan_annual.saving') }}
             </div>
-            <PrimaryButton href="#contact" class="w-full !rounded-2xl !py-3.5 text-lg font-bold">
+            <PrimaryButton href="#contact" @click.prevent="scrollToSection('contact')" class="w-full !rounded-2xl !py-3.5 text-lg font-bold">
               {{ $t('pricing.plan_annual.cta') }}
             </PrimaryButton>
           </div>
@@ -122,6 +122,13 @@
 </template>
 
 <script setup>
+const scrollToSection = (sectionId) => {
+  const element = document.getElementById(sectionId)
+  if (element) {
+    const y = element.getBoundingClientRect().top + window.scrollY - 80
+    window.scrollTo({ top: y, behavior: 'smooth' })
+  }
+}
 </script>
 
 <style scoped>
