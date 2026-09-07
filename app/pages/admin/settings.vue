@@ -329,17 +329,38 @@
           </template>
         </BaseModal>
 
+        <!-- Upgrade Plan Modal -->
+        <UpgradeModal
+          :isOpen="showUpgradeModal"
+          limitType="categories"
+          :currentCount="form.categories.length"
+          :maxCount="maxCategories"
+          :businessName="form.business_name || profile?.business_name || ''"
+          @close="showUpgradeModal = false"
+        />
+
         <!--  Categories -->
         <div class="md:col-span-2 pt-4">
-          <div class="flex items-center gap-3 mb-4 px-1">
-            <label class="text-sm font-bold text-gray-700">{{
-              $t("admin.menu_sections")
-            }}</label>
-            <span
-              class="text-[10px] bg-orange-50 text-orange-600 px-2 py-1 rounded-lg font-bold"
-              >{{ form.categories.length }}
-              {{ $t("admin.sections_count") }}</span
+          <div class="flex items-center justify-between mb-4 px-1">
+            <div class="flex items-center gap-3">
+              <label class="text-sm font-bold text-gray-700">{{
+                $t("admin.menu_sections")
+              }}</label>
+              <span
+                class="text-[10px] bg-orange-50 text-orange-600 px-2 py-1 rounded-lg font-black"
+                >{{ form.categories.length }} / {{ maxCategories === -1 ? '∞' : maxCategories }}
+                {{ $t("admin.sections_count") }}</span
+              >
+            </div>
+
+            <button
+              v-if="isCategoryLimitReached || profile?.plan_type === 'free'"
+              type="button"
+              @click="showUpgradeModal = true"
+              class="text-xs font-black bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white px-3 py-1.5 rounded-xl shadow-xs transition-transform active:scale-95 cursor-pointer"
             >
+              ⚡ ترقية الباقة
+            </button>
           </div>
 
           <div class="flex gap-3 items-end">
@@ -523,6 +544,16 @@ const {
 
 const { deleteItemsByCategory, updateItemsCategory } = useMenu();
 
+const showUpgradeModal = ref(false);
+const maxCategories = computed(() => {
+  if (profile.value?.max_categories === -1) return -1;
+  return profile.value?.max_categories ?? 5;
+});
+const isCategoryLimitReached = computed(() => {
+  if (maxCategories.value === -1) return false;
+  return (form.value.categories?.length || 0) >= maxCategories.value;
+});
+
 const newCategory = ref("");
 const newDeliveryArea = ref({ name: "", price: "" });
 
@@ -620,6 +651,14 @@ const addCategory = () => {
   if (!cat) return $toast.error($t("admin.error_fields"));
   if (form.value.categories.includes(cat))
     return $toast.error($t("admin.category_exists"));
+
+  if (isCategoryLimitReached.value) {
+    $toast.error(
+      `لقد وصلت للحد الأقصى للأقسام في باقتك الحالية (${maxCategories.value} أقسام). يرجى ترقية الباقة.`
+    );
+    showUpgradeModal.value = true;
+    return;
+  }
 
   form.value.categories.push(cat);
   newCategory.value = "";

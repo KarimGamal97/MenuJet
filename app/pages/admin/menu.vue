@@ -34,17 +34,38 @@
         </template>
       </BaseModal>
 
+      <!-- Upgrade Plan Modal -->
+      <UpgradeModal
+        :isOpen="showUpgradeModal"
+        limitType="items"
+        :currentCount="items?.length || 0"
+        :maxCount="maxItems"
+        :businessName="profile?.business_name || profile?.business_name_ar || ''"
+        @close="showUpgradeModal = false"
+      />
+
       <div
         class="flex flex-col sm:flex-row justify-between items-center bg-white p-4 md:p-6 rounded-3xl shadow-sm gap-4"
       >
-        <h2 class="text-xl md:text-2xl font-bold text-gray-800">
-          {{ $t("admin.menu_title") }}
-          <span
-            class="text-orange-600 bg-orange-50 px-3 py-1 rounded-xl text-sm md:text-base ml-2"
+        <div class="flex items-center gap-3">
+          <h2 class="text-xl md:text-2xl font-bold text-gray-800">
+            {{ $t("admin.menu_title") }}
+            <span
+              class="text-orange-600 bg-orange-50 px-3 py-1 rounded-xl text-sm md:text-base ml-2 font-black"
+            >
+              {{ items?.length || 0 }} / {{ maxItems === -1 ? '∞' : maxItems }}
+            </span>
+          </h2>
+
+          <button
+            v-if="isItemLimitReached || profile?.plan_type === 'free'"
+            @click="showUpgradeModal = true"
+            class="text-xs font-black bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white px-3 py-1.5 rounded-xl shadow-xs transition-transform active:scale-95 cursor-pointer"
           >
-            {{ items?.length || 0 }}
-          </span>
-        </h2>
+            ⚡ ترقية الباقة
+          </button>
+        </div>
+
         <div class="flex gap-3 w-full sm:w-auto">
           <BaseButton
             variant="primary"
@@ -564,6 +585,16 @@ const {
 const { profile, loading: profileLoading, fetchProfile } = useSettings();
 
 // UI State
+const showUpgradeModal = ref(false);
+const maxItems = computed(() => {
+  if (profile.value?.max_items === -1) return -1;
+  return profile.value?.max_items ?? 30;
+});
+const isItemLimitReached = computed(() => {
+  if (maxItems.value === -1) return false;
+  return (items.value?.length || 0) >= maxItems.value;
+});
+
 const isModalOpen = ref(false);
 const showDeleteModal = ref(false);
 const itemToDelete = ref(null);
@@ -700,6 +731,14 @@ const handleFileUpload = async (event) => {
 };
 
 const openAddModal = () => {
+  if (isItemLimitReached.value) {
+    $toast.error(
+      `لقد وصلت للحد الأقصى للأصناف في باقتك الحالية (${maxItems.value} صنف). يرجى ترقية الباقة.`
+    );
+    showUpgradeModal.value = true;
+    return;
+  }
+
   editingId.value = null;
   newItem.value = {
     name: "",

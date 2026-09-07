@@ -40,4 +40,8 @@ export interface Profile {
   whatsapp_number?: string;
   categories?: string[];
   is_active?: boolean;
+  plan_type?: "free" | "basic" | "pro" | "unlimited" | string;
+  max_items?: number;
+  max_categories?: number;
+  subscription_end_date?: string;
 }

@@ -239,10 +239,32 @@
         </nav>
 
         <!-- Sidebar Footer -->
-        <div class="mt-auto pt-6 space-y-2 border-t border-gray-100">
+        <div class="mt-auto pt-4 space-y-2 border-t border-gray-100">
+          <!-- Free Plan Badge / Upgrade Card -->
+          <div
+            v-if="!isCollapsed && (!localProfile?.plan_type || localProfile?.plan_type === 'free')"
+            class="mb-3 p-3.5 bg-gradient-to-br from-orange-500/10 via-amber-500/10 to-orange-500/5 border border-orange-200/80 rounded-2xl text-right"
+            dir="rtl"
+          >
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-xs font-black text-orange-950">الباقة المجانية 🎁</span>
+              <span class="text-[10px] bg-orange-200 text-orange-800 font-bold px-1.5 py-0.5 rounded-md">تجربة</span>
+            </div>
+            <p class="text-[11px] text-orange-800/80 mb-2.5 font-medium leading-tight">
+              حد 30 صنف و 5 أقسام
+            </p>
+            <button
+              type="button"
+              @click="showUpgradeModal = true"
+              class="w-full bg-orange-600 hover:bg-orange-500 text-white font-black text-xs py-2 px-3 rounded-xl shadow-xs transition-transform active:scale-95 text-center cursor-pointer block"
+            >
+              ⚡ ترقية الباقة الآن
+            </button>
+          </div>
+
           <button
             @click="showLogoutModal = true"
-            class="flex items-center gap-3 w-full p-4 text-red-700 font-bold hover:bg-red-50 rounded-2xl transition-all overflow-hidden"
+            class="flex items-center gap-3 w-full p-4 text-red-700 font-bold hover:bg-red-50 rounded-2xl transition-all overflow-hidden cursor-pointer"
             :title="isCollapsed ? $t('admin.logout') : ''"
           >
             <BaseIcon name="logout" class="w-6 h-6 shrink-0" />
@@ -253,6 +275,14 @@
         </div>
       </div>
     </aside>
+
+    <!-- Upgrade Plan Modal in Layout -->
+    <UpgradeModal
+      :isOpen="showUpgradeModal"
+      limitType="general"
+      :businessName="profileName"
+      @close="showUpgradeModal = false"
+    />
 
     <!-- Main Content Area -->
     <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
@@ -286,6 +316,7 @@ const { $toast } = useNuxtApp();
 const isCollapsed = ref(false);
 const isMobileOpen = ref(false);
 const showLogoutModal = ref(false);
+const showUpgradeModal = ref(false);
 
 // Local profile ref — direct fetch, no store dependency for display
 const localProfile = ref(null);

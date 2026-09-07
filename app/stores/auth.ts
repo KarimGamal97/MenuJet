@@ -10,6 +10,10 @@ interface UserProfile {
   logo?: string;
   categories?: string[];
   is_active?: boolean;
+  plan_type?: string;
+  max_items?: number;
+  max_categories?: number;
+  subscription_end_date?: string;
 }
 
 export const useAuthStore = defineStore("auth", {

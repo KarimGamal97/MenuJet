@@ -1,5 +1,5 @@
 <template>
-  <div class="landing-page">
+  <div class="landing-page" :dir="$i18n.locale === 'ar' ? 'rtl' : 'ltr'">
     <LandingTheNavbar />
     <main>
       <LandingHeroSection />
@@ -7,6 +7,7 @@
       <LandingHowItWorks />
       <LandingDemoVideo />
       <LandingPricing />
+      <LandingFAQs />
       <LandingContactForm />
     </main>
 
@@ -19,8 +20,7 @@
 
 <style>
 body {
-  font-family: 'Cairo', sans-serif;
-  direction: rtl;
+  font-family: 'Cairo', 'Tajawal', sans-serif;
 }
 .text-teal-900 { color: #004d4d; }
 </style>

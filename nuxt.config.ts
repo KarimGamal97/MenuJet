@@ -91,13 +91,14 @@ export default defineNuxtConfig({
     ],
     langDir: "locales",
     defaultLocale: "ar",
-    strategy: "prefix_except_default",
+    strategy: "prefix",
+    detectBrowserLanguage: false,
   },
   supabase: {
     redirectOptions: {
       login: "/login",
       callback: "/confirm",
-      exclude: ["/menu/*", "/"],
+      exclude: ["/menu/*", "/", "/en", "/en/*", "/ar", "/ar/*"],
     },
   },
 });

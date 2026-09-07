@@ -280,5 +280,42 @@
     "restaurant_not_found_desc": "Sorry, we couldn't find a menu with this name. Please make sure you scanned the correct restaurant QR code.",
     "notes": "Notes",
     "notes_placeholder": "No sugar, extra sauce..."
+  },
+  "nav": {
+    "features": "Features",
+    "how_it_works": "How It Works",
+    "faqs": "FAQs",
+    "pricing": "Pricing",
+    "contact": "Contact Us",
+    "login": "Login",
+    "start_free": "Start Free Trial",
+    "lang_name": "العربية"
+  },
+  "faqs": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Clear answers to the most common questions from restaurant and cafe owners",
+    "q1": "Do customers need to download an app to open the menu?",
+    "a1": "Not at all! Customers simply scan the QR code with their phone camera and the interactive menu opens instantly in the browser.",
+    "q2": "How are customer orders received?",
+    "a2": "Orders can be received directly on WhatsApp with full customization details, or tracked through the live cashier and KDS screen.",
+    "q3": "Can I update prices and items myself?",
+    "a3": "Yes, easily! Through a simple dashboard from your phone or computer, you can update prices, add new items, or hide sold-out dishes in seconds.",
+    "q4": "Do you charge any commission on sales or orders?",
+    "a4": "No, MenuJet charges 0% commission on your orders. You keep 100% of your earnings with zero hidden fees."
+  },
+  "howItWorks": {
+    "title": "How to get started with MenuJet?",
+    "register": {
+      "title": "Sign Up",
+      "desc": "Create your account in seconds"
+    },
+    "customize": {
+      "title": "Customize",
+      "desc": "Design your smart menu professionally and upload your high-quality dish photos"
+    },
+    "start": {
+      "title": "Launch",
+      "desc": "Get your custom QR code and start receiving customer orders and sales immediately!"
+    }
   }
 }
