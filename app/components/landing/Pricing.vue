@@ -22,7 +22,7 @@
           </div>
 
           <!-- العنوان والوصف -->
-          <div class="text-center mt-2 mb-8">
+          <div class="text-center mt-2 mb-6">
             <h3 class="text-3xl md:text-4xl font-black text-slate-900 mb-2">
               باقة منيو جت المتكاملة
             </h3>
@@ -31,22 +31,63 @@
             </p>
           </div>
 
-          <!-- أزرار اختيار المدة (Tabs) -->
-          <div class="grid grid-cols-4 gap-2 bg-slate-100 p-1.5 rounded-2xl mb-8">
+          <!-- اختيار العملة (مصر / السعودية) -->
+          <div class="flex items-center justify-center mb-8">
+            <div class="inline-flex items-center bg-slate-100 p-1.5 rounded-2xl border border-slate-200/80 gap-1.5 shadow-inner">
+              <button
+                type="button"
+                @click="selectedCurrency = 'EGP'"
+                :class="[
+                  'py-2 px-4 rounded-xl text-xs sm:text-sm font-black transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer',
+                  selectedCurrency === 'EGP'
+                    ? 'bg-white text-slate-900 shadow-md shadow-slate-900/10 border border-slate-200/60'
+                    : 'text-slate-500 hover:text-slate-800'
+                ]"
+              >
+                <svg class="w-5 h-3.5 rounded-xs shadow-xs shrink-0 border border-slate-200/60" viewBox="0 0 30 20" fill="none">
+                  <rect width="30" height="6.66" fill="#C8102E"/>
+                  <rect y="6.66" width="30" height="6.66" fill="#FFFFFF"/>
+                  <rect y="13.33" width="30" height="6.67" fill="#000000"/>
+                  <circle cx="15" cy="10" r="1.8" fill="#C69214"/>
+                </svg>
+                <span>الجنيه المصري</span>
+              </button>
+              <button
+                type="button"
+                @click="selectedCurrency = 'SAR'"
+                :class="[
+                  'py-2 px-4 rounded-xl text-xs sm:text-sm font-black transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer',
+                  selectedCurrency === 'SAR'
+                    ? 'bg-white text-slate-900 shadow-md shadow-slate-900/10 border border-slate-200/60'
+                    : 'text-slate-500 hover:text-slate-800'
+                ]"
+              >
+                <svg class="w-5 h-3.5 rounded-xs shadow-xs shrink-0" viewBox="0 0 30 20" fill="none">
+                  <rect width="30" height="20" fill="#006C35"/>
+                  <path d="M8 12.5H22V13.5H8V12.5Z" fill="#FFFFFF"/>
+                  <path d="M10 9.5H20V11H10V9.5Z" fill="#FFFFFF" opacity="0.85"/>
+                </svg>
+                <span>الريال السعودي</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- أزرار اختيار المدة (Tabs) - بجانب بعض على سطر واحد -->
+          <div class="flex items-center gap-2 bg-slate-100 p-1.5 rounded-2xl mb-8">
             <button
               v-for="(plan, key) in plans"
               :key="key"
               @click="selectedDuration = key"
               type="button"
               :class="[
-                'py-3 px-2 rounded-xl text-xs sm:text-sm font-black transition-all duration-200 flex flex-col items-center justify-center gap-1 cursor-pointer',
+                'flex-1 py-3 px-2 rounded-xl text-xs sm:text-sm font-black transition-all duration-200 flex flex-col items-center justify-center gap-1 cursor-pointer text-center',
                 selectedDuration === key
                   ? 'bg-slate-900 text-white shadow-md shadow-slate-900/20'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
               ]"
             >
               <span>{{ plan.title }}</span>
-              <span v-if="plan.discountBadge" :class="selectedDuration === key ? 'text-emerald-300' : 'text-emerald-600'" class="text-[10px] sm:text-xs font-black">
+              <span v-if="plan.discountBadge" :class="selectedDuration === key ? 'text-emerald-300' : 'text-emerald-600'" class="text-[10px] sm:text-xs font-black whitespace-nowrap">
                 {{ plan.discountBadge }}
               </span>
             </button>
@@ -61,7 +102,7 @@
                 <span class="text-5xl md:text-6xl font-black text-slate-900 tracking-tight">
                   {{ currentPlan.totalPrice.toLocaleString() }}
                 </span>
-                <span class="text-slate-500 text-lg font-bold">ج.م / {{ currentPlan.label }}</span>
+                <span class="text-slate-500 text-lg font-bold">{{ currentCurrency.symbol }} / {{ currentPlan.label }}</span>
               </div>
               <p class="text-xs sm:text-sm text-slate-500 mt-2 font-semibold">
                 {{ currentPlan.monthlyRateText }}
@@ -71,20 +112,20 @@
             <!-- تفاصيل الحسبة -->
             <div class="space-y-2 text-sm font-semibold">
               <div class="flex justify-between items-center text-slate-600">
-                <span>300 ج.م × {{ currentPlan.monthsCount }} {{ currentPlan.monthsCount === 1 ? 'شهر' : 'شهور' }}</span>
+                <span>{{ currentCurrency.monthlyBase }} {{ currentCurrency.symbol }} × {{ currentPlan.monthsCount }} {{ currentPlan.monthsCount === 1 ? 'شهر' : 'شهور' }}</span>
                 <span :class="currentPlan.discountAmount > 0 ? 'line-through text-slate-400' : 'text-slate-700'">
-                  {{ (300 * currentPlan.monthsCount).toLocaleString() }} ج.م
+                  {{ (currentCurrency.monthlyBase * currentPlan.monthsCount).toLocaleString() }} {{ currentCurrency.symbol }}
                 </span>
               </div>
               
               <div v-if="currentPlan.discountAmount > 0" class="flex justify-between items-center text-emerald-600 font-bold">
                 <span>الخصم والتوفير</span>
-                <span>- {{ currentPlan.discountAmount.toLocaleString() }} ج.م</span>
+                <span>- {{ currentPlan.discountAmount.toLocaleString() }} {{ currentCurrency.symbol }}</span>
               </div>
 
               <div class="border-t border-dashed border-slate-300 pt-2 flex justify-between items-center font-black text-slate-900">
-                <span>المطلوب دفعه</span>
-                <span class="text-xl text-orange-600">{{ currentPlan.totalPrice.toLocaleString() }} ج.م</span>
+                <span>المبلغ</span>
+                <span class="text-xl text-orange-600">{{ currentPlan.totalPrice.toLocaleString() }} {{ currentCurrency.symbol }}</span>
               </div>
             </div>
           </div>
@@ -118,7 +159,7 @@
       <div class="mt-14 text-center max-w-2xl mx-auto flex flex-col items-center gap-6">
         <div class="flex items-center justify-center gap-2 text-slate-500 text-sm md:text-base font-medium">
           <span>🔒</span>
-          <span>دفع آمن — تفعيل تلقائي فوري — ضمان استرداد خلال 7 أيام</span>
+          <span>دفع آمن — تفعيل تلقائي فوري </span>
         </div>
 
         <a
@@ -138,45 +179,76 @@
 <script setup>
 import { ref, computed } from 'vue'
 
+const selectedCurrency = ref('SAR') // الافتراضي: الريال السعودي
 const selectedDuration = ref('year') // الافتراضي: سنة (الأوفر)
 
-// خطط الأسعار والخصومات
-const plans = {
-  month: {
-    title: 'شهر',
-    discountBadge: '',
-    monthsCount: 1,
-    totalPrice: 300,
-    discountAmount: 0,
-    label: 'شهر',
-    monthlyRateText: 'سعر شهري 300 ج.م'
+// خطط الأسعار بالريال والجنيه
+const pricingData = {
+  SAR: {
+    symbol: 'ر.س',
+    monthlyBase: 20,
+    plans: {
+      month: {
+        title: 'شهر',
+        discountBadge: '',
+        monthsCount: 1,
+        totalPrice: 20,
+        discountAmount: 0,
+        label: 'شهر',
+        monthlyRateText: 'سعر شهري 20 ر.س'
+      },
+      '6months': {
+        title: '6 شهور',
+        discountBadge: 'خصم 18 ر.س',
+        monthsCount: 6,
+        totalPrice: 102,
+        discountAmount: 18,
+        label: '6 شهور',
+        monthlyRateText: 'بمعدل 17 ر.س شهرياً'
+      },
+      year: {
+        title: 'سنة',
+        discountBadge: 'خصم 20 ر.س',
+        monthsCount: 12,
+        totalPrice: 220,
+        discountAmount: 20,
+        label: 'سنة',
+        monthlyRateText: 'بمعدل ~18.3 ر.س شهرياً (الأوفر)'
+      }
+    }
   },
-  '3months': {
-    title: '3 شهور',
-    discountBadge: 'خصم 100 ج',
-    monthsCount: 3,
-    totalPrice: 800,
-    discountAmount: 100,
-    label: '3 شهور',
-    monthlyRateText: 'بمعدل ~267 ج.م شهرياً'
-  },
-  '6months': {
-    title: 'نص سنة',
-    discountBadge: 'خصم 400 ج',
-    monthsCount: 6,
-    totalPrice: 1400,
-    discountAmount: 400,
-    label: '6 شهور',
-    monthlyRateText: 'بمعدل ~233 ج.م شهرياً'
-  },
-  year: {
-    title: 'سنة',
-    discountBadge: 'خصم 600 ج',
-    monthsCount: 12,
-    totalPrice: 3000,
-    discountAmount: 600,
-    label: 'سنة',
-    monthlyRateText: 'بمعدل 250 ج.م شهرياً (الأوفر)'
+  EGP: {
+    symbol: 'ج.م',
+    monthlyBase: 300,
+    plans: {
+      month: {
+        title: 'شهر',
+        discountBadge: '',
+        monthsCount: 1,
+        totalPrice: 300,
+        discountAmount: 0,
+        label: 'شهر',
+        monthlyRateText: 'سعر شهري 300 ج.م'
+      },
+      '6months': {
+        title: '6 شهور',
+        discountBadge: 'خصم 400 ج',
+        monthsCount: 6,
+        totalPrice: 1400,
+        discountAmount: 400,
+        label: '6 شهور',
+        monthlyRateText: 'بمعدل ~233 ج.م شهرياً'
+      },
+      year: {
+        title: 'سنة',
+        discountBadge: 'خصم 600 ج',
+        monthsCount: 12,
+        totalPrice: 3000,
+        discountAmount: 600,
+        label: 'سنة',
+        monthlyRateText: 'بمعدل 250 ج.م شهرياً (الأوفر)'
+      }
+    }
   }
 }
 
@@ -192,7 +264,9 @@ const realFeatures = [
   'دعم فني ومساعدة مستمرة'
 ]
 
-const currentPlan = computed(() => plans[selectedDuration.value])
+const currentCurrency = computed(() => pricingData[selectedCurrency.value])
+const plans = computed(() => currentCurrency.value.plans)
+const currentPlan = computed(() => plans.value[selectedDuration.value])
 
 const scrollToSection = (sectionId) => {
   const element = document.getElementById(sectionId)
