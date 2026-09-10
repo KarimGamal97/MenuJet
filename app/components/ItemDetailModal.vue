@@ -148,7 +148,7 @@
                       : 'bg-white text-gray-400 border-gray-200 hover:border-orange-300 hover:text-orange-500',
                   ]"
                 >
-                  {{ entry.label }}<span v-if="!isWeightType"> {{ $t("admin.piece") }}</span>
+                  {{ entry.label }}
                 </button>
               </div>
             </div>
@@ -386,7 +386,7 @@ const handleAdd = () => {
   if (pricingType.value === "size") itemInfo.size = selectedSize.value;
   if (pricingType.value === "patty") itemInfo.size = $t(`admin.patty_${selectedPatty.value}`);
   if (pricingType.value === "count")
-    itemInfo.size = selectedCount.value + " قطعة";
+    itemInfo.size = selectedCount.value;
   if (notes.value.trim()) itemInfo.notes = notes.value.trim();
   
   for (let i = 0; i < qty.value; i++) addToCart(itemInfo);

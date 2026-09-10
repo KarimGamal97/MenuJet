@@ -80,7 +80,7 @@
           </span>
           <span class="flex flex-col leading-tight">
             <span v-if="item.category" class="text-[10px] text-gray-400 font-bold">{{ item.category }}</span>
-            <span class="font-bold text-gray-700 text-sm">{{ item.name }}<span v-if="item.size"> ({{ item.size }})</span></span>
+            <span class="font-bold text-gray-700 text-sm">{{ item.name }}<span v-if="item.size"> ({{ cleanSize(item.size) }})</span></span>
             <div v-if="item.selectedExtras?.length" class="flex flex-wrap gap-1 mt-1">
               <span v-for="ex in item.selectedExtras" :key="ex.name" class="bg-blue-50 text-blue-600 text-[9px] font-bold px-1.5 py-0.5 rounded-lg border border-blue-100 ">
                 + {{ ex.name }}
@@ -91,7 +91,7 @@
         </div>
         <span class="font-bold text-gray-900 text-sm">
           {{ (item.basePrice || item.price) * item.quantity }}<span v-if="item.selectedExtras?.length" class="text-orange-600"> + {{ (item.price - (item.basePrice || item.price)) * item.quantity }}</span>
-          <small class="text-[10px]">{{ $t("currency") }}</small>
+          <small class="text-[10px] ms-1">{{ $t("currency") }}</small>
         </span>
       </div>
     </div>
@@ -146,6 +146,11 @@ const props = defineProps({
 
 const emit = defineEmits(["update-status"]);
 
+const cleanSize = (size) => {
+  if (!size) return "";
+  return size.replace(/\s*قطعة/g, "").trim();
+};
+
 const timeAgo = ref("");
 
 const calculateTimeAgo = () => {
@@ -182,7 +187,7 @@ const printOrder = () => {
   const itemsHtml = orderData.items.map(item => `
     <div style="border-bottom: 1px dashed #eee; padding: 8px 0;">
       <div style="display: flex; justify-content: space-between; font-weight: bold;">
-        <span>${item.quantity}x ${item.name} ${item.size ? `(${item.size})` : ''}</span>
+        <span>${item.quantity}x ${item.name} ${item.size ? `(${cleanSize(item.size)})` : ''}</span>
         <span>${(item.basePrice || item.price) * item.quantity} جنيه</span>
       </div>
       ${item.selectedExtras?.length ? `

@@ -52,7 +52,7 @@
               <p class="font-bold text-gray-800 text-sm truncate">
                 {{ item.name }}
                 <span v-if="item.size" class="text-orange-600"
-                  >({{ item.size }})</span
+                  >({{ item.size.replace(/\s*قطعة/g, '').trim() }})</span
                 >
               </p>
               <p v-if="item.notes" class="text-xs text-gray-500 truncate mt-0.5">{{ item.notes }}</p>
@@ -715,7 +715,7 @@ const whatsappLink = computed(() => {
     .map(
       (i, index) => {
         let basePrice = i.basePrice || i.price;
-        let text = `${index + 1}. ${i.name} ${i.size ? `(${i.size})` : ''} (${basePrice} ${t("currency")}) × ${i.quantity}`;
+        let text = `${index + 1}. ${i.name} ${i.size ? `(${i.size.replace(/\s*قطعة/g, '').trim()})` : ''} (${basePrice} ${t("currency")}) × ${i.quantity}`;
         
         if (i.selectedExtras?.length) {
           const extrasText = i.selectedExtras.map(e => `${e.name} (+${e.price} ${t("currency")})`).join(', ');

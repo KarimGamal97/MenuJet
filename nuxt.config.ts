@@ -91,7 +91,7 @@ export default defineNuxtConfig({
     ],
     langDir: "locales",
     defaultLocale: "ar",
-    strategy: "prefix",
+    strategy: "prefix_except_default",
     detectBrowserLanguage: false,
   },
   supabase: {
