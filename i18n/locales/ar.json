@@ -96,7 +96,7 @@
   "admin": {
     "users_page_cancel": "إلغاء",
     "dashboard": "الرئيسية",
-    "menu": "قائمة الطعام",
+    "menu": "قائمة الأصناف",
     "settings": "الاعدادات",
     "view_menu": "عرض المنيو",
     "logout": "خروج",
@@ -228,6 +228,7 @@
     "order_error": "حدث خطأ أثناء إرسال الطلب",
     "piece": "قطعة",
     "by_size": " بالحجم",
+    "by_weight": "بالوزن",
     "by_count": "بالعدد",
     "by_fixed": "بسعر ثابت",
     "by_patty": "بالقطع",

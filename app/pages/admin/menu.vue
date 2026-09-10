@@ -188,29 +188,55 @@
       <div class="space-y-4 mt-2">
         <BaseInput v-model="newItem.name" :label="$t('admin.item_name')" />
 
-        <!-- Pricing Type Selector -->
-        <div class="space-y-2">
-          <label
-            class="text-[10px] font-black text-gray-400 px-1 uppercase tracking-wider block"
-            >نوع التسعير</label
-          >
-          <div class="flex gap-2">
-            <button
-              v-for="pt in pricingTypes"
-              :key="pt.value"
-              type="button"
-              @click="newItem.pricingType = pt.value"
-              :class="[
-                'flex-1 py-2.5 rounded-2xl font-bold text-xs transition-all border-2 flex flex-col items-center gap-0.5',
-                newItem.pricingType === pt.value
-                  ? 'bg-orange-600 text-white border-orange-600 shadow-md shadow-orange-100'
-                  : 'bg-gray-50 text-gray-400 border-transparent hover:border-orange-200 hover:text-orange-600',
-              ]"
+        <!-- Pricing Type Selector (Custom Dropdown) -->
+        <div class="space-y-2 relative">
+          <div class="relative">
+            <label
+              class="absolute -top-2 right-3 bg-white px-1.5 text-[10px] font-black uppercase tracking-wider text-gray-400 group-focus-within:text-orange-500 transition-colors z-10 pointer-events-none flex gap-2"
             >
-              <span class="text-base leading-none">{{ pt.icon }}</span>
-              <span>{{ pt.label }}</span>
+              <span>نوع التسعير</span>
+            </label>
+            <button
+              type="button"
+              @click="isPricingTypeDropdownOpen = !isPricingTypeDropdownOpen"
+              class="w-full p-4 bg-gray-50 border-2 border-transparent rounded-2xl outline-none flex items-center justify-between font-bold text-gray-800 shadow-sm transition-all focus:border-orange-500 focus:bg-white text-sm"
+            >
+              <span>{{ pricingTypes.find(p => p.value === newItem.pricingType)?.label || $t("admin.by_size") }}</span>
+              <BaseIcon
+                name="chevron-down"
+                class="w-4 h-4 text-orange-500 transition-transform duration-200"
+                :class="{ 'rotate-180': isPricingTypeDropdownOpen }"
+              />
             </button>
+
+            <div
+              v-if="isPricingTypeDropdownOpen"
+              class="absolute top-full mt-2 left-0 right-0 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-[60] animate-in slide-in-from-top-2 duration-200 p-2"
+            >
+              <button
+                v-for="pt in pricingTypes"
+                :key="pt.value"
+                type="button"
+                @click="
+                  newItem.pricingType = pt.value;
+                  isPricingTypeDropdownOpen = false;
+                "
+                :class="[
+                  'w-full text-right px-4 py-3 rounded-xl font-bold transition-colors text-sm',
+                  newItem.pricingType === pt.value
+                    ? 'bg-orange-600 text-white shadow-md shadow-orange-100'
+                    : 'text-gray-600 hover:bg-orange-50 hover:text-orange-600',
+                ]"
+              >
+                {{ pt.label }}
+              </button>
+            </div>
           </div>
+          <div
+            v-if="isPricingTypeDropdownOpen"
+            @click="isPricingTypeDropdownOpen = false"
+            class="fixed inset-0 z-[55]"
+          ></div>
         </div>
 
         <!-- By Size (sm/md/lg) -->
@@ -297,49 +323,61 @@
           </div>
         </div>
 
-        <!-- By Patty (single/double/triple) -->
-        <div v-else-if="newItem.pricingType === 'patty'" class="space-y-2">
-          <div class="flex gap-2">
-            <button
-              v-for="p in ['single', 'double', 'triple']"
-              :key="p"
-              type="button"
-              @click="newItem.activePatty = p"
-              :class="[
-                'flex-1 py-3 rounded-2xl font-bold text-sm transition-all border-2',
-                newItem.activePatty === p
-                  ? 'bg-orange-600 text-white border-orange-600 shadow-md shadow-orange-100'
-                  : 'bg-gray-50 text-gray-400 border-transparent hover:border-orange-200 hover:text-orange-600',
-              ]"
+        <!-- By Weight (Dynamic) -->
+        <div v-else-if="newItem.pricingType === 'weight'" class="space-y-3">
+          <div
+            class="flex text-[10px] font-black text-gray-400 uppercase tracking-wider gap-2 px-1"
+          >
+            <span class="flex-1">الوزن (مثال: ربع كيلو، نصف كيلو..)</span>
+            <span class="w-24 text-center">السعر</span>
+            <span class="w-9"></span>
+          </div>
+
+          <div
+            v-for="(opt, i) in newItem.weightOptions"
+            :key="i"
+            class="flex gap-2 items-center"
+          >
+            <div
+              class="flex-1 bg-gray-50 rounded-2xl px-4 border-2 border-transparent focus-within:border-orange-500 focus-within:bg-white transition-all"
             >
-              {{ $t(`admin.patty_${p}`) }}
+              <input
+                v-model="opt.label"
+                type="text"
+                :placeholder="['ربع كيلو', 'نصف كيلو', 'كيلو'][i] || `وزن ${i + 1}`"
+                class="w-full py-3 bg-transparent outline-none font-bold text-sm text-gray-800"
+              />
+            </div>
+
+            <div
+              class="w-24 bg-gray-50 rounded-2xl px-3 border-2 border-transparent focus-within:border-orange-500 focus-within:bg-white transition-all"
+            >
+              <input
+                v-model="opt.price"
+                type="number"
+                placeholder="السعر"
+                class="w-full py-3 bg-transparent outline-none font-bold text-sm text-gray-800 text-center"
+                oninput="if (this.value.length > 5) this.value = this.value.slice(0, 5);"
+              />
+            </div>
+
+            <button
+              type="button"
+              v-if="newItem.weightOptions.length > 1"
+              @click="newItem.weightOptions.splice(i, 1)"
+              class="w-9 h-9 rounded-xl bg-red-50 text-red-500 hover:bg-red-500 hover:text-white flex items-center justify-center transition-colors shrink-0 cursor-pointer"
+            >
+              <BaseIcon name="trash" class="w-4 h-4" />
             </button>
           </div>
-          <div class="pt-1">
-            <BaseInput
-              v-model="newItem.pattyPrices[newItem.activePatty]"
-              type="number"
-              :label="`${$t('admin.price_word')} ${$t('admin.patty_' + newItem.activePatty)}`"
-              oninput="if (this.value.length > 5) this.value = this.value.slice(0, 5);"
-            />
-          </div>
-          <div class="flex gap-2 pt-1">
-            <div
-              v-for="p in ['single', 'double', 'triple']"
-              :key="p"
-              class="flex-1 bg-gray-50 rounded-xl p-2 text-center border border-gray-100"
-            >
-              <p class="text-[9px] font-black text-gray-400 uppercase mb-0.5">
-                {{ $t(`admin.patty_${p}`) }}
-              </p>
-              <p
-                class="text-xs font-black"
-                :class="newItem.pattyPrices[p] ? 'text-gray-700' : 'text-gray-300'"
-              >
-                {{ newItem.pattyPrices[p] || "—" }}
-              </p>
-            </div>
-          </div>
+
+          <button
+            type="button"
+            @click="newItem.weightOptions.push({ label: '', price: '' })"
+            class="w-full py-3 rounded-2xl border-2 border-dashed border-orange-200 text-orange-600 font-bold text-xs hover:bg-orange-50 transition-all flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <span>+ إضافة وزن آخر</span>
+          </button>
         </div>
 
         <!-- Fixed Price -->
@@ -600,20 +638,24 @@ const showDeleteModal = ref(false);
 const itemToDelete = ref(null);
 const editingId = ref(null);
 const isCategoryDropdownOpen = ref(false);
+const isPricingTypeDropdownOpen = ref(false);
 const imageUrl = ref("");
 const newItem = ref({
   name: "",
   pricingType: "size",
   prices: { sm: "", md: "", lg: "" },
   activeSize: "sm",
+  weightOptions: [
+    { label: "ربع كيلو", price: "" },
+    { label: "نصف كيلو", price: "" },
+    { label: "كيلو", price: "" },
+  ],
   countOptions: [
     { label: "", price: "" },
     { label: "", price: "" },
     { label: "", price: "" },
   ],
   fixedPrice: "",
-  pattyPrices: { single: "", double: "", triple: "" },
-  activePatty: "single",
   category: "",
   badge: "",
   available: true,
@@ -638,19 +680,21 @@ const dynamicCategories = computed(() => availableCategories.value);
 
 const pricingTypes = [
   { value: "size", label: $t("admin.by_size") },
+  { value: "weight", label: $t("admin.by_weight") },
   { value: "count", label: $t("admin.by_count") },
   { value: "fixed", label: $t("admin.by_fixed") },
-  { value: "patty", label: $t("admin.by_patty") },
 ];
 
 const detectPricingType = (prices) => {
   if (!prices || typeof prices !== 'object') return "fixed";
   const keys = Object.keys(prices).map(k => k.toLowerCase());
-  if (keys.some((k) => ["single", "double", "triple"].includes(k)))
-    return "patty";
   if (keys.some((k) => ["sm", "md", "lg", "s"].includes(k)))
     return "size";
   if (keys.includes("fixed")) return "fixed";
+  if (keys.some((k) => /كيلو|جرام|كجم|kg|gram|وزن|ربع|نصف|ثمن|نص/i.test(k)))
+    return "weight";
+  if (keys.some((k) => ["single", "double", "triple"].includes(k)))
+    return "weight";
   if (keys.length > 0) return "count";
   return "fixed";
 };
@@ -745,15 +789,21 @@ const openAddModal = () => {
     pricingType: "size",
     prices: { sm: "", md: "", lg: "" },
     activeSize: "sm",
+    weightOptions: [
+      { label: "ربع كيلو", price: "" },
+      { label: "نصف كيلو", price: "" },
+      { label: "كيلو", price: "" },
+    ],
     countOptions: [
       { label: "", price: "" },
       { label: "", price: "" },
       { label: "", price: "" },
     ],
     fixedPrice: "",
-    pattyPrices: { single: "", double: "", triple: "" },
-    activePatty: "single",
-    category: availableCategories.value[0],
+    category: (selectedCategory.value && selectedCategory.value !== "الكل")
+  ? selectedCategory.value
+  : availableCategories.value[0],
+
     badge: "",
     available: true,
     description: "",
@@ -780,6 +830,21 @@ const openEditModal = (item) => {
   }
 
   const type = detectPricingType(item.prices);
+
+  const weightOptions = [];
+  if ((type === "weight" || type === "patty") && item.prices) {
+    Object.entries(item.prices).forEach(([label, price]) => {
+      weightOptions.push({ label, price: String(price) });
+    });
+  }
+  if (weightOptions.length === 0) {
+    weightOptions.push(
+      { label: "ربع كيلو", price: "" },
+      { label: "نصف كيلو", price: "" },
+      { label: "كيلو", price: "" }
+    );
+  }
+
   const countOptions = [
     { label: "", price: "" },
     { label: "", price: "" },
@@ -789,13 +854,6 @@ const openEditModal = (item) => {
     Object.entries(item.prices).forEach(([label, price], i) => {
       if (i < 3) countOptions[i] = { label, price: String(price) };
     });
-  }
-  
-  const pattyPrices = { single: "", double: "", triple: "" };
-  if (type === "patty" && item.prices) {
-    for (const p of ["single", "double", "triple"]) {
-      if (item.prices[p]) pattyPrices[p] = String(item.prices[p]);
-    }
   }
 
   newItem.value = {
@@ -807,10 +865,9 @@ const openEditModal = (item) => {
       lg: String(normPrices.lg || ""),
     },
     activeSize: "sm",
+    weightOptions,
     countOptions,
     fixedPrice: type === "fixed" ? String(item.prices?.fixed || item.price || "") : "",
-    pattyPrices,
-    activePatty: "single",
     category: item.category,
     badge: item.badge || "",
     available: item.available !== false,
@@ -825,7 +882,7 @@ const openEditModal = (item) => {
 const handleSaveItem = async () => {
   if (!userId.value) return;
 
-  const { name, pricingType, prices, countOptions, fixedPrice, category } =
+  const { name, pricingType, prices, weightOptions, countOptions, fixedPrice, category } =
     newItem.value;
   let cleanPrices = {};
   let displayPrice = 0;
@@ -837,9 +894,9 @@ const handleSaveItem = async () => {
     }
     hasPrices = Object.keys(cleanPrices).length > 0;
     if (hasPrices) displayPrice = Math.min(...Object.values(cleanPrices));
-  } else if (pricingType === "patty") {
-    for (const p of ["single", "double", "triple"]) {
-      if (newItem.value.pattyPrices[p]) cleanPrices[p] = Number(newItem.value.pattyPrices[p]);
+  } else if (pricingType === "weight") {
+    for (const opt of weightOptions) {
+      if (opt.label && opt.price) cleanPrices[opt.label] = Number(opt.price);
     }
     hasPrices = Object.keys(cleanPrices).length > 0;
     if (hasPrices) displayPrice = Math.min(...Object.values(cleanPrices));

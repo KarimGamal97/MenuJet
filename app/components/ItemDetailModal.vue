@@ -128,27 +128,27 @@
               </div>
             </div>
 
-            <!-- Count Selector (for 'count' type, e.g. 10P / 15P / 25P) -->
+            <!-- Count / Weight Selector -->
             <div
               v-else-if="pricingType === 'count'"
               class="bg-gray-50 rounded-2xl p-3"
             >
               <p class="text-sm font-bold text-gray-500 mb-2">
-                {{ $t("admin.quantity") }}
+                {{ isWeightType ? 'الوزن' : $t("admin.quantity") }}
               </p>
-              <div class="flex gap-2">
+              <div class="flex gap-2 flex-wrap">
                 <button
                   v-for="entry in countEntries"
                   :key="entry.label"
                   @click="selectedCount = entry.label"
                   :class="[
-                    'flex-1 py-2.5 rounded-xl font-black text-xs transition-all border-2 active:scale-95',
+                    'flex-1 min-w-[70px] py-2.5 rounded-xl font-black text-xs transition-all border-2 active:scale-95',
                     selectedCount === entry.label
                       ? 'bg-orange-600 text-white border-orange-600 shadow-md shadow-orange-200'
                       : 'bg-white text-gray-400 border-gray-200 hover:border-orange-300 hover:text-orange-500',
                   ]"
                 >
-                  {{ entry.label }} {{ $t("admin.piece") }}
+                  {{ entry.label }}<span v-if="!isWeightType"> {{ $t("admin.piece") }}</span>
                 </button>
               </div>
             </div>
@@ -315,6 +315,12 @@ const countEntries = computed(() => {
     label,
     price: Number(price),
   }));
+});
+
+const isWeightType = computed(() => {
+  if (!props.item.prices) return false;
+  const keys = Object.keys(props.item.prices);
+  return keys.some((k) => /كيلو|جرام|كجم|kg|gram|وزن|ربع|نصف|ثمن|نص/i.test(k));
 });
 
 // Reset state every time modal opens

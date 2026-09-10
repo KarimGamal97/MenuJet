@@ -86,7 +86,7 @@
             dir="ltr"
           >
             <span class="text-gray-400 text-sm font-bold opacity-60"
-              >menujet.com/menu/</span
+              >getmenujet.com/menu/</span
             >
             <input
               v-model="form.slug"
@@ -609,12 +609,12 @@ watch(
 
 // QR Code Logic
 const menuUrl = computed(() => {
-  if (!form.value.slug) return "https://menu-jet-one.vercel.app/menu";
+  if (!form.value.slug) return "https://getmenujet.com/menu";
   const cleanSlug = form.value.slug
     .toLowerCase()
     .replace(/[^a-z0-9]/g, "-")
     .replace(/-+/g, "-");
-  return `https://menu-jet-one.vercel.app/menu/${cleanSlug}`;
+  return `https://getmenujet.com/menu/${cleanSlug}`;
 });
 
 const qrUrl = computed(() => {
