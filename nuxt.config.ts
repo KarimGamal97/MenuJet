@@ -2,6 +2,20 @@ export default defineNuxtConfig({
   css: ["~/assets/main.css"],
   app: {
     head: {
+      script: [
+        {
+          src: "https://www.googletagmanager.com/gtag/js?id=G-N5QZJH3DJM",
+          async: true,
+        },
+        {
+          innerHTML: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-N5QZJH3DJM');
+          `,
+        },
+      ],
       link: [
         {
           rel: "icon",
