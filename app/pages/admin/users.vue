@@ -1,12 +1,55 @@
 <template>
-  <div class="p-6 bg-white rounded-[2rem] shadow-sm border border-gray-100">
+  <div class="space-y-6" :dir="$i18n.locale === 'ar' ? 'rtl' : 'ltr'">
+    <!-- Smart Lock Screen for Non-Pro Plan Users -->
+    <div
+      v-if="!can('allow_users')"
+      class="bg-white p-8 md:p-14 rounded-[2.5rem] border border-purple-100 shadow-sm text-center flex flex-col items-center justify-center relative overflow-hidden"
+    >
+      <div
+        class="w-16 h-16 bg-gradient-to-tr from-purple-600 to-indigo-500 text-white rounded-3xl flex items-center justify-center text-3xl shadow-lg shadow-purple-500/25 mb-4"
+      >
+        👥
+      </div>
+      <span
+        class="inline-block bg-purple-100 text-purple-700 text-xs font-black px-4 py-1.5 rounded-full mb-3"
+      >
+        {{ $t("plans.exclusive_pro_badge") }}
+      </span>
+      <h2 class="text-2xl md:text-3xl font-black text-slate-900 mb-2">
+        {{ $t("plans.users_lock_title") }}
+      </h2>
+      <p
+        class="text-slate-500 text-sm md:text-base max-w-lg mb-8 leading-relaxed font-medium"
+      >
+        {{ $t("plans.users_lock_desc") }}
+      </p>
 
-    <!-- Add User Modal -->
-    <Teleport to="body">
-      <div v-if="showAddModal" class="fixed inset-0 z-[100] flex items-center justify-center p-6">
-        <div class="absolute inset-0 bg-black bg-opacity-30 backdrop-blur-sm" @click="closeModal" />
-        <div class="bg-white rounded-[2rem] p-8 max-w-md w-full relative z-[110] shadow-2xl border border-gray-100" dir="rtl">
-          <h2 class="text-xl font-black text-gray-900 mb-1">{{ $t('admin.users_page.add_user_title') }}</h2>
+      <button
+        type="button"
+        @click="showUpgradeModal = true"
+        class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black py-4 px-8 rounded-2xl shadow-xl shadow-purple-500/25 transition-transform active:scale-95 text-base cursor-pointer"
+      >
+        👑 {{ $t("plans.users_lock_btn") }}
+      </button>
+
+      <!-- Upgrade Modal -->
+      <UpgradeModal
+        :isOpen="showUpgradeModal"
+        :title="$t('plans.users_modal_title')"
+        :badgeText="$t('plans.pro_badge_short')"
+        :message="$t('plans.users_modal_msg')"
+        @close="showUpgradeModal = false"
+      />
+    </div>
+
+    <!-- Active Management Content for Pro Plan Users -->
+    <div v-else class="p-6 bg-white rounded-[2rem] shadow-sm border border-gray-100">
+      <!-- Add User Modal -->
+      <Teleport to="body">
+        <div v-if="showAddModal" class="fixed inset-0 z-[100] flex items-center justify-center p-6">
+          <div class="absolute inset-0 bg-black bg-opacity-30 backdrop-blur-sm" @click="closeModal" />
+          <div class="bg-white rounded-[2rem] p-8 max-w-md w-full relative z-[110] shadow-2xl border border-gray-100" dir="rtl">
+            <h2 class="text-xl font-black text-gray-900 mb-1">{{ $t('admin.users_page.add_user_title') }}</h2>
           <p class="text-gray-400 text-sm mb-6">{{ $t('admin.users_page.add_user_msg') }}</p>
 
           <div class="space-y-4">
@@ -158,6 +201,7 @@
     <div v-if="users.length === 0" class="py-20 text-center">
       <p class="text-gray-400">{{ $t('admin.users_page.no_users') }}</p>
     </div>
+    </div>
   </div>
 </template>
 
@@ -166,6 +210,9 @@ definePageMeta({
   middleware: 'superadmin',
   layout: 'admin'
 })
+
+const { can } = usePlan()
+const showUpgradeModal = ref(false)
 
 const client = useSupabaseClient()
 const { $toast } = useNuxtApp()
@@ -260,6 +307,8 @@ const getRoleClass = (role: string) => {
 }
 
 onMounted(() => {
-  fetchUsers()
+  if (can('allow_users')) {
+    fetchUsers()
+  }
 })
 </script>

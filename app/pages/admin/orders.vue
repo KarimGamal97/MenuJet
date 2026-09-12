@@ -31,6 +31,9 @@
         </div>
       </div>
 
+      <!-- Shift Manager Bar -->
+      <ShiftManager />
+
       <!-- Cleanup Center Modal -->
       <BaseModal
         :isOpen="showCleanupModal"

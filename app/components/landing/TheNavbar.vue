@@ -3,89 +3,86 @@
     class="fixed w-full z-50 bg-white/95 backdrop-blur-xl border-b border-gray-200/60 shadow-xs transition-all duration-300" 
     :dir="$i18n.locale === 'ar' ? 'rtl' : 'ltr'"
   >
-    <div class="container mx-auto px-4 sm:px-6 py-3.5 flex justify-between items-center">
+    <div class="container relative mx-auto px-4 sm:px-6 py-3.5 flex justify-between items-center">
       
-      <!-- Right Side (Logo + Navigation Links next to it) -->
-      <div class="flex items-center gap-6 lg:gap-10">
-        <!-- Logo -->
-        <NuxtLink to="/" class="flex items-center gap-2 group">
-          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-orange-600 to-amber-500 text-white flex items-center justify-center font-black text-xl shadow-md shadow-orange-500/20 group-hover:scale-105 transition-transform">
-            ⚡
-          </div>
-          <span class="text-2xl font-black bg-gradient-to-r from-slate-950 via-slate-800 to-orange-600 bg-clip-text text-transparent tracking-tight">
-            MenuJet
-          </span>
-        </NuxtLink>
-        
-        <!-- Desktop Nav Links (Next to Logo on the right) -->
-        <div class="hidden lg:flex items-center gap-6 text-sm font-bold">
-          <a 
-            href="#features" 
-            @click.prevent="scrollToSection('features')"
-            :class="[
-              'relative py-1 transition-colors cursor-pointer',
-              activeSection === 'features' ? 'text-orange-600' : 'text-slate-600 hover:text-orange-600'
-            ]"
-          >
-            {{ $t('nav.features') }}
-            <span 
-              :class="[
-                'absolute -bottom-1 right-0 h-0.5 bg-orange-600 transition-all duration-200',
-                activeSection === 'features' ? 'w-full' : 'w-0 hover:w-full'
-              ]"
-            ></span>
-          </a>
-          <a 
-            href="#faqs" 
-            @click.prevent="scrollToSection('faqs')"
-            :class="[
-              'relative py-1 transition-colors cursor-pointer',
-              activeSection === 'faqs' ? 'text-orange-600' : 'text-slate-600 hover:text-orange-600'
-            ]"
-          >
-            {{ $t('nav.faqs') }}
-            <span 
-              :class="[
-                'absolute -bottom-1 right-0 h-0.5 bg-orange-600 transition-all duration-200',
-                activeSection === 'faqs' ? 'w-full' : 'w-0 hover:w-full'
-              ]"
-            ></span>
-          </a>
-
-          <a 
-            href="#pricing" 
-            @click.prevent="scrollToSection('pricing')"
-            :class="[
-              'relative py-1 transition-colors cursor-pointer',
-              activeSection === 'pricing' ? 'text-orange-600' : 'text-slate-600 hover:text-orange-600'
-            ]"
-          >
-            {{ $t('nav.pricing') }}
-            <span 
-              :class="[
-                'absolute -bottom-1 right-0 h-0.5 bg-orange-600 transition-all duration-200',
-                activeSection === 'pricing' ? 'w-full' : 'w-0 hover:w-full'
-              ]"
-            ></span>
-          </a>
-
-          <a 
-            href="#contact" 
-            @click.prevent="scrollToSection('contact')"
-            :class="[
-              'relative py-1 transition-colors cursor-pointer',
-              activeSection === 'contact' ? 'text-orange-600' : 'text-slate-600 hover:text-orange-600'
-            ]"
-          >
-            {{ $t('nav.contact') }}
-            <span 
-              :class="[
-                'absolute -bottom-1 right-0 h-0.5 bg-orange-600 transition-all duration-200',
-                activeSection === 'contact' ? 'w-full' : 'w-0 hover:w-full'
-              ]"
-            ></span>
-          </a>
+      <!-- Right Side (Logo) -->
+      <NuxtLink to="/" class="flex items-center gap-2 group shrink-0">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-orange-600 to-amber-500 text-white flex items-center justify-center font-black text-xl shadow-md shadow-orange-500/20 group-hover:scale-105 transition-transform">
+          ⚡
         </div>
+        <span class="text-2xl font-black bg-gradient-to-r from-slate-950 via-slate-800 to-orange-600 bg-clip-text text-transparent tracking-tight">
+          MenuJet
+        </span>
+      </NuxtLink>
+      
+      <!-- Center (Desktop Nav Links) -->
+      <div class="hidden lg:flex items-center gap-8 text-sm font-bold absolute left-1/2 -translate-x-1/2">
+        <a 
+          href="#features" 
+          @click.prevent="scrollToSection('features')"
+          :class="[
+            'relative py-1 transition-colors cursor-pointer',
+            activeSection === 'features' ? 'text-orange-600' : 'text-slate-600 hover:text-orange-600'
+          ]"
+        >
+          {{ $t('nav.features') }}
+          <span 
+            :class="[
+              'absolute -bottom-1 right-0 h-0.5 bg-orange-600 transition-all duration-200',
+              activeSection === 'features' ? 'w-full' : 'w-0 hover:w-full'
+            ]"
+          ></span>
+        </a>
+        <a 
+          href="#faqs" 
+          @click.prevent="scrollToSection('faqs')"
+          :class="[
+            'relative py-1 transition-colors cursor-pointer',
+            activeSection === 'faqs' ? 'text-orange-600' : 'text-slate-600 hover:text-orange-600'
+          ]"
+        >
+          {{ $t('nav.faqs') }}
+          <span 
+            :class="[
+              'absolute -bottom-1 right-0 h-0.5 bg-orange-600 transition-all duration-200',
+              activeSection === 'faqs' ? 'w-full' : 'w-0 hover:w-full'
+            ]"
+          ></span>
+        </a>
+
+        <a 
+          href="#pricing" 
+          @click.prevent="scrollToSection('pricing')"
+          :class="[
+            'relative py-1 transition-colors cursor-pointer',
+            activeSection === 'pricing' ? 'text-orange-600' : 'text-slate-600 hover:text-orange-600'
+          ]"
+        >
+          {{ $t('nav.pricing') }}
+          <span 
+            :class="[
+              'absolute -bottom-1 right-0 h-0.5 bg-orange-600 transition-all duration-200',
+              activeSection === 'pricing' ? 'w-full' : 'w-0 hover:w-full'
+            ]"
+          ></span>
+        </a>
+
+        <a 
+          href="#contact" 
+          @click.prevent="scrollToSection('contact')"
+          :class="[
+            'relative py-1 transition-colors cursor-pointer',
+            activeSection === 'contact' ? 'text-orange-600' : 'text-slate-600 hover:text-orange-600'
+          ]"
+        >
+          {{ $t('nav.contact') }}
+          <span 
+            :class="[
+              'absolute -bottom-1 right-0 h-0.5 bg-orange-600 transition-all duration-200',
+              activeSection === 'contact' ? 'w-full' : 'w-0 hover:w-full'
+            ]"
+          ></span>
+        </a>
       </div>
 
       <!-- Left Side (Language Switcher + Login + Start Now) -->

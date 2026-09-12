@@ -19,6 +19,48 @@
         </div>
       </div>
 
+      <!-- Current Subscription & Plan Card -->
+      <div class="mb-8 p-5 rounded-3xl border border-gray-100 bg-gradient-to-l from-gray-50/80 via-white to-orange-50/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs">
+        <div class="flex items-center gap-4">
+          <div
+            class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-xs shrink-0"
+            :class="isPro ? 'bg-amber-100 text-amber-700' : isBasic ? 'bg-blue-50 text-blue-700' : 'bg-orange-50 text-orange-600'"
+          >
+            {{ isPro ? '👑' : isBasic ? '⚡' : '🎁' }}
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="font-black text-gray-900 text-base md:text-lg">
+                {{ $t(`plans.${currentPlan.id || 'free'}_name`) }}
+              </h3>
+              <span
+                class="text-xs px-2.5 py-0.5 rounded-full font-black"
+                :class="isPro ? 'bg-amber-100 text-amber-800' : isBasic ? 'bg-blue-100 text-blue-800' : 'bg-emerald-100 text-emerald-800'"
+              >
+                {{ isFree ? $t("plans.free_trial_badge") : $t("plans.active_badge") }}
+              </span>
+            </div>
+            <p class="text-xs text-gray-500 font-medium mt-1">
+              <template v-if="isFree">
+                {{ $t("plans.allowed_limit", { items: currentPlan.max_items, categories: currentPlan.max_categories }) }}
+              </template>
+              <template v-else>
+                {{ $t("plans.unlimited_items_cats") }} • {{ $t("plans.all_features_active") }}
+              </template>
+            </p>
+          </div>
+        </div>
+
+        <button
+          v-if="!isPro"
+          type="button"
+          @click="openUpgradeForFeature($t('plans.full_upgrade_title'), $t('plans.full_upgrade_badge'), $t('plans.full_upgrade_msg'))"
+          class="w-full sm:w-auto bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-500 hover:to-amber-400 text-white font-black text-xs md:text-sm py-2.5 px-5 rounded-xl shadow-md shadow-orange-500/15 transition-transform active:scale-95 cursor-pointer whitespace-nowrap"
+        >
+          ⚡ {{ $t("plans.upgrade_now") }}
+        </button>
+      </div>
+
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <!-- اسم المطعم -->
         <div class="md:col-span-2">
@@ -212,20 +254,95 @@
             </div>
           </div>
           
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-gray-50/50 p-4 rounded-3xl border border-gray-100">
+          <div class="grid grid-cols-2 gap-3 bg-gray-50/50 p-4 rounded-3xl border border-gray-100 max-w-md">
             <button 
-              v-for="type in ['none', 'daily', 'weekly', 'monthly']" 
+              v-for="type in ['shift', 'daily']" 
               :key="type"
               @click="form.order_reset_type = type"
               :class="[
-                'py-3 px-2 rounded-2xl font-bold text-xs transition-all border-2 text-center',
+                'py-3.5 px-3 rounded-2xl font-bold text-xs transition-all border-2 text-center flex items-center justify-center gap-2',
                 form.order_reset_type === type 
                   ? 'bg-blue-600 text-white border-blue-600 shadow-md ring-2 ring-blue-600/10' 
-                  : 'bg-white text-gray-400 border-transparent hover:border-blue-200'
+                  : 'bg-white text-gray-500 border-transparent hover:border-blue-200'
               ]"
             >
-              {{ $t(`cart.reset_${type}`) }}
+              <span>{{ type === 'shift' ? '⏱️' : '📅' }}</span>
+              <span>{{ $t(`cart.reset_${type}`) }}</span>
             </button>
+          </div>
+        </div>
+
+        <!-- Restaurant Shifts Section -->
+        <div class="md:col-span-2 pt-6 border-t border-gray-100 mt-4">
+          <div class="flex items-center justify-between mb-4 px-1">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center shrink-0">
+                <BaseIcon name="clock" class="w-5 h-5 text-orange-600" />
+              </div>
+              <div>
+                <label class="text-sm font-bold text-gray-800 block">{{ $t("shifts.shifts_settings_title") }}</label>
+                <p class="text-xs text-gray-400 font-medium">{{ $t("shifts.shifts_settings_desc") }}</p>
+              </div>
+            </div>
+            <span class="text-[10px] bg-orange-50 text-orange-600 px-2.5 py-1 rounded-lg font-black">
+              {{ restaurantShiftsList.length }} {{ $t("shifts.shift_name") }}
+            </span>
+          </div>
+
+          <!-- Add New Shift Inputs -->
+          <div class="flex flex-col sm:flex-row gap-3 items-end bg-gray-50/50 p-4 rounded-2xl border border-gray-100">
+            <div class="flex-1 w-full">
+              <label class="text-[10px] font-bold text-gray-400 px-1 mb-1 block">{{ $t("shifts.shift_name") }}</label>
+              <BaseInput v-model="newShiftForm.shift_name" :placeholder="$t('shifts.general_shift')" />
+            </div>
+            <div class="w-full sm:w-36">
+              <label class="text-[10px] font-bold text-gray-400 px-1 mb-1 block">{{ $t("shifts.start_time") }}</label>
+              <input type="time" v-model="newShiftForm.start_time" class="w-full bg-white border border-gray-200 rounded-2xl px-4 py-3 text-sm font-bold text-gray-700 outline-none focus:ring-2 focus:ring-orange-500 transition-all" />
+            </div>
+            <div class="w-full sm:w-36">
+              <label class="text-[10px] font-bold text-gray-400 px-1 mb-1 block">{{ $t("shifts.end_time") }}</label>
+              <input type="time" v-model="newShiftForm.end_time" class="w-full bg-white border border-gray-200 rounded-2xl px-4 py-3 text-sm font-bold text-gray-700 outline-none focus:ring-2 focus:ring-orange-500 transition-all" />
+            </div>
+            <BaseButton
+              variant="primary"
+              icon="plus"
+              @click="handleAddNewShift"
+              class="!w-14 !h-12 !p-0 shrink-0 mb-1"
+            />
+          </div>
+
+          <!-- Defined Shifts Cards Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-6">
+            <div
+              v-for="s in restaurantShiftsList"
+              :key="s.id"
+              class="bg-white p-4 rounded-2xl border-2 border-gray-100 shadow-xs flex items-center justify-between group hover:border-orange-200 transition-all relative"
+            >
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-orange-50 text-orange-600 flex items-center justify-center shrink-0 font-black text-sm">
+                  ⏱️
+                </div>
+                <div>
+                  <p class="font-black text-sm text-gray-800">{{ s.shift_name }}</p>
+                  <p class="text-xs font-bold text-gray-400 mt-0.5" dir="ltr">
+                    {{ s.start_time.slice(0, 5) }} - {{ s.end_time.slice(0, 5) }}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                @click="handleRemoveShift(s.id)"
+                class="w-8 h-8 rounded-xl bg-red-50 text-red-500 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
+              >
+                <BaseIcon name="trash" class="w-4 h-4" />
+              </button>
+            </div>
+
+            <div v-if="restaurantShiftsList.length === 0" class="col-span-full py-8 flex flex-col items-center justify-center text-gray-400 font-bold border-2 border-dashed border-gray-100 rounded-3xl text-xs bg-gray-50/30">
+              <span class="text-2xl mb-2">⏱️</span>
+              {{ $t("shifts.no_shifts_defined") }}
+            </div>
           </div>
         </div>
 
@@ -255,10 +372,13 @@
               <BaseToggle
                 v-model="form.automated_hours_enabled"
                 :label="$t('admin.automated_hours_label')"
+                :locked="!can('allow_custom_hours')"
+                :badge="$t('plans.pro_badge_short')"
+                @lock-click="openUpgradeForFeature($t('plans.feat_automated_hours'), $t('plans.pro_badge_short'), $t('plans.hours_modal_msg'))"
                 class="!bg-transparent"
               />
               
-              <div v-if="form.automated_hours_enabled" class="px-5 pb-5 pt-2 border-t border-gray-50 flex items-center gap-4 animate-in slide-in-from-top-2 duration-300" dir="ltr">
+              <div v-if="form.automated_hours_enabled && can('allow_custom_hours')" class="px-5 pb-5 pt-2 border-t border-gray-50 flex items-center gap-4 animate-in slide-in-from-top-2 duration-300" dir="ltr">
                 <div class="flex-1 flex flex-col gap-1.5">
                   <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">{{ $t('admin.opening_time_label') }}</label>
                   <input type="time" v-model="form.opening_time" class="bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm font-bold text-gray-700 outline-none focus:ring-2 focus:ring-orange-500 transition-all" />
@@ -278,21 +398,30 @@
             <BaseToggle
               v-model="form.show_table_number"
               :label="$t('cart.table_number_setting_label')"
+              :locked="!can('allow_tables')"
+              :badge="$t('plans.pro_badge_short')"
+              @lock-click="openUpgradeForFeature($t('plans.feat_tables'), $t('plans.pro_badge_short'), $t('plans.tables_modal_msg'))"
               class="!bg-gray-50/50 !border !border-gray-100"
             />
             <BaseToggle
               v-model="form.show_queue_number"
               :label="$t('cart.queue_number_setting_label')"
+              :locked="!can('allow_tables')"
+              :badge="$t('plans.pro_badge_short')"
+              @lock-click="openUpgradeForFeature($t('plans.feat_queue'), $t('plans.pro_badge_short'), $t('plans.queue_modal_msg'))"
               class="!bg-gray-50/50 !border !border-gray-100"
             />
             <BaseToggle
               v-model="form.whatsapp_ordering_enabled"
-              label="تفعيل الطلب عبر الواتساب"
+              :label="$t('plans.enable_whatsapp_ordering')"
+              :locked="!can('allow_whatsapp_orders')"
+              :badge="$t('plans.pro_badge_short')"
+              @lock-click="openUpgradeForFeature($t('plans.feat_whatsapp_ordering'), $t('plans.pro_badge_short'), $t('plans.whatsapp_modal_msg'))"
               class="!bg-gray-50/50 !border !border-gray-100"
             />
             <BaseToggle
               v-model="form.show_phone_number"
-              label="تفعيل رقم الهاتف"
+              :label="$t('plans.enable_phone_number')"
               class="!bg-gray-50/50 !border !border-gray-100"
             />
           </div>
@@ -332,7 +461,10 @@
         <!-- Upgrade Plan Modal -->
         <UpgradeModal
           :isOpen="showUpgradeModal"
-          limitType="categories"
+          :limitType="upgradeModalConfig.limitType"
+          :title="upgradeModalConfig.title"
+          :badgeText="upgradeModalConfig.badgeText"
+          :message="upgradeModalConfig.message"
           :currentCount="form.categories.length"
           :maxCount="maxCategories"
           :businessName="form.business_name || profile?.business_name || ''"
@@ -354,12 +486,12 @@
             </div>
 
             <button
-              v-if="isCategoryLimitReached || profile?.plan_type === 'free'"
+              v-if="isCategoryLimitReached || isPlanFree"
               type="button"
-              @click="showUpgradeModal = true"
+              @click="openUpgradeForCategories"
               class="text-xs font-black bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white px-3 py-1.5 rounded-xl shadow-xs transition-transform active:scale-95 cursor-pointer"
             >
-              ⚡ ترقية الباقة
+              ⚡ {{ $t("plans.upgrade_btn") }}
             </button>
           </div>
 
@@ -451,7 +583,30 @@
         </div>
 
         <!-- Delivery Areas -->
-        <div class="md:col-span-2 pt-6 border-t border-gray-100 mt-4">
+        <div class="md:col-span-2 pt-6 border-t border-gray-100 mt-4 relative">
+          <!-- Smart Lock Overlay for Free & Basic Plans -->
+          <div
+            v-if="!can('allow_branches')"
+            class="absolute inset-0 bg-white/85 backdrop-blur-[3px] z-20 rounded-3xl flex flex-col items-center justify-center p-6 text-center border-2 border-dashed border-amber-200/90 shadow-xs"
+          >
+            <div class="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center text-2xl mb-3 shadow-xs">
+              👑
+            </div>
+            <h4 class="font-black text-gray-900 text-base mb-1">
+              {{ $t("plans.delivery_lock_title") }}
+            </h4>
+            <p class="text-xs text-gray-500 font-medium max-w-sm mb-4 leading-relaxed">
+              {{ $t("plans.delivery_lock_desc") }}
+            </p>
+            <button
+              type="button"
+              @click="openUpgradeForFeature($t('plans.feat_delivery'), $t('plans.pro_badge_short'), $t('plans.delivery_modal_msg'))"
+              class="bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-500 hover:to-amber-400 text-white font-black text-xs py-2.5 px-6 rounded-xl shadow-md shadow-orange-500/20 transition-transform active:scale-95 cursor-pointer"
+            >
+              ⚡ {{ $t("plans.delivery_lock_btn") }}
+            </button>
+          </div>
+
           <div class="flex items-center gap-3 mb-4 px-1">
             <div class="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center shrink-0">
               <BaseIcon name="map-pin" class="w-5 h-5 text-green-600" />
@@ -543,11 +698,41 @@ const {
 } = useSettings();
 
 const { deleteItemsByCategory, updateItemsCategory } = useMenu();
+const { maxCategories: planMaxCategories, isFree: isPlanFree, isBasic, isPro, currentPlan, can } = usePlan();
 
 const showUpgradeModal = ref(false);
+const upgradeModalConfig = ref({
+  limitType: "categories",
+  title: "",
+  badgeText: "",
+  message: "",
+});
+
+const openUpgradeForCategories = () => {
+  upgradeModalConfig.value = {
+    limitType: "categories",
+    title: t("plans.modal_default_title"),
+    badgeText: t("plans.reached_limit"),
+    message: "",
+  };
+  showUpgradeModal.value = true;
+};
+
+const openUpgradeForFeature = (featureName, badge = "", customMsg = "") => {
+  upgradeModalConfig.value = {
+    limitType: "general",
+    title: t("plans.feature_upgrade_title", { feature: featureName }),
+    badgeText: badge || t("plans.pro_badge_short"),
+    message: customMsg || t("plans.feature_upgrade_msg", { feature: featureName }),
+  };
+  showUpgradeModal.value = true;
+};
+
 const maxCategories = computed(() => {
-  if (profile.value?.max_categories === -1) return -1;
-  return profile.value?.max_categories ?? 5;
+  if (profile.value?.max_categories !== undefined && profile.value?.max_categories !== null) {
+    return profile.value.max_categories;
+  }
+  return planMaxCategories.value;
 });
 const isCategoryLimitReached = computed(() => {
   if (maxCategories.value === -1) return false;
@@ -557,6 +742,47 @@ const isCategoryLimitReached = computed(() => {
 const newCategory = ref("");
 const newDeliveryArea = ref({ name: "", price: "" });
 
+// Shifts Logic
+const {
+  shifts: restaurantShiftsList,
+  fetchShifts: loadRestaurantShifts,
+  addShift: createRestaurantShift,
+  deleteShift: removeRestaurantShift,
+} = useShifts();
+
+const newShiftForm = ref({
+  shift_name: "",
+  start_time: "08:00",
+  end_time: "16:00",
+});
+
+const handleAddNewShift = async () => {
+  if (!ownerId.value) return;
+  if (!newShiftForm.value.shift_name.trim()) {
+    return $toast.error(t("admin.error_fields"));
+  }
+  await createRestaurantShift(ownerId.value, {
+    shift_name: newShiftForm.value.shift_name.trim(),
+    start_time: newShiftForm.value.start_time,
+    end_time: newShiftForm.value.end_time,
+  });
+  newShiftForm.value.shift_name = "";
+};
+
+const handleRemoveShift = async (shiftId) => {
+  await removeRestaurantShift(shiftId);
+};
+
+watch(
+  ownerId,
+  (id) => {
+    if (id) {
+      loadRestaurantShifts(id);
+    }
+  },
+  { immediate: true }
+);
+
 const form = ref({
   business_name: "",
   slug: "",
@@ -565,7 +791,7 @@ const form = ref({
   delivery_areas: [],
   logo: "",
   is_active: true,
-  order_reset_type: "none",
+  order_reset_type: "shift",
   primary_color: "#ea580c",
   show_table_number: false,
   show_queue_number: false,
@@ -591,7 +817,7 @@ watch(
           delivery_areas: data.delivery_areas || [],
           logo: data.logo || "",
           is_active: data.is_active !== false,
-          order_reset_type: data.order_reset_type || "none",
+          order_reset_type: ["shift", "daily"].includes(data.order_reset_type) ? data.order_reset_type : "shift",
           primary_color: data.primary_color || "#ea580c",
           show_table_number: data.show_table_number === true,
           show_queue_number: data.show_queue_number === true,
@@ -654,9 +880,9 @@ const addCategory = () => {
 
   if (isCategoryLimitReached.value) {
     $toast.error(
-      `لقد وصلت للحد الأقصى للأقسام في باقتك الحالية (${maxCategories.value} أقسام). يرجى ترقية الباقة.`
+      t("plans.cats_limit_toast", { max: maxCategories.value })
     );
-    showUpgradeModal.value = true;
+    openUpgradeForCategories();
     return;
   }
 
@@ -665,6 +891,11 @@ const addCategory = () => {
 };
 
 const addDeliveryArea = () => {
+  if (!can('allow_branches')) {
+    openUpgradeForFeature(t('plans.feat_delivery'), t('plans.pro_badge_short'), t('plans.delivery_modal_msg'));
+    return;
+  }
+
   const name = newDeliveryArea.value.name.trim();
   const price = newDeliveryArea.value.price;
   
@@ -807,7 +1038,7 @@ const saveSettings = async () => {
     delivery_areas: form.value.delivery_areas ? [...form.value.delivery_areas] : [],
     logo: form.value.logo,
     is_active: form.value.is_active !== false,
-    order_reset_type: form.value.order_reset_type || "none",
+    order_reset_type: form.value.order_reset_type || "shift",
     primary_color: form.value.primary_color || "#ea580c",
     show_table_number: form.value.show_table_number === true,
     show_queue_number: form.value.show_queue_number === true,

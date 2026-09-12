@@ -58,11 +58,11 @@
           </h2>
 
           <button
-            v-if="isItemLimitReached || profile?.plan_type === 'free'"
+            v-if="isItemLimitReached || isPlanFree"
             @click="showUpgradeModal = true"
             class="text-xs font-black bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white px-3 py-1.5 rounded-xl shadow-xs transition-transform active:scale-95 cursor-pointer"
           >
-            ⚡ ترقية الباقة
+            ⚡ {{ $t("plans.upgrade_btn") }}
           </button>
         </div>
 
@@ -605,6 +605,7 @@
 definePageMeta({ layout: "admin", middleware: "auth" });
 
 const { user, userId, ownerId, userRole } = useAuthUser();
+const { t } = useI18n();
 const { $toast } = useNuxtApp();
 
 // Composables
@@ -621,12 +622,15 @@ const {
 } = useMenu();
 
 const { profile, loading: profileLoading, fetchProfile } = useSettings();
+const { maxItems: planMaxItems, isFree: isPlanFree } = usePlan();
 
 // UI State
 const showUpgradeModal = ref(false);
 const maxItems = computed(() => {
-  if (profile.value?.max_items === -1) return -1;
-  return profile.value?.max_items ?? 30;
+  if (profile.value?.max_items !== undefined && profile.value?.max_items !== null) {
+    return profile.value.max_items;
+  }
+  return planMaxItems.value;
 });
 const isItemLimitReached = computed(() => {
   if (maxItems.value === -1) return false;
@@ -777,7 +781,7 @@ const handleFileUpload = async (event) => {
 const openAddModal = () => {
   if (isItemLimitReached.value) {
     $toast.error(
-      `لقد وصلت للحد الأقصى للأصناف في باقتك الحالية (${maxItems.value} صنف). يرجى ترقية الباقة.`
+      t("plans.items_limit_toast", { max: maxItems.value })
     );
     showUpgradeModal.value = true;
     return;

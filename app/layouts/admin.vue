@@ -145,14 +145,23 @@
           <NuxtLink
             v-if="userRole === 'super_admin'"
             to="/admin/sales"
-            class="flex items-center gap-3 p-4 rounded-2xl transition-all font-bold hover:bg-orange-50 text-gray-500 overflow-hidden group"
+            class="flex items-center justify-between p-4 rounded-2xl transition-all font-bold hover:bg-orange-50 text-gray-500 overflow-hidden group"
             active-class="bg-orange-50 text-orange-600 shadow-sm shadow-orange-50"
           >
-            <BaseIcon
-              name="chart"
-              class="w-6 h-6 shrink-0 group-hover:scale-110 transition-transform"
-            />
-            <span v-show="!isCollapsed" class="whitespace-nowrap">{{ $t("admin.sales") }}</span>
+            <div class="flex items-center gap-3">
+              <BaseIcon
+                name="chart"
+                class="w-6 h-6 shrink-0 group-hover:scale-110 transition-transform"
+              />
+              <span v-show="!isCollapsed" class="whitespace-nowrap">{{ $t("admin.sales") }}</span>
+            </div>
+            <span
+              v-if="!isCollapsed && !can('allow_analytics')"
+              class="text-xs bg-amber-100/90 text-amber-800 px-2 py-0.5 rounded-full font-black text-[10px] border border-amber-200/80 shadow-xs shrink-0 flex items-center gap-1"
+            >
+              <span>🔒</span>
+              <span>{{ $t("plans.basic_badge_short") }}</span>
+            </span>
           </NuxtLink>
 
           <NuxtLink
@@ -173,11 +182,20 @@
           <NuxtLink
             v-if="isSuperAdmin"
             to="/admin/users"
-            class="flex items-center gap-3 p-4 rounded-2xl transition-all font-bold hover:bg-purple-50 text-gray-500 overflow-hidden group"
+            class="flex items-center justify-between p-4 rounded-2xl transition-all font-bold hover:bg-purple-50 text-gray-500 overflow-hidden group"
             active-class="bg-purple-50 text-purple-600 shadow-sm"
           >
-            <BaseIcon name="users" class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" />
-            <span v-show="!isCollapsed" class="whitespace-nowrap"> {{ $t("admin.users") }} </span>
+            <div class="flex items-center gap-3">
+              <BaseIcon name="users" class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" />
+              <span v-show="!isCollapsed" class="whitespace-nowrap"> {{ $t("admin.users") }} </span>
+            </div>
+            <span
+              v-if="!isCollapsed && !can('allow_users')"
+              class="text-xs bg-amber-100/90 text-amber-800 px-2 py-0.5 rounded-full font-black text-[10px] border border-amber-200/80 shadow-xs shrink-0 flex items-center gap-1"
+            >
+              <span>🔒</span>
+              <span>{{ $t("plans.pro_badge_short") }}</span>
+            </span>
           </NuxtLink>
 
           <!-- Language Switcher Dropdown -->
@@ -240,26 +258,61 @@
 
         <!-- Sidebar Footer -->
         <div class="mt-auto pt-4 space-y-2 border-t border-gray-100">
-          <!-- Free Plan Badge / Upgrade Card -->
+          <!-- Plan Badge / Upgrade Card -->
           <div
-            v-if="!isCollapsed && (!localProfile?.plan_type || localProfile?.plan_type === 'free')"
-            class="mb-3 p-3.5 bg-gradient-to-br from-orange-500/10 via-amber-500/10 to-orange-500/5 border border-orange-200/80 rounded-2xl text-right"
-            dir="rtl"
+            v-if="!isCollapsed && isFree"
+            class="mb-3 p-3.5 bg-gradient-to-br from-orange-500/10 via-amber-500/10 to-orange-500/5 border border-orange-200/80 rounded-2xl"
+            :dir="$i18n.locale === 'ar' ? 'rtl' : 'ltr'"
           >
             <div class="flex items-center justify-between mb-1">
-              <span class="text-xs font-black text-orange-950">الباقة المجانية 🎁</span>
-              <span class="text-[10px] bg-orange-200 text-orange-800 font-bold px-1.5 py-0.5 rounded-md">تجربة</span>
+              <span class="text-xs font-black text-orange-950">{{ $t(`plans.${currentPlan.id || 'free'}_name`) }} 🎁</span>
+              <span class="text-[10px] bg-orange-200 text-orange-800 font-bold px-1.5 py-0.5 rounded-md">{{ $t("plans.trial_badge") }}</span>
             </div>
             <p class="text-[11px] text-orange-800/80 mb-2.5 font-medium leading-tight">
-              حد 30 صنف و 5 أقسام
+              {{ $t("plans.limit_summary", { items: currentPlan.max_items, categories: currentPlan.max_categories }) }}
             </p>
             <button
               type="button"
               @click="showUpgradeModal = true"
               class="w-full bg-orange-600 hover:bg-orange-500 text-white font-black text-xs py-2 px-3 rounded-xl shadow-xs transition-transform active:scale-95 text-center cursor-pointer block"
             >
-              ⚡ ترقية الباقة الآن
+              ⚡ {{ $t("plans.upgrade_now") }}
             </button>
+          </div>
+
+          <div
+            v-else-if="!isCollapsed && isBasic"
+            class="mb-3 p-3.5 bg-gradient-to-br from-slate-900/5 via-slate-800/5 to-slate-900/10 border border-slate-200 rounded-2xl"
+            :dir="$i18n.locale === 'ar' ? 'rtl' : 'ltr'"
+          >
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-xs font-black text-slate-900">{{ $t(`plans.${currentPlan.id || 'basic'}_name`) }} ⚡</span>
+              <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded-md">{{ $t("plans.active_badge") }}</span>
+            </div>
+            <p class="text-[11px] text-slate-600 mb-2.5 font-medium leading-tight">
+              {{ $t("plans.unlimited_items_cats") }}
+            </p>
+            <button
+              type="button"
+              @click="showUpgradeModal = true"
+              class="w-full bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-500 hover:to-amber-400 text-white font-black text-xs py-2 px-3 rounded-xl shadow-xs transition-transform active:scale-95 text-center cursor-pointer block"
+            >
+              👑 {{ $t("plans.upgrade_pro") }}
+            </button>
+          </div>
+
+          <div
+            v-else-if="!isCollapsed && isPro"
+            class="mb-3 p-3.5 bg-gradient-to-br from-amber-500/10 via-orange-500/10 to-amber-500/5 border border-amber-300/80 rounded-2xl"
+            :dir="$i18n.locale === 'ar' ? 'rtl' : 'ltr'"
+          >
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-xs font-black text-amber-950">{{ $t(`plans.${currentPlan.id || 'pro'}_name`) }} 👑</span>
+              <span class="text-[10px] bg-amber-200 text-amber-900 font-black px-1.5 py-0.5 rounded-md">{{ $t("plans.vip_badge") }}</span>
+            </div>
+            <p class="text-[11px] text-amber-900/80 font-medium leading-tight">
+              {{ $t("plans.all_features_active") }}
+            </p>
           </div>
 
           <button
@@ -312,6 +365,8 @@ const authStore = useAuthStore();
 const client = useSupabaseClient();
 const user = useSupabaseUser();
 const { userRole } = useAuthUser();
+const { currentPlan, isFree, isBasic, isPro, can } = usePlan();
+const { t } = useI18n();
 const { $toast } = useNuxtApp();
 const isCollapsed = ref(false);
 const isMobileOpen = ref(false);
@@ -332,13 +387,25 @@ const profileName = computed(() =>
 const isSuperAdmin = computed(() => localProfile.value?.role === 'super_admin');
 
 const fetchProfile = async (userId) => {
-  const { data, error } = await client
+  let { data, error } = await client
     .from('profiles')
-    .select('*')
+    .select('*, plans(*)')
     .eq('user_id', userId)
     .single();
 
-  if (!error && data) {
+  if (error) {
+    const res = await client
+      .from('profiles')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
+    data = res.data;
+  }
+
+  if (data) {
+    if (data.plans) {
+      data.plan = data.plans;
+    }
     // If this is a regular admin without a business name, fetch the owner's business name for display
     if (data.role === 'admin' && data.owner_id && !data.business_name_ar) {
       const { data: ownerData } = await client
@@ -371,7 +438,7 @@ const handleLogout = async () => {
   await client.auth.signOut();
   localProfile.value = null;
   authStore.profile = null;
-  $toast.success('تم تسجيل الخروج بنجاح');
+  $toast.success(t('auth.logout_success'));
   navigateTo('/login');
 };
 </script>

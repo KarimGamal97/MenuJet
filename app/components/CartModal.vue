@@ -543,8 +543,24 @@ const placeCashierOrder = async () => {
 
     console.log("الـ ID اللي هيتبعت:", finalRestaurantId);
 
+    // Fetch active shift session if any
+    let activeSessionId = null;
+    try {
+      const { data: openSession } = await client
+        .from("cashier_sessions")
+        .select("id")
+        .eq("restaurant_id", finalRestaurantId)
+        .eq("status", "open")
+        .order("opened_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (openSession?.id) activeSessionId = openSession.id;
+    } catch (e) {
+      console.warn("Could not query active session for order:", e);
+    }
+
     // Calculate Sequential Order Number
-    const calculateNextOrderNumber = async (restaurantId) => {
+    const calculateNextOrderNumber = async (restaurantId, currentSessionId) => {
       // 1. Fetch profile to get order_reset_type
       const { data: profile } = await client
         .from("profiles")
@@ -552,9 +568,35 @@ const placeCashierOrder = async () => {
         .eq("user_id", restaurantId)
         .single();
       
-      const resetType = profile?.order_reset_type || 'none';
+      const resetType = profile?.order_reset_type || 'shift';
       
-      // 2. Determine start date based on resetType
+      // Case A: Reset per shift
+      if (resetType === 'shift') {
+        if (currentSessionId) {
+          const { data: lastOrders } = await client
+            .from("orders")
+            .select("order_number")
+            .eq("user_id", restaurantId)
+            .eq("session_id", currentSessionId)
+            .order("order_number", { ascending: false })
+            .limit(1);
+          return (lastOrders?.[0]?.order_number || 0) + 1;
+        } else {
+          // If no active session, fallback to start of today
+          const todayStart = new Date();
+          todayStart.setHours(0, 0, 0, 0);
+          const { data: lastOrders } = await client
+            .from("orders")
+            .select("order_number")
+            .eq("user_id", restaurantId)
+            .gt("created_at", todayStart.toISOString())
+            .order("order_number", { ascending: false })
+            .limit(1);
+          return (lastOrders?.[0]?.order_number || 0) + 1;
+        }
+      }
+
+      // Case B: Time-based resets (daily, weekly, monthly, or none)
       const now = new Date();
       let startDate = new Date(0); // Default for 'none'
       
@@ -581,15 +623,17 @@ const placeCashierOrder = async () => {
       return (lastOrders?.[0]?.order_number || 0) + 1;
     };
 
-    const nextOrderNum = await calculateNextOrderNumber(finalRestaurantId);
+    const nextOrderNum = await calculateNextOrderNumber(finalRestaurantId, activeSessionId);
 
     const { data: order, error: orderError } = await client
       .from("orders")
       .insert({
         user_id: finalRestaurantId,
+        session_id: activeSessionId,
         items: cart.value,
         total_price: totalPrice.value,
         status: "pending",
+        payment_method: "cash",
         customer_phone: cashierPhone.value.trim(),
         order_number: nextOrderNum,
         table_number: props.tableNumberEnabled ? tableNumber.value.trim() || null : null,
