@@ -34,9 +34,9 @@
         <div v-if="item.description" class="text-gray-400 text-xs line-clamp-2">
           {{ item.description }}
         </div>
-        <!-- <p class="text-orange-600 font-bold text-xs">
-          {{ item.price }}
-        </p> -->
+        <p v-if="displayPrice" class="text-orange-600 font-black text-xs mt-1">
+          {{ displayPrice }} {{ $t("currency") }}
+        </p>
       </div>
     </div>
 
@@ -58,8 +58,8 @@
         />
       </div>
 
-      <!-- Public Mode: Add to Cart (Only if NOT in admin dashboard) -->
-      <div v-else-if="!isAdmin">
+      <!-- Public Mode: Add to Cart (Only if NOT in admin dashboard AND ordering is allowed) -->
+      <div v-else-if="!isAdmin && allowOrdering">
         <BaseButton
           @click.stop="emit('select', item)"
           variant="ghost"
@@ -95,9 +95,26 @@ const props = defineProps({
     type: String,
     default: null,
   },
+  allowOrdering: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 const emit = defineEmits(["edit", "delete", "select"]);
+
+const displayPrice = computed(() => {
+  if (props.item.prices && typeof props.item.prices === 'object') {
+    if (props.item.prices.fixed) return props.item.prices.fixed;
+    const numericPrices = Object.values(props.item.prices)
+      .map(Number)
+      .filter((n) => !isNaN(n) && n > 0);
+    if (numericPrices.length > 0) {
+      return Math.min(...numericPrices);
+    }
+  }
+  return props.item.price || null;
+});
 
 const handleCardClick = () => {
   if (props.isAdmin) {

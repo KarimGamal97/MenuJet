@@ -15,11 +15,15 @@
           <ul class="space-y-4 opacity-90 hidden md:block text-start">
              <li class="flex items-center gap-4">
                 <span class="bg-white/20 p-2 rounded-full"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg></span>
-                <span class="text-xl font-bold">{{ $i18n.locale === 'ar' ? 'تفعيل في نفس اليوم' : 'Same-day Activation' }}</span>
+                <span class="text-xl font-bold">{{ $t('contact.feature_1') }}</span>
              </li>
              <li class="flex items-center gap-4">
                 <span class="bg-white/20 p-2 rounded-full"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg></span>
-                <span class="text-xl font-bold">{{ $i18n.locale === 'ar' ? 'بدون بطاقة ائتمان' : 'No Credit Card Required' }}</span>
+                <span class="text-xl font-bold">{{ $t('contact.feature_2') }}</span>
+             </li>
+             <li class="flex items-center gap-4">
+                <span class="bg-white/20 p-2 rounded-full"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg></span>
+                <span class="text-xl font-bold">{{ $t('contact.feature_3') }}</span>
              </li>
           </ul>
         </div>

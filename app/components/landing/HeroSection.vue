@@ -21,17 +21,17 @@
     </div>
 
     <div class="container mx-auto px-6 text-center z-10 relative">
-      <h1 class="text-5xl md:text-7xl font-black text-gray-900 mb-6 leading-tight drop-shadow-sm">
+      <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 mb-6 leading-tight max-w-5xl mx-auto drop-shadow-sm">
         {{ $t('hero.title_part1') }} <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-orange-400">{{ $t('hero.title_part2') }}</span>
       </h1>
-      <p class="text-xl md:text-2xl text-gray-600 mb-10 max-w-3xl mx-auto font-medium">
+      <p class="text-lg md:text-xl text-gray-600 mb-10 max-w-3xl mx-auto font-medium leading-relaxed whitespace-pre-line">
         {{ $t('hero.subtitle') }}
       </p>
       <div class="flex flex-col md:flex-row gap-6 justify-center items-center">
         <PrimaryButton href="#contact" @click.prevent="scrollToSection('contact')" class="!px-10 !py-4">
           {{ $t('hero.cta_start') }}
         </PrimaryButton>
-        <SecondaryButton href="#demo" @click.prevent="scrollToSection('demo')" class="!px-10 !py-4">
+        <SecondaryButton href="#features" @click.prevent="scrollToSection('features')" class="!px-10 !py-4">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-500 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />

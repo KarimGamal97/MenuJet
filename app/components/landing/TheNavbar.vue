@@ -164,13 +164,6 @@
         {{ $t('nav.features') }}
       </a>
       <a 
-        href="#how-it-works" 
-        @click.prevent="scrollToSection('how-it-works')" 
-        :class="['font-black py-2.5 rounded-xl transition cursor-pointer text-sm', activeSection === 'how-it-works' ? 'text-orange-600 bg-orange-50' : 'text-slate-700 hover:bg-slate-50']"
-      >
-        {{ $t('nav.how_it_works') }}
-      </a>
-      <a 
         href="#faqs" 
         @click.prevent="scrollToSection('faqs')" 
         :class="['font-black py-2.5 rounded-xl transition cursor-pointer text-sm', activeSection === 'faqs' ? 'text-orange-600 bg-orange-50' : 'text-slate-700 hover:bg-slate-50']"

@@ -4,7 +4,6 @@
     <main>
       <LandingHeroSection />
       <LandingFeatures />
-      <LandingHowItWorks />
       <LandingDemoVideo />
       <LandingPricing />
       <LandingFAQs />

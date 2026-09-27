@@ -107,6 +107,7 @@
             v-for="item in filteredItems"
             :key="item.id"
             :item="item"
+            :allowOrdering="canOrder"
             @select="openItemModal"
           />
         </div>
@@ -122,9 +123,9 @@
         </div>
       </main>
 
-      <!-- Floating Cart Bar (Only when shop is actually open) -->
+      <!-- Floating Cart Bar (Only when ordering is active) -->
       <FloatingCartBar
-        v-if="isActuallyOpen"
+        v-if="canOrder"
         :whatsappNumber="restaurant.whatsapp_number"
         @openCart="showCart = true"
       />
@@ -134,6 +135,7 @@
         :isOpen="showItemModal"
         :item="selectedItem"
         :isClosed="!isActuallyOpen"
+        :allowOrdering="canOrder"
         @close="showItemModal = false"
       />
 
@@ -261,8 +263,21 @@ const isActuallyOpen = computed(() => {
   return false;
 });
 
-// isShopOpen: Controls the overlay visibility only
-const isShopOpen = computed(() => isActuallyOpen.value || isShopOpenOverride.value);
+// Ordering enabled toggle from restaurant settings
+const isOrderingEnabled = computed(() => {
+  return restaurant.value?.whatsapp_ordering_enabled !== false;
+});
+
+// canOrder: true only when restaurant is open AND ordering is enabled
+const canOrder = computed(() => {
+  return isActuallyOpen.value && isOrderingEnabled.value;
+});
+
+// isShopOpen: Controls the overlay visibility only (in browse-only mode, menu is always viewable)
+const isShopOpen = computed(() => {
+  if (!isOrderingEnabled.value) return true;
+  return isActuallyOpen.value || isShopOpenOverride.value;
+});
 
 const closedMessage = computed(() => {
   if (!restaurant.value) return "";

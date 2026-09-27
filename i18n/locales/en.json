@@ -2,7 +2,7 @@
   "hero": {
     "title_part1": "Turn your restaurant menu into a",
     "title_part2": "Smart Experience",
-    "subtitle": "Save printing costs, update your prices in seconds, and impress your customers with the fastest QR menu.",
+    "subtitle": "Save printing costs, update your prices in seconds,\nand impress your customers with the fastest QR menu.",
     "cta_start": "Start Your Free Week",
     "cta_demo": "Watch Demo Video",
     "cta_download": "Download App",
@@ -13,21 +13,24 @@
     }
   },
   "features": {
-    "instant_edit": {
-      "title": "Instant Editing",
-      "desc": "Change prices and items from your phone in seconds, and customers will see the updates instantly."
+    "title_part1": "How It",
+    "title_part2": "Works?",
+    "subtitle": "Four simple steps from registration to the first table scan.",
+    "step1": {
+      "title": "Create Your Account",
+      "desc": "Sign up for free and access your dashboard in minutes."
     },
-    "attractive_photos": {
-      "title": "Attractive Photos",
-      "desc": "Display your dishes in high quality and video. Encourage customers to order more just by looking at the picture."
+    "step2": {
+      "title": "Add Your Items",
+      "desc": "Categories, photos, prices, and deals — no technical skills needed."
     },
-    "brand_custom": {
-      "title": "Your Brand Identity",
-      "desc": "Fully customize your menu's colors, logo, and layout to perfectly match your restaurant's unique style."
+    "step3": {
+      "title": "Print QR Code",
+      "desc": "Download the code and place it on tables or at the entrance."
     },
-    "real_savings": {
-      "title": "Real Savings",
-      "desc": "Save thousands of pounds wasted on printing paper menus every time a price changes."
+    "step4": {
+      "title": "Customers Scan",
+      "desc": "The menu opens on their phones, and updates appear instantly."
     }
   },
   "pricing": {
@@ -73,6 +76,9 @@
     "name_placeholder": "Name",
     "restaurant_placeholder": "Restaurant Name",
     "cta": "Request Demo on WhatsApp",
+    "feature_1": "Free Full Menu Setup",
+    "feature_2": "0% Commission on All Orders",
+    "feature_3": "Browse-Only Menu Mode (Items & Prices Only)",
     "msg_template": "Hello MenuJet, I am {name}, owner of {restaurant}, and I would like to try the free digital menu."
   },
   "welcome": "Welcome to",
@@ -291,7 +297,6 @@
   },
   "nav": {
     "features": "Features",
-    "how_it_works": "How It Works",
     "faqs": "FAQs",
     "pricing": "Pricing",
     "contact": "Contact Us",
@@ -310,21 +315,6 @@
     "a3": "Yes, easily! Through a simple dashboard from your phone or computer, you can update prices, add new items, or hide sold-out dishes in seconds.",
     "q4": "Do you charge any commission on sales or orders?",
     "a4": "No, MenuJet charges 0% commission on your orders. You keep 100% of your earnings with zero hidden fees."
-  },
-  "howItWorks": {
-    "title": "How to get started with MenuJet?",
-    "register": {
-      "title": "Sign Up",
-      "desc": "Create your account in seconds"
-    },
-    "customize": {
-      "title": "Customize",
-      "desc": "Design your smart menu professionally and upload your high-quality dish photos"
-    },
-    "start": {
-      "title": "Launch",
-      "desc": "Get your custom QR code and start receiving customer orders and sales immediately!"
-    }
   },
   "plans": {
     "free_name": "Free Plan",
@@ -362,7 +352,7 @@
     "full_upgrade_title": "Full Plan Upgrade",
     "full_upgrade_badge": "MenuJet Plans ⚡",
     "full_upgrade_msg": "Choose the right plan for your restaurant to unlock all platform features without limits.",
-    "enable_whatsapp_ordering": "Enable WhatsApp Ordering",
+    "enable_whatsapp_ordering": "Accept Orders (or browse only)",
     "enable_phone_number": "Enable Phone Number",
     "reached_limit": "Plan limit reached 🔒",
     "modal_default_title": "Upgrade your plan & unlock limitless features",

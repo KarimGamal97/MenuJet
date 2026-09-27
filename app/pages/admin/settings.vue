@@ -414,9 +414,6 @@
             <BaseToggle
               v-model="form.whatsapp_ordering_enabled"
               :label="$t('plans.enable_whatsapp_ordering')"
-              :locked="!can('allow_whatsapp_orders')"
-              :badge="$t('plans.pro_badge_short')"
-              @lock-click="openUpgradeForFeature($t('plans.feat_whatsapp_ordering'), $t('plans.pro_badge_short'), $t('plans.whatsapp_modal_msg'))"
               class="!bg-gray-50/50 !border !border-gray-100"
             />
             <BaseToggle

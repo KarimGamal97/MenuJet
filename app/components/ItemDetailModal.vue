@@ -53,6 +53,7 @@
 
             <!-- Quantity -->
             <div
+              v-if="allowOrdering"
               class="flex items-center justify-between bg-gray-50 rounded-2xl p-3"
             >
               <span class="text-sm font-bold text-gray-500">{{
@@ -195,7 +196,7 @@
             </div>
 
             <!-- Notes -->
-            <div class="bg-gray-50 rounded-2xl p-3">
+            <div v-if="allowOrdering" class="bg-gray-50 rounded-2xl p-3">
               <button 
                 @click="showNotes = !showNotes"
                 class="flex items-center justify-between w-full focus:outline-none"
@@ -236,22 +237,26 @@
               class="bg-orange-50 rounded-2xl p-3 border border-orange-100 flex items-center justify-between"
             >
               <p class="text-sm font-bold text-orange-400">
-                {{ $t("admin.total") }}
+                {{ allowOrdering ? $t("admin.total") : ($i18n.locale === 'ar' ? 'السعر' : 'Price') }}
               </p>
               <p class="text-xl font-black text-orange-600">
                 {{ total }} {{ $t("admin.currency") }}
               </p>
             </div>
 
-            <!-- Add to Cart Button or Closed Notice -->
+            <!-- Add to Cart Button or Closed Notice or Browse Only Notice -->
             <button
-              v-if="!isClosed"
+              v-if="allowOrdering && !isClosed"
               @click="handleAdd"
               class="w-full py-4 bg-orange-600 text-white font-black rounded-2xl text-sm hover:bg-orange-700 active:scale-[0.98] transition-all shadow-lg shadow-orange-200 flex items-center justify-center gap-2"
             >
               <BaseIcon name="plus" class="w-4 h-4" />
               {{ $t("admin.add_to_cart") }}
             </button>
+            <div v-else-if="!allowOrdering" class="w-full py-3.5 bg-gray-50 text-gray-500 font-bold rounded-2xl text-xs text-center border border-gray-100 flex items-center justify-center gap-2">
+              <span>📖</span>
+              <span>{{ $i18n.locale === 'ar' ? 'تصفح فقط - الطلب متاح مع الويتر' : 'Browse only - Order with your waiter' }}</span>
+            </div>
             <div v-else class="w-full py-4 bg-gray-100 text-gray-400 font-bold rounded-2xl text-sm text-center border-2 border-dashed border-gray-200">
               🔒 {{ $t('admin.status_closed') }}
             </div>
@@ -267,6 +272,7 @@ const props = defineProps({
   isOpen: Boolean,
   item: { type: Object, default: () => ({}) },
   isClosed: { type: Boolean, default: false },
+  allowOrdering: { type: Boolean, default: true },
 });
 
 const emit = defineEmits(["close", "added"]);
