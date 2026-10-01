@@ -42,15 +42,35 @@
           class="flex flex-col md:flex-row items-center gap-3 px-4 mx-auto max-w-3xl w-full"
         >
           <!-- Search Input -->
-          <div class="relative w-full md:w-64 lg:w-80 shrink-0">
+          <div class="relative w-full md:w-64 lg:w-80 shrink-0 bg-gray-50 rounded-2xl shadow-sm overflow-hidden">
             <input
               v-model="searchQuery"
               type="text"
-              :placeholder="$t('admin.search_placeholder')"
-              class="w-full py-3 pr-10 pl-4 bg-gray-50 border-none rounded-2xl outline-none transition-all text-sm font-bold shadow-sm"
+              class="w-full py-3 pr-10 pl-4 bg-transparent border-none rounded-2xl outline-none transition-all text-sm font-bold relative z-10 text-gray-800"
             />
+
+            <!-- Animated Placeholder: static prefix + dynamic sliding product name -->
             <div
-              class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+              v-if="!searchQuery"
+              class="absolute inset-y-0 right-10 left-4 flex items-center gap-1.5 pointer-events-none overflow-hidden z-0"
+            >
+              <span class="text-sm font-bold text-gray-400 shrink-0 select-none">
+                {{ locale === 'ar' ? 'ابحث عن' : 'Search for' }}
+              </span>
+              <div class="relative overflow-hidden h-full flex items-center flex-1">
+                <Transition name="placeholder-slide" mode="out-in">
+                  <span
+                    :key="dynamicSearchPlaceholder"
+                    class="text-sm font-bold text-gray-400 truncate block select-none"
+                  >
+                    {{ dynamicSearchPlaceholder }}
+                  </span>
+                </Transition>
+              </div>
+            </div>
+
+            <div
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 z-10 pointer-events-none"
             >
               <BaseIcon name="search" class="w-4 h-4" />
             </div>
@@ -303,6 +323,53 @@ const openItemModal = (item) => {
 const activeCategory = ref("");
 const searchQuery = ref("");
 
+// Arabic text normalizer (e.g. قهوة === قهوه, أ/إ/آ -> ا, remove diacritics/tatweel)
+const normalizeArabic = (text) => {
+  if (!text) return "";
+  return text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/[\u064B-\u065F\u0670]/g, "") // remove tashkeel
+    .replace(/\u0640/g, "") // remove tatweel
+    .replace(/[أإآٱ]/g, "ا") // normalize alef
+    .replace(/ة/g, "ه") // normalize taa marbuta
+    .replace(/[ىئ]/g, "ي") // normalize yaa
+    .replace(/\s+/g, " "); // collapse multiple spaces
+};
+
+// Dynamic Rotating Search Placeholder (Max 5 items from current menu)
+const sampleProductNames = computed(() => {
+  const items = restaurant.value?.menu_items || [];
+  const names = items
+    .filter((i) => i.name && i.available !== false)
+    .map((i) => i.name.trim());
+  return [...new Set(names)].slice(0, 5);
+});
+
+const placeholderIndex = ref(0);
+let placeholderTimer = null;
+
+onMounted(() => {
+  placeholderTimer = setInterval(() => {
+    if (sampleProductNames.value.length > 0) {
+      placeholderIndex.value =
+        (placeholderIndex.value + 1) % sampleProductNames.value.length;
+    }
+  }, 3600);
+});
+
+onUnmounted(() => {
+  if (placeholderTimer) clearInterval(placeholderTimer);
+});
+
+const dynamicSearchPlaceholder = computed(() => {
+  if (sampleProductNames.value.length > 0) {
+    return sampleProductNames.value[placeholderIndex.value];
+  }
+  return locale.value === "ar" ? "وجبة أو مشروب" : "item";
+});
+
 const isInitialLoading = ref(true);
 
 const categories = computed(() => {
@@ -330,7 +397,7 @@ watch(pending, (isPending) => {
   if (!isPending && (!restaurant.value || !activeCategory.value)) {
     // wait for the categories watch to fire
   } else if (!isPending) {
-     // done
+    // done
   }
 });
 
@@ -345,10 +412,10 @@ const filteredItems = computed(() => {
   );
 
   if (searchQuery.value) {
-    const q = searchQuery.value.toLowerCase();
+    const q = normalizeArabic(searchQuery.value);
     return items.filter((i) => 
-      (i.name || "").toLowerCase().includes(q) || 
-      (i.description || "").toLowerCase().includes(q)
+      normalizeArabic(i.name).includes(q) || 
+      normalizeArabic(i.description).includes(q)
     );
   }
 
@@ -374,4 +441,20 @@ const filteredItems = computed(() => {
 :deep(.bg-orange-100) { background-color: color-mix(in srgb, var(--p-color), transparent 85%) !important; }
 :deep(.text-orange-100) { color: color-mix(in srgb, var(--p-color), white 80%) !important; }
 :deep(.bg-orange-900\/30) { background-color: color-mix(in srgb, var(--p-color), black 70%) !important; }
+
+/* Animated slide up placeholder (from bottom to top) */
+.placeholder-slide-enter-active,
+.placeholder-slide-leave-active {
+  transition: all 0.55s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.placeholder-slide-enter-from {
+  opacity: 0;
+  transform: translateY(100%);
+}
+
+.placeholder-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-100%);
+}
 </style>

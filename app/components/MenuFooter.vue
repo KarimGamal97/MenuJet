@@ -1,17 +1,17 @@
 <template>
   <footer
-    class="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-t border-gray-100 py-4 text-center z-40"
+    class="bg-white/80 backdrop-blur-lg border-t border-gray-100 py-3.5 text-center z-40"
   >
-    <p class="text-[10px] text-gray-300 uppercase tracking-widest font-bold">
-      Created by
+    <div class="flex items-center justify-center gap-1.5 text-xs font-bold text-gray-400">
+      <span>مدعوم بواسطة</span>
       <a
-        href="https://kariim-portfolio.vercel.app/"
-        target="_blank"
-        class="text-orange-600 hover:text-orange-400 transition-colors"
+        href="/"
+        class="text-orange-600 font-black hover:text-orange-500 transition-colors flex items-center gap-1"
       >
-        Kariim
+        <span>MenuJet</span>
+        <span class="text-xs">🚀</span>
       </a>
-    </p>
+    </div>
   </footer>
 </template>
 

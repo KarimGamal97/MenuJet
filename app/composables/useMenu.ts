@@ -153,6 +153,21 @@ export const useMenu = () => {
 
   const uploadMenuImage = async (file: File, userId: string) => {
     if (!file || !userId) return null;
+
+    // Validate size (max 2MB)
+    const maxSize = 2 * 1024 * 1024;
+    if (file.size > maxSize) {
+      $toast.error("حجم الصورة كبير جداً، الحد الأقصى 2 ميجابايت");
+      return null;
+    }
+
+    // Validate mime type
+    const validTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
+    if (file.type && !validTypes.includes(file.type.toLowerCase())) {
+      $toast.error("صيغة الصورة غير مدعومة");
+      return null;
+    }
+
     uploading.value = true;
 
     const fileExt = file.name.split(".").pop();

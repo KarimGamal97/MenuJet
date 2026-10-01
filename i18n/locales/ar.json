@@ -509,5 +509,32 @@
     "shift_lock_msg": "ميزة إدارة الشيفتات وحسابات الدرج متاحة لأصحاب الباقات الأساسية والاحترافية.",
     "shift_select_label": "اختر الشيفت أو الفترة",
     "shift_suggested_badge": "مقترح تلقائياً بناءً على الوقت الحالى"
+  },
+  "qr_print": {
+    "title": "تخصيص وطباعة الستاند",
+    "exit": "خروج ✕",
+    "restaurant_name": "اسم المطعم",
+    "restaurant_name_placeholder": "اسم المطعم",
+    "slug": "الرابط (Slug)",
+    "slug_placeholder": "cafe",
+    "logo": "لوجو العميل (اختياري)",
+    "logo_placeholder": "رابط اللوجو (أو ارفع صورة)",
+    "remove_logo": "إزالة اللوجو",
+    "hook": "العرض الترويجي (Hook)",
+    "hook_badge": "جذاب ومختصر",
+    "hook_placeholder": "خصم 15% على طلبك الآن",
+    "preset_discount15": "خصم 15% على طلبك الآن",
+    "preset_order_mobile": "اطلب من موبايلك في ثوانى",
+    "preset_today_offer": "عرض اليوم الخاص متاح هنا",
+    "preset_discount20": "امسح الكود ووفّر 20%",
+    "print_size": "حجم الكارت على ورقة A4",
+    "size_stand": "ستاند طاولة مدمج (وسط الورقة)",
+    "size_poster": "بوستر كبير (معلّق على الحائط)",
+    "print_btn": "طباعة على ورقة A4 الآن",
+    "print_tip_prefix": "في إعدادات الطباعة: الورق",
+    "print_tip_suffix": "وفعّل خيار",
+    "default_restaurant_name": "اسم المطعم",
+    "scan_and_order": "سكان واطلب",
+    "scan_me": "SCAN ME"
   }
 }

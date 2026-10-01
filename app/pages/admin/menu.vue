@@ -763,14 +763,23 @@ const navigateToMenu = () => {
 };
 
 const handleFileUpload = async (event) => {
-  const file = event.target.files[0];
+  const file = event.target.files?.[0];
   if (!file || !userId.value) return;
 
-  // Check file size (5MB = 5 * 1024 * 1024 bytes)
-  const maxSize = 5 * 1024 * 1024;
+  // 1. Validate file type
+  const validMimeTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
+  if (!file.type || !validMimeTypes.includes(file.type.toLowerCase())) {
+    $toast.error("صيغة الملف غير مدعومة! يرجى اختيار صورة بصيغة (JPG, PNG, WEBP)");
+    event.target.value = "";
+    return;
+  }
+
+  // 2. Validate file size (Max 2MB for fast loading on customer mobile devices)
+  const maxSize = 2 * 1024 * 1024;
   if (file.size > maxSize) {
-    $toast.error("حجم الصورة كبير جداً، الحد الأقصى هو 5 ميجا");
-    event.target.value = ''; // Reset input to allow re-selection
+    const sizeInMB = (file.size / (1024 * 1024)).toFixed(1);
+    $toast.error(`حجم الصورة (${sizeInMB} ميجا) كبير! الحد الأقصى المسموح هو 2 ميجابايت لضمان سرعة تحميل المنيو للزبائن.`);
+    event.target.value = "";
     return;
   }
 

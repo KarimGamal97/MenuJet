@@ -428,5 +428,32 @@
     "shift_lock_msg": "Shifts and cashier drawer management is available on Basic and Pro plans.",
     "shift_select_label": "Select Shift Period",
     "shift_suggested_badge": "Auto-suggested based on current time"
+  },
+  "qr_print": {
+    "title": "Customize & Print Stand",
+    "exit": "Exit ✕",
+    "restaurant_name": "Restaurant Name",
+    "restaurant_name_placeholder": "Restaurant Name",
+    "slug": "Menu Slug",
+    "slug_placeholder": "cafe",
+    "logo": "Customer Logo (Optional)",
+    "logo_placeholder": "Logo URL (or click to upload)",
+    "remove_logo": "Remove Logo",
+    "hook": "Promotional Hook",
+    "hook_badge": "Catchy & Short",
+    "hook_placeholder": "15% Off Your Order Now",
+    "preset_discount15": "15% Off Your Order Now",
+    "preset_order_mobile": "Order from phone in seconds",
+    "preset_today_offer": "Today's special offer here",
+    "preset_discount20": "Scan & save 20%",
+    "print_size": "Card Size on A4 Paper",
+    "size_stand": "Compact Table Stand (Centered)",
+    "size_poster": "Large Poster (Wall Hanging)",
+    "print_btn": "Print on A4 Paper Now",
+    "print_tip_prefix": "In print settings: paper",
+    "print_tip_suffix": "and enable",
+    "default_restaurant_name": "Restaurant Name",
+    "scan_and_order": "Scan & Order",
+    "scan_me": "SCAN ME"
   }
 }
