@@ -1,7 +1,8 @@
 <template>
   <div
-    class="min-h-screen flex items-center justify-center bg-gray-50 px-6 text-right py-12"
-    dir="rtl"
+    class="min-h-screen flex items-center justify-center bg-gray-50 px-6 py-12"
+    :class="locale === 'ar' ? 'text-right' : 'text-left'"
+    :dir="locale === 'ar' ? 'rtl' : 'ltr'"
   >
     <div class="max-w-md w-full">
       <div class="text-center mb-8">
@@ -9,10 +10,10 @@
           <span class="text-2xl font-black text-orange-600 tracking-tight">MenuJet</span>
         </NuxtLink>
         <h2 class="text-3xl font-black text-gray-900 mb-2">
-          {{ isSignUp ? "إنشاء حساب مطعم جديد 🚀" : $t("login.title") }}
+          {{ isSignUp ? $t("login.signup_title") : $t("login.title") }}
         </h2>
         <p class="text-gray-500 text-sm">
-          {{ isSignUp ? "ابدأ تجربتك المجانية لمدة 14 يوم فوراً بدون بطاقة ائتمان" : $t("login.subtitle") + " MenuJet" }}
+          {{ isSignUp ? $t("login.signup_subtitle") : $t("login.subtitle") + " MenuJet" }}
         </p>
       </div>
 
@@ -28,7 +29,7 @@
               : 'text-gray-500 hover:text-gray-800'
           ]"
         >
-          تسجيل الدخول
+          {{ $t("login.tab_signin") }}
         </button>
         <button
           type="button"
@@ -40,7 +41,7 @@
               : 'text-gray-500 hover:text-gray-800'
           ]"
         >
-          تجربة مجانية جديدة
+          {{ $t("login.tab_signup") }}
         </button>
       </div>
 
@@ -57,14 +58,14 @@
           <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
           <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
         </svg>
-        <span>{{ isSignUp ? "التسجيل السريع بحساب Google" : "تسجيل الدخول بحساب Google" }}</span>
+        <span>{{ isSignUp ? $t("login.google_signup") : $t("login.google_signin") }}</span>
       </button>
 
       <!-- Divider -->
       <div class="relative flex items-center justify-center mb-6">
         <div class="border-t border-gray-200 w-full"></div>
         <span class="bg-gray-50 px-3 text-xs text-gray-400 font-bold uppercase tracking-wider whitespace-nowrap">
-          أو عبر البريد الإلكتروني
+          {{ $t("login.or_email") }}
         </span>
         <div class="border-t border-gray-200 w-full"></div>
       </div>
@@ -75,7 +76,7 @@
           <BaseInput
             v-model="businessName"
             type="text"
-            placeholder="اسم المطعم أو الكافيه (مثال: برجر شوب)"
+            :placeholder="$t('login.business_name_placeholder')"
             :error="errors.businessName"
             class="bg-white"
           />
@@ -108,7 +109,7 @@
             {{ $t("login.loading") }}
           </template>
           <template v-else>
-            {{ isSignUp ? "إنشاء الحساب وبدء التجربة المجانية 🚀" : $t("login.submit") }}
+            {{ isSignUp ? $t("login.signup_submit") : $t("login.submit") }}
           </template>
         </BaseButton>
       </form>
@@ -122,8 +123,8 @@
         >
           {{
             isSignUp
-              ? "لديك حساب بالفعل؟ اضغط هنا لتسجيل الدخول"
-              : "ليس لديك حساب؟ اضغط هنا لإنشاء حساب تجريبي جديد مجاناً"
+              ? $t("login.have_account_toggle")
+              : $t("login.no_account_toggle")
           }}
         </button>
       </div>
@@ -148,7 +149,7 @@
 import { useForm, useField } from "vee-validate";
 import { defineRule } from "vee-validate";
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const route = useRoute();
 const isSignUp = ref(route.query.mode === "signup");
 
@@ -167,33 +168,44 @@ const user = useSupabaseUser();
 watch(
   user,
   (val) => {
-    if (val) {
+    if (val && route.path.includes("/login")) {
       navigateTo("/admin");
     }
   },
   { immediate: true }
 );
 
+let authSubscription = null;
+
 onMounted(async () => {
   // Listen for OAuth redirect state changes
-  client.auth.onAuthStateChange((event, session) => {
-    if (session?.user && (event === "SIGNED_IN" || event === "INITIAL_SESSION")) {
+  const { data } = client.auth.onAuthStateChange((event, session) => {
+    if (
+      route.path.includes("/login") &&
+      session?.user &&
+      (event === "SIGNED_IN" || event === "INITIAL_SESSION")
+    ) {
       navigateTo("/admin");
     }
   });
+  authSubscription = data?.subscription;
 
   // Direct check in case session exists
-  const { data } = await client.auth.getSession();
-  if (data?.session?.user) {
+  const { data: sessionData } = await client.auth.getSession();
+  if (sessionData?.session?.user && route.path.includes("/login")) {
     navigateTo("/admin");
   }
+});
+
+onUnmounted(() => {
+  authSubscription?.unsubscribe();
 });
 
 const { handleSubmit, errors, resetForm } = useForm();
 const { value: email } = useField("email", "required|email");
 const { value: password } = useField("password", "required");
 const { value: businessName } = useField("businessName", (val) => {
-  if (isSignUp.value && !val) return "اسم المطعم مطلوب";
+  if (isSignUp.value && !val) return t("login.error_business_name_required");
   return true;
 });
 
@@ -212,20 +224,20 @@ const onSubmit = handleSubmit(async (values) => {
         password: values.password,
         options: {
           data: {
-            business_name: values.businessName?.trim() || "مطعم جديد",
+            business_name: values.businessName?.trim() || t("login.default_business_name"),
           },
         },
       });
 
       if (error) {
-        $toast.error(error.message || "حدث خطأ أثناء إنشاء الحساب");
+        $toast.error(error.message || t("login.error_signup_generic"));
         loading.value = false;
         return;
       }
 
       // Check if session exists (auto-confirmed or confirmation disabled)
       if (data?.session || data?.user) {
-        $toast.success("تم إنشاء حسابك وتجهيز مطعمك بنجاح! 🚀");
+        $toast.success(t("login.signup_success"));
         
         // Wait for Supabase user sync
         const user = useSupabaseUser();
@@ -242,7 +254,7 @@ const onSubmit = handleSubmit(async (values) => {
         }
         navigateTo("/admin");
       } else {
-        $toast.success("تم إنشاء الحساب بنجاح! يرجى مراجعة بريدك الإلكتروني لتأكيد التسجيل ثم تسجيل الدخول.");
+        $toast.success(t("login.signup_email_confirmation"));
         isSignUp.value = false;
       }
     } else {
@@ -273,7 +285,7 @@ const onSubmit = handleSubmit(async (values) => {
     }
   } catch (err) {
     console.error("Auth error:", err);
-    $toast.error("حدث خطأ غير متوقع، يرجى المحاولة لاحقاً");
+    $toast.error(t("login.unexpected_error"));
   } finally {
     loading.value = false;
   }
@@ -295,11 +307,11 @@ const signInWithGoogle = async () => {
     });
 
     if (error) {
-      $toast.error(error.message || "فشل تسجيل الدخول بحساب Google");
+      $toast.error(error.message || t("login.error_google_failed"));
     }
   } catch (err) {
     console.error("Google sign in error:", err);
-    $toast.error("تعذر الاتصال بخدمة Google");
+    $toast.error(t("login.error_google_service"));
   } finally {
     googleLoading.value = false;
   }

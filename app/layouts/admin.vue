@@ -438,7 +438,7 @@ const handleLogout = async () => {
   await client.auth.signOut();
   localProfile.value = null;
   authStore.profile = null;
-  $toast.success(t('auth.logout_success'));
+  $toast.success(t('admin.logout_success'));
   navigateTo('/login');
 };
 </script>
