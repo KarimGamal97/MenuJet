@@ -146,7 +146,7 @@ const props = defineProps({
 defineEmits(["close"]);
 
 const openWhatsAppUpgrade = () => {
-  const whatsappNumber = "21132234124";
+  const whatsappNumber = "201132234124";
   const restaurant = props.businessName || t("plans.my_restaurant");
   const message = encodeURIComponent(
     t("plans.whatsapp_upgrade_text", { restaurant })
