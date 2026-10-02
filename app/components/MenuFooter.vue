@@ -6,11 +6,8 @@
       <span>مدعوم بواسطة</span>
       <a
         href="/"
-        class="text-orange-600 font-black hover:text-orange-500 transition-colors flex items-center gap-1"
-      >
-        <span>MenuJet</span>
-        <span class="text-xs">🚀</span>
-      </a>
+        class="text-orange-600 font-black hover:text-orange-500 transition-colors flex items-center gap-1">
+        <span>MenuJet</span></a>
     </div>
   </footer>
 </template>

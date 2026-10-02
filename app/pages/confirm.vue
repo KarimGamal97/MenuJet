@@ -3,7 +3,7 @@
     <div class="text-center space-y-4 max-w-sm w-full bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
       <div class="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
       <h3 class="text-lg font-black text-gray-900">جاري تسجيل الدخول...</h3>
-      <p class="text-gray-500 text-sm font-medium">يتم الآن تجهيز لوحة تحكم مطعمك في MenuJet 🚀</p>
+      <p class="text-gray-500 text-sm font-medium">يتم الآن تجهيز لوحة تحكم مطعمك في MenuJet</p>
     </div>
   </div>
 </template>

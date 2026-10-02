@@ -25,12 +25,6 @@
 
         <!-- Header Icon & Badge -->
         <div class="text-center mb-6">
-          <div
-            class="w-16 h-16 mx-auto bg-gradient-to-tr from-orange-500 to-amber-400 text-white rounded-3xl flex items-center justify-center text-3xl shadow-lg shadow-orange-500/25 mb-4"
-          >
-            🚀
-          </div>
-
           <span
             class="inline-block bg-orange-100 text-orange-700 text-xs font-black px-4 py-1.5 rounded-full mb-2"
           >
