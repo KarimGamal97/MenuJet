@@ -473,6 +473,8 @@
     "print_tip_suffix": "and enable",
     "default_restaurant_name": "Restaurant Name",
     "scan_and_order": "Scan & Order",
-    "scan_me": "SCAN ME"
+    "scan_me": "SCAN ME",
+    "phone": "Contact Phone Number",
+    "phone_placeholder": "01xxxxxxxxx"
   }
 }

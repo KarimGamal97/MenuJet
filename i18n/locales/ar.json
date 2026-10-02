@@ -554,6 +554,8 @@
     "print_tip_suffix": "وفعّل خيار",
     "default_restaurant_name": "اسم المطعم",
     "scan_and_order": "سكان واطلب",
-    "scan_me": "SCAN ME"
+    "scan_me": "SCAN ME",
+    "phone": "رقم هاتف التواصل",
+    "phone_placeholder": "01xxxxxxxxx"
   }
 }

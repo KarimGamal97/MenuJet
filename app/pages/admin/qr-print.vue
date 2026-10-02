@@ -88,6 +88,20 @@
           </div>
         </div>
 
+        <!-- Phone number -->
+        <div>
+          <label class="block text-gray-700 font-bold mb-1 text-[11px]">
+            {{ $t('qr_print.phone') }}
+          </label>
+          <input
+            v-model="customData.phone"
+            type="text"
+            :placeholder="$t('qr_print.phone_placeholder')"
+            class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-orange-500 outline-none text-gray-900 text-xs font-mono transition text-left"
+            dir="ltr"
+          />
+        </div>
+
         <!-- Promo hook -->
         <div>
           <div class="flex items-center justify-between mb-1">
@@ -229,8 +243,10 @@
         <footer class="w-full pt-2.5 border-t border-orange-100 flex items-center justify-center">
           <div dir="ltr" class="text-xs font-bold text-gray-600 flex items-center gap-2">
             <span class="text-orange-600 font-black text-sm tracking-tight">MenuJet</span>
-            <span class="text-gray-300 font-normal">|</span>
-            <span class="font-mono text-gray-800 font-bold tracking-wider">01147321714</span>
+            <template v-if="customData.phone">
+              <span class="text-gray-300 font-normal">|</span>
+              <span class="font-mono text-gray-800 font-bold tracking-wider">{{ customData.phone }}</span>
+            </template>
           </div>
         </footer>
       </div>
@@ -265,7 +281,8 @@ const customData = ref({
   restaurantName: '',
   slug: '',
   logo: '',
-  hook: ''
+  hook: '',
+  phone: ''
 });
 
 // Load profile
@@ -280,6 +297,7 @@ onMounted(async () => {
       if (profile.value.business_name) customData.value.restaurantName = profile.value.business_name;
       if (profile.value.slug) customData.value.slug = profile.value.slug;
       if (profile.value.logo) customData.value.logo = profile.value.logo;
+      if (profile.value.whatsapp_number) customData.value.phone = profile.value.whatsapp_number;
     }
   }
 });
