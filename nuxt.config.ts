@@ -35,7 +35,7 @@ export default defineNuxtConfig({
     "@nuxtjs/supabase",
     "@nuxtjs/tailwindcss",
     "@pinia/nuxt",
-    "@vite-pwa/nuxt",
+    // "@vite-pwa/nuxt",
   ],
 
   pwa: {

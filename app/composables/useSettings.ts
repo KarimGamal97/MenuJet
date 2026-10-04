@@ -61,11 +61,22 @@ export const useSettings = () => {
     const filePath = `logos/${fileName}`;
 
     try {
+      // Try 'menu-images' bucket which is public and standard
       const { error: uploadError } = await client.storage
+        .from("menu-images")
+        .upload(filePath, file);
+
+      if (!uploadError) {
+        const { data } = client.storage.from("menu-images").getPublicUrl(filePath);
+        return data.publicUrl;
+      }
+
+      // Fallback to 'logos' bucket
+      const { error: fallbackError } = await client.storage
         .from("logos")
         .upload(filePath, file);
 
-      if (uploadError) throw uploadError;
+      if (fallbackError) throw fallbackError;
 
       const { data } = client.storage.from("logos").getPublicUrl(filePath);
       return data.publicUrl;

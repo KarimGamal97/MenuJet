@@ -35,24 +35,22 @@
       </div>
       
       <nav
-        class="sticky top-20 z-40 backdrop-blur-md border-b border-gray-100 flex py-3 shadow-sm"
+        class="sticky top-20 z-40 backdrop-blur-md border-b border-white/10 flex flex-col py-3 shadow-md transition-all duration-300"
         :style="{ backgroundColor: primaryColor }"
       >
-        <div
-          class="flex flex-col md:flex-row items-center gap-3 px-4 mx-auto max-w-3xl w-full"
-        >
+        <div class="max-w-3xl mx-auto w-full px-4 flex flex-col gap-3">
           <!-- Search Input -->
-          <div class="relative w-full md:w-64 lg:w-80 shrink-0 bg-gray-50 rounded-2xl shadow-sm overflow-hidden">
+          <div class="relative w-full bg-white rounded-2xl shadow-sm overflow-hidden border border-white/20">
             <input
               v-model="searchQuery"
               type="text"
-              class="w-full py-3 pr-10 pl-4 bg-transparent border-none rounded-2xl outline-none transition-all text-sm font-bold relative z-10 text-gray-800"
+              class="w-full py-3 pr-11 pl-4 bg-transparent border-none rounded-2xl outline-none transition-all text-sm font-bold relative z-10 text-gray-800"
             />
 
             <!-- Animated Placeholder: static prefix + dynamic sliding product name -->
             <div
               v-if="!searchQuery"
-              class="absolute inset-y-0 right-10 left-4 flex items-center gap-1.5 pointer-events-none overflow-hidden z-0"
+              class="absolute inset-y-0 right-11 left-4 flex items-center gap-1.5 pointer-events-none overflow-hidden z-0"
             >
               <span class="text-sm font-bold text-gray-400 shrink-0 select-none">
                 {{ locale === 'ar' ? 'ابحث عن' : 'Search for' }}
@@ -70,36 +68,75 @@
             </div>
 
             <div
-              class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 z-10 pointer-events-none"
+              class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 z-10 pointer-events-none"
             >
               <BaseIcon name="search" class="w-4 h-4" />
             </div>
           </div>
 
-          <!-- Categories List -->
-          <div class="flex-1 min-w-0 w-full">
-            <div class="flex gap-2 overflow-x-auto no-scrollbar py-1 w-full">
+          <!-- Categories List with arrows outside the scroll container -->
+          <div class="flex items-center gap-1.5 w-full">
+            <!-- Scroll Arrow Right (In RTL: scroll back towards right) -->
+            <button
+              v-if="hasScrollOverflow"
+              type="button"
+              @click="scrollCategories('right')"
+              :disabled="!canScrollRight"
+              :class="[
+                'w-7 h-7 rounded-xl flex items-center justify-center shrink-0 transition-all border border-white/20',
+                canScrollRight
+                  ? 'bg-white/30 text-white hover:bg-white hover:text-gray-800 shadow-sm active:scale-90 cursor-pointer'
+                  : 'bg-white/10 text-white/30 cursor-not-allowed opacity-40'
+              ]"
+              aria-label="Scroll right"
+            >
+              <BaseIcon name="chevron-right" class="w-3.5 h-3.5" />
+            </button>
+
+            <!-- Categories Horizontal Container -->
+            <div
+              ref="categoriesContainer"
+              @scroll="checkCategoryScroll"
+              class="flex-1 min-w-0 flex gap-2 overflow-x-auto custom-scrollbar-thin py-1.5 scroll-smooth select-none px-0.5"
+            >
               <button
                 v-for="cat in categories"
                 :key="cat"
-                @click="activeCategory = cat"
-                :style="activeCategory === cat ? { backgroundColor: 'white', color: primaryColor } : { backgroundColor: 'rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.8)' }"
+                @click="selectCategory(cat, $event)"
+                :style="activeCategory === cat ? { backgroundColor: 'white', color: primaryColor } : { backgroundColor: 'rgba(255,255,255,0.22)', color: 'white' }"
                 :class="[
-                  'px-7 py-2.5 rounded-2xl font-bold whitespace-nowrap text-sm transition-all duration-300 shrink-0 flex items-center gap-2 tracking-wide',
+                  'px-5 py-2 rounded-2xl font-black whitespace-nowrap text-xs sm:text-sm transition-all duration-300 shrink-0 flex items-center gap-2 border border-white/20 active:scale-95 cursor-pointer',
                   activeCategory === cat
-                    ? 'shadow-2xl -translate-y-0.5 scale-105'
-                    : 'backdrop-blur-sm active:scale-95',
+                    ? 'shadow-lg shadow-black/10 -translate-y-0.5'
+                    : 'hover:bg-white/30 backdrop-blur-sm',
                 ]"
               >
                 <BaseIcon 
                   v-if="activeCategory === cat" 
                   name="check" 
-                  class="w-4 h-4 animate-in zoom-in spin-in-12 duration-300" 
+                  class="w-3.5 h-3.5 animate-in zoom-in duration-200" 
                   :style="{ color: primaryColor }"
                 />
                 {{ cat }}
               </button>
             </div>
+
+            <!-- Scroll Arrow Left (In RTL: scroll forward towards left) -->
+            <button
+              v-if="hasScrollOverflow"
+              type="button"
+              @click="scrollCategories('left')"
+              :disabled="!canScrollLeft"
+              :class="[
+                'w-7 h-7 rounded-xl flex items-center justify-center shrink-0 transition-all border border-white/20',
+                canScrollLeft
+                  ? 'bg-white/30 text-white hover:bg-white hover:text-gray-800 shadow-sm active:scale-90 cursor-pointer'
+                  : 'bg-white/10 text-white/30 cursor-not-allowed opacity-40'
+              ]"
+              aria-label="Scroll left"
+            >
+              <BaseIcon name="chevron-left" class="w-3.5 h-3.5" />
+            </button>
           </div>
         </div>
       </nav>
@@ -167,7 +204,7 @@
         :deliveryAreas="restaurant.delivery_areas"
         :tableNumberEnabled="restaurant.show_table_number === true"
         :queueNumberEnabled="restaurant.show_queue_number === true"
-        :whatsappOrderingEnabled="restaurant.whatsapp_ordering_enabled !== false"
+        :whatsappOrderingEnabled="isWhatsappOrderingAllowed"
         :phoneNumberEnabled="restaurant.show_phone_number !== false"
         @close="showCart = false"
       />
@@ -213,7 +250,7 @@ const {
   async () => {
     const { data: profile, error: pError } = await client
       .from("profiles")
-      .select("*")
+      .select("*, plans(*)")
       .eq("slug", route.params.slug)
       .single();
 
@@ -284,6 +321,14 @@ const isActuallyOpen = computed(() => {
 });
 
 // Ordering enabled toggle from restaurant settings
+const isWhatsappOrderingAllowed = computed(() => {
+  if (!restaurant.value) return false;
+  const p = restaurant.value;
+  const planId = p.plan?.id || p.plans?.id || p.plan_id || p.plan_type || "free";
+  const allowsWhatsapp = p.plans?.allow_whatsapp_orders ?? p.plan?.allow_whatsapp_orders ?? (planId === "pro");
+  return Boolean(allowsWhatsapp) && p.whatsapp_ordering_enabled !== false;
+});
+
 const isOrderingEnabled = computed(() => {
   return restaurant.value?.whatsapp_ordering_enabled !== false;
 });
@@ -357,10 +402,20 @@ onMounted(() => {
         (placeholderIndex.value + 1) % sampleProductNames.value.length;
     }
   }, 3600);
+
+  if (process.client) {
+    nextTick(() => {
+      checkCategoryScroll();
+    });
+    window.addEventListener("resize", checkCategoryScroll);
+  }
 });
 
 onUnmounted(() => {
   if (placeholderTimer) clearInterval(placeholderTimer);
+  if (process.client) {
+    window.removeEventListener("resize", checkCategoryScroll);
+  }
 });
 
 const dynamicSearchPlaceholder = computed(() => {
@@ -376,6 +431,47 @@ const categories = computed(() => {
   return restaurant.value?.categories || [];
 });
 
+const categoriesContainer = ref(null);
+const canScrollLeft = ref(false);
+const canScrollRight = ref(false);
+const hasScrollOverflow = ref(false);
+
+const checkCategoryScroll = () => {
+  const el = categoriesContainer.value;
+  if (!el) return;
+  const maxScroll = el.scrollWidth - el.clientWidth;
+  if (maxScroll <= 5) {
+    hasScrollOverflow.value = false;
+    canScrollLeft.value = false;
+    canScrollRight.value = false;
+    return;
+  }
+  hasScrollOverflow.value = true;
+  const current = Math.abs(el.scrollLeft);
+  canScrollLeft.value = current < maxScroll - 8;
+  canScrollRight.value = current > 8;
+};
+
+const scrollCategories = (direction) => {
+  const el = categoriesContainer.value;
+  if (!el) return;
+  const amount = direction === 'left' ? -220 : 220;
+  el.scrollBy({ left: amount, behavior: 'smooth' });
+  setTimeout(checkCategoryScroll, 350);
+};
+
+const selectCategory = (cat, event) => {
+  activeCategory.value = cat;
+  if (event?.currentTarget) {
+    event.currentTarget.scrollIntoView({
+      behavior: 'smooth',
+      inline: 'center',
+      block: 'nearest',
+    });
+  }
+  setTimeout(checkCategoryScroll, 350);
+};
+
 watch(
   () => restaurant.value?.categories,
   (newCats) => {
@@ -383,9 +479,9 @@ watch(
       if (!activeCategory.value || !newCats.includes(activeCategory.value)) {
         activeCategory.value = newCats[0];
       }
-      // Data is ready and category is set
       setTimeout(() => {
         isInitialLoading.value = false;
+        checkCategoryScroll();
       }, 100);
     }
   },
@@ -456,5 +552,21 @@ const filteredItems = computed(() => {
 .placeholder-slide-leave-to {
   opacity: 0;
   transform: translateY(-100%);
+}
+
+/* Custom Thin Horizontal Scrollbar */
+.custom-scrollbar-thin::-webkit-scrollbar {
+  height: 4px;
+}
+.custom-scrollbar-thin::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
+}
+.custom-scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.55);
+  border-radius: 9999px;
+}
+.custom-scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.85);
 }
 </style>

@@ -72,17 +72,17 @@
         </div>
 
         <!-- Logo Upload Section -->
-        <!-- <div class="md:col-span-2 mb-4">
-          <label class="block text-sm font-bold mb-3 text-gray-700 px-1"
-            >شعار المطعم</label
-          >
-          <div class="flex items-center gap-4">
+        <div class="md:col-span-2 mb-2 p-5 bg-gray-50/60 rounded-3xl border border-gray-100">
+          <label class="block text-sm font-bold mb-3 text-gray-800 px-1">
+            شعار المطعم / الكافيه (اللوجو)
+          </label>
+          <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
             <div
-              class="relative w-20 h-20 bg-gray-100 rounded-3xl flex items-center justify-center overflow-hidden border-2 border-dashed border-gray-200 shrink-0"
+              class="relative w-20 h-20 bg-white rounded-2xl flex items-center justify-center overflow-hidden border-2 border-dashed border-gray-200 shadow-xs shrink-0"
             >
               <template v-if="logoUploading">
                 <div
-                  class="absolute inset-0 bg-white/50 flex items-center justify-center z-10"
+                  class="absolute inset-0 bg-white/70 flex items-center justify-center z-10"
                 >
                   <div
                     class="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"
@@ -95,28 +95,47 @@
                 class="w-full h-full object-cover"
                 :class="{ 'opacity-50': logoUploading }"
               />
-              <BaseIcon v-else name="photo" class="w-8 h-8 opacity-20" />
+              <BaseIcon v-else name="photo" class="w-8 h-8 text-gray-300" />
             </div>
-            <label class="cursor-pointer">
-              <BaseButton
-                variant="outline"
-                size="sm"
-                :loading="logoUploading"
-                @click="$refs.logoInput.click()"
-              >
-                {{ $t("admin.choose_logo") }}
-              </BaseButton>
-              <input
-                ref="logoInput"
-                type="file"
-                class="hidden"
-                @change="uploadLogo"
-                accept="image/*"
-                :disabled="logoUploading"
-              />
-            </label>
+
+            <div class="flex-1 space-y-2">
+              <div class="flex flex-wrap items-center gap-3">
+                <label class="cursor-pointer">
+                  <BaseButton
+                    variant="outline"
+                    size="sm"
+                    :loading="logoUploading"
+                    @click="$refs.logoInput.click()"
+                    type="button"
+                  >
+                    {{ form.logo ? 'تغيير الشعار' : $t("admin.choose_logo") }}
+                  </BaseButton>
+                  <input
+                    ref="logoInput"
+                    type="file"
+                    class="hidden"
+                    @change="uploadLogo"
+                    accept="image/*"
+                    :disabled="logoUploading"
+                  />
+                </label>
+
+                <button
+                  v-if="form.logo"
+                  type="button"
+                  @click="form.logo = ''"
+                  class="text-xs text-red-500 hover:text-red-700 font-bold px-3 py-1.5 rounded-xl hover:bg-red-50 transition-colors cursor-pointer"
+                >
+                  حذف الشعار
+                </button>
+              </div>
+
+              <p class="text-xs text-gray-400 font-medium leading-relaxed">
+                يظهر الشعار بجانب اسم المطعم أعلى المنيو للزبائن. يُفضل استخدام صورة مربعة واضحة (PNG أو JPG أو WEBP).
+              </p>
+            </div>
           </div>
-        </div> -->
+        </div>
 
         <!-- رابط المنيو -->
         <div class="md:col-span-2">
@@ -422,6 +441,9 @@
             <BaseToggle
               v-model="form.whatsapp_ordering_enabled"
               :label="$t('plans.enable_whatsapp_ordering')"
+              :locked="!can('allow_whatsapp_orders')"
+              :badge="$t('plans.pro_badge_short')"
+              @lock-click="openUpgradeForFeature($t('plans.feat_whatsapp'), $t('plans.pro_badge_short'), $t('plans.whatsapp_modal_msg'))"
               class="!bg-gray-50/50 !border !border-gray-100"
             />
             <BaseToggle

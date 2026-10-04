@@ -1,49 +1,64 @@
 <template>
   <header
     class="sticky top-0 z-50 bg-orange-600 backdrop-blur-xl transition-all duration-300 h-20"
+    :style="restaurant?.primary_color ? { backgroundColor: restaurant.primary_color } : {}"
   >
     <div
       class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center h-full"
     >
       <!-- Brand Logo & Status -->
-      <div class="flex flex-col items-center shrink-0">
+      <div class="flex items-center gap-3 shrink-0">
+        <!-- Client Logo if uploaded -->
         <div
-          class="flex items-center justify-center overflow-hidden transition-transform mb-1"
+          v-if="restaurant?.logo"
+          class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl overflow-hidden bg-white/15 p-0.5 border border-white/30 shadow-md shrink-0 flex items-center justify-center transition-transform hover:scale-105"
         >
-          <span class="text-white font-black capitalize text-lg sm:text-xl leading-none">
-            {{ restaurant.business_name }}
-          </span>
+          <img
+            :src="restaurant.logo"
+            :alt="restaurant.business_name"
+            class="w-full h-full object-cover rounded-[14px]"
+          />
         </div>
 
-        <!-- Status Badge below Logo -->
-        <div
-          v-if="isOpen !== false"
-          class="flex items-center gap-1.5 bg-green-50 px-2 py-0.5 rounded-full"
-        >
-          <span class="relative flex h-1.5 w-1.5">
-            <span
-              class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"
-            ></span>
-            <span
-              class="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500"
-            ></span>
-          </span>
-          <span
-            class="text-[9px] font-black text-green-600 whitespace-nowrap uppercase tracking-tight"
+        <div class="flex flex-col items-start shrink-0">
+          <div
+            class="flex items-center justify-center overflow-hidden transition-transform mb-1"
           >
-            {{ $t("admin.status_available") }}
-          </span>
-        </div>
-        <div
-          v-else
-          class="flex items-center gap-1.5 bg-gray-50 px-2 py-0.5 rounded-full opacity-70"
-        >
-          <span class="inline-flex rounded-full h-1.5 w-1.5 bg-gray-300"></span>
-          <span
-            class="text-[9px] font-black text-gray-400 whitespace-nowrap uppercase tracking-tight"
+            <span class="text-white font-black capitalize text-lg sm:text-xl leading-none">
+              {{ restaurant.business_name }}
+            </span>
+          </div>
+
+          <!-- Status Badge below Logo -->
+          <div
+            v-if="isOpen !== false"
+            class="flex items-center gap-1.5 bg-green-50 px-2 py-0.5 rounded-full"
           >
-            {{ $t("admin.status_closed") }}
-          </span>
+            <span class="relative flex h-1.5 w-1.5">
+              <span
+                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"
+              ></span>
+              <span
+                class="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500"
+              ></span>
+            </span>
+            <span
+              class="text-[9px] font-black text-green-600 whitespace-nowrap uppercase tracking-tight"
+            >
+              {{ $t("admin.status_available") }}
+            </span>
+          </div>
+          <div
+            v-else
+            class="flex items-center gap-1.5 bg-gray-50 px-2 py-0.5 rounded-full opacity-70"
+          >
+            <span class="inline-flex rounded-full h-1.5 w-1.5 bg-gray-300"></span>
+            <span
+              class="text-[9px] font-black text-gray-400 whitespace-nowrap uppercase tracking-tight"
+            >
+              {{ $t("admin.status_closed") }}
+            </span>
+          </div>
         </div>
       </div>
 

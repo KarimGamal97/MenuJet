@@ -317,10 +317,12 @@ const availablePatties = computed(() =>
 // Parse count entries from prices object
 const countEntries = computed(() => {
   if (pricingType.value !== "count") return [];
-  return Object.entries(props.item.prices || {}).map(([label, price]) => ({
-    label,
-    price: Number(price),
-  }));
+  return Object.entries(props.item.prices || {})
+    .map(([label, price]) => ({
+      label,
+      price: Number(price),
+    }))
+    .sort((a, b) => a.price - b.price);
 });
 
 const isWeightType = computed(() => {

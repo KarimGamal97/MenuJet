@@ -1,13 +1,13 @@
 <template>
   <div
     :class="[
-      'p-6 rounded-3xl border-2 transition-all duration-500 flex flex-col h-full',
+      'p-6 rounded-3xl border-2 transition-all duration-500 flex flex-col h-[480px]',
       order.status === 'pending'
         ? 'bg-white border-orange-200 shadow-xl shadow-orange-100'
         : 'bg-green-50/10 border-green-500/20 opacity-80 shadow-none',
     ]"
   >
-    <div class="flex justify-between items-start mb-4">
+    <div class="flex justify-between items-start mb-3 shrink-0">
       <div>
         <span
           class="text-[10px] uppercase tracking-wider font-bold text-gray-400"
@@ -66,7 +66,7 @@
     </div>
 
     <!-- Items List -->
-    <div class="space-y-2 mb-6 flex-grow">
+    <div class="space-y-2 mb-3 overflow-y-auto flex-1 pe-1 custom-scrollbar min-h-0">
       <div
         v-for="item in order.items"
         :key="item.id"
@@ -74,7 +74,7 @@
       >
         <div class="flex items-center gap-2">
           <span
-            class="w-6 h-6 flex items-center justify-center bg-orange-100 text-orange-600 rounded-lg text-xs font-bold"
+            class="w-6 h-6 flex items-center justify-center bg-orange-100 text-orange-600 rounded-lg text-xs font-bold shrink-0"
           >
             {{ item.quantity }}
           </span>
@@ -89,7 +89,7 @@
             <span v-if="item.notes" class="text-[10px] text-orange-600 font-bold mt-1 bg-orange-100 px-2 py-0.5 rounded-md self-start border border-orange-200">{{ item.notes }}</span>
           </span>
         </div>
-        <span class="font-bold text-gray-900 text-sm">
+        <span class="font-bold text-gray-900 text-sm shrink-0">
           {{ (item.basePrice || item.price) * item.quantity }}<span v-if="item.selectedExtras?.length" class="text-orange-600"> + {{ (item.price - (item.basePrice || item.price)) * item.quantity }}</span>
           <small class="text-[10px] ms-1">{{ $t("currency") }}</small>
         </span>
@@ -98,7 +98,7 @@
 
     <!-- Footer Action -->
     <div
-      class="flex justify-between items-center border-t border-gray-100 pt-4"
+      class="flex justify-between items-center border-t border-gray-100 pt-4 shrink-0 mt-auto"
     >
       <div>
         <span class="text-[10px] font-bold text-gray-400 block">{{

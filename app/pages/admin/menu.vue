@@ -37,7 +37,10 @@
       <!-- Upgrade Plan Modal -->
       <UpgradeModal
         :isOpen="showUpgradeModal"
-        limitType="items"
+        :limitType="upgradeModalConfig.limitType"
+        :title="upgradeModalConfig.title"
+        :badgeText="upgradeModalConfig.badgeText"
+        :message="upgradeModalConfig.message"
         :currentCount="items?.length || 0"
         :maxCount="maxItems"
         :businessName="profile?.business_name || profile?.business_name_ar || ''"
@@ -328,7 +331,7 @@
           <div
             class="flex text-[10px] font-black text-gray-400 uppercase tracking-wider gap-2 px-1"
           >
-            <span class="flex-1">الوزن (مثال: ربع كيلو، نصف كيلو..)</span>
+            <span class="flex-1">الوزن (مثال: 1/8 كيلو، 1/4 كيلو..)</span>
             <span class="w-24 text-center">السعر</span>
             <span class="w-9"></span>
           </div>
@@ -344,7 +347,7 @@
               <input
                 v-model="opt.label"
                 type="text"
-                :placeholder="['ربع كيلو', 'نصف كيلو', 'كيلو'][i] || `وزن ${i + 1}`"
+                :placeholder="['1/8 كيلو', '1/4 كيلو', 'كيلو'][i] || `وزن ${i + 1}`"
                 class="w-full py-3 bg-transparent outline-none font-bold text-sm text-gray-800"
               />
             </div>
@@ -534,7 +537,12 @@
         <div class="mt-8 border-t border-gray-100 pt-6">
           <div class="flex items-center justify-between mb-4">
             <div>
-              <h3 class="text-sm font-black text-gray-800">{{ $t('admin.extras_label') }}</h3>
+              <div class="flex items-center gap-2">
+                <h3 class="text-sm font-black text-gray-800">{{ $t('admin.extras_label') }}</h3>
+                <span v-if="!can('allow_extras')" class="bg-amber-100 text-amber-800 text-[10px] font-black px-2 py-0.5 rounded-full">
+                  ⚡ {{ $t('plans.basic_badge_short') }}
+                </span>
+              </div>
               <p class="text-[10px] text-gray-400 font-bold mt-0.5">{{ $t('admin.extras_subtitle') }}</p>
             </div>
             <BaseButton 
@@ -548,7 +556,21 @@
             </BaseButton>
           </div>
 
-          <div class="space-y-3">
+          <!-- Locked Banner for Free Plan -->
+          <div v-if="!can('allow_extras')" class="bg-amber-50/70 border border-amber-200/80 rounded-2xl p-4 text-center">
+            <p class="text-xs font-bold text-amber-900 mb-2.5">
+              🔒 {{ $t('plans.extras_lock_msg') }}
+            </p>
+            <button
+              type="button"
+              @click="openUpgradeForExtras"
+              class="text-xs font-black bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white px-4 py-2 rounded-xl shadow-xs transition-transform active:scale-95 cursor-pointer"
+            >
+              ⚡ {{ $t('plans.upgrade_btn') }}
+            </button>
+          </div>
+
+          <div v-else class="space-y-3">
             <div v-for="(extra, i) in newItem.extras" :key="i" class="flex gap-2 items-center animate-in slide-in-from-right-2 duration-300">
               <div class="flex-1 bg-gray-50 rounded-2xl flex items-center px-3 border-2 border-transparent focus-within:border-orange-400 transition-all">
                 <input 
@@ -622,10 +644,26 @@ const {
 } = useMenu();
 
 const { profile, loading: profileLoading, fetchProfile } = useSettings();
-const { maxItems: planMaxItems, isFree: isPlanFree } = usePlan();
+const { maxItems: planMaxItems, isFree: isPlanFree, can } = usePlan();
 
 // UI State
 const showUpgradeModal = ref(false);
+const upgradeModalConfig = ref({
+  limitType: "items",
+  title: "",
+  badgeText: "",
+  message: "",
+});
+
+const openUpgradeForExtras = () => {
+  upgradeModalConfig.value = {
+    limitType: "general",
+    title: t("plans.extras_modal_title"),
+    badgeText: t("plans.basic_badge_short"),
+    message: t("plans.extras_modal_msg"),
+  };
+  showUpgradeModal.value = true;
+};
 const maxItems = computed(() => {
   if (profile.value?.max_items !== undefined && profile.value?.max_items !== null) {
     return profile.value.max_items;
@@ -650,8 +688,8 @@ const newItem = ref({
   prices: { sm: "", md: "", lg: "" },
   activeSize: "sm",
   weightOptions: [
-    { label: "ربع كيلو", price: "" },
-    { label: "نصف كيلو", price: "" },
+    { label: "1/8 كيلو", price: "" },
+    { label: "1/4 كيلو", price: "" },
     { label: "كيلو", price: "" },
   ],
   countOptions: [
@@ -803,8 +841,8 @@ const openAddModal = () => {
     prices: { sm: "", md: "", lg: "" },
     activeSize: "sm",
     weightOptions: [
-      { label: "ربع كيلو", price: "" },
-      { label: "نصف كيلو", price: "" },
+      { label: "1/8 كيلو", price: "" },
+      { label: "1/4 كيلو", price: "" },
       { label: "كيلو", price: "" },
     ],
     countOptions: [
@@ -827,6 +865,10 @@ const openAddModal = () => {
 };
 
 const addExtraField = () => {
+  if (!can("allow_extras")) {
+    openUpgradeForExtras();
+    return;
+  }
   if (!newItem.value.extras) newItem.value.extras = [];
   newItem.value.extras.push({ name: "", price: "" });
 };
@@ -846,14 +888,17 @@ const openEditModal = (item) => {
 
   const weightOptions = [];
   if ((type === "weight" || type === "patty") && item.prices) {
-    Object.entries(item.prices).forEach(([label, price]) => {
-      weightOptions.push({ label, price: String(price) });
-    });
+    Object.entries(item.prices)
+      .map(([label, price]) => ({ label, price: String(price) }))
+      .sort((a, b) => Number(a.price || 0) - Number(b.price || 0))
+      .forEach((opt) => {
+        weightOptions.push(opt);
+      });
   }
   if (weightOptions.length === 0) {
     weightOptions.push(
-      { label: "ربع كيلو", price: "" },
-      { label: "نصف كيلو", price: "" },
+      { label: "1/8 كيلو", price: "" },
+      { label: "1/4 كيلو", price: "" },
       { label: "كيلو", price: "" }
     );
   }
@@ -908,13 +953,19 @@ const handleSaveItem = async () => {
     hasPrices = Object.keys(cleanPrices).length > 0;
     if (hasPrices) displayPrice = Math.min(...Object.values(cleanPrices));
   } else if (pricingType === "weight") {
-    for (const opt of weightOptions) {
+    const sorted = [...weightOptions].sort(
+      (a, b) => Number(a.price || 0) - Number(b.price || 0)
+    );
+    for (const opt of sorted) {
       if (opt.label && opt.price) cleanPrices[opt.label] = Number(opt.price);
     }
     hasPrices = Object.keys(cleanPrices).length > 0;
     if (hasPrices) displayPrice = Math.min(...Object.values(cleanPrices));
   } else if (pricingType === "count") {
-    for (const opt of countOptions) {
+    const sorted = [...countOptions].sort(
+      (a, b) => Number(a.price || 0) - Number(b.price || 0)
+    );
+    for (const opt of sorted) {
       if (opt.label && opt.price) cleanPrices[opt.label] = Number(opt.price);
     }
     hasPrices = Object.keys(cleanPrices).length > 0;
