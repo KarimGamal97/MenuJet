@@ -77,12 +77,28 @@ export default defineEventHandler(async (event) => {
 
     if (authError) {
       console.error("Auth Creation Error:", authError.message);
+      let errorCode = "UNKNOWN_ERROR";
+      let userFriendlyMessage = authError.message;
+
+      if (
+        authError.message.includes("already registered") ||
+        authError.message.includes("already been registered")
+      ) {
+        errorCode = "EMAIL_ALREADY_EXISTS";
+        userFriendlyMessage = "هذا البريد الإلكتروني مسجل بالفعل لمستخدم آخر";
+      } else if (
+        authError.message.includes("Password should contain") ||
+        authError.message.toLowerCase().includes("password")
+      ) {
+        errorCode = "PASSWORD_WEAK";
+        userFriendlyMessage =
+          "كلمة المرور ضعيفة! يجب أن تحتوي على: حرف كبير (A-Z)، حرف صغير (a-z)، رقم (0-9)، ورمز خاص (مثل #)";
+      }
+
       throw createError({
         statusCode: 400,
-        message:
-          authError.message === "User already registered"
-            ? "هذا البريد الإلكتروني مسجل بالفعل"
-            : authError.message,
+        message: userFriendlyMessage,
+        data: { code: errorCode },
       });
     }
 
@@ -94,25 +110,42 @@ export default defineEventHandler(async (event) => {
     }
 
     // 2. Create/Update profile for the new user
-    const { error: profileError } = await adminClient.from("profiles").upsert(
-      {
-        id: newUser.user.id,
-        user_id: newUser.user.id,
-        email: email,
-        role: role || "admin",
-        owner_id: userId,
-        business_name: superAdminProfile?.business_name || null,
-        business_name_ar:
-          superAdminProfile?.business_name_ar || body.business_name_ar || null,
-        business_name_en: superAdminProfile?.business_name_en || null,
-        slug: null, // Sub-admins don't need the restaurant's unique slug
-        logo: superAdminProfile?.logo || null,
-        whatsapp_number: superAdminProfile?.whatsapp_number || null,
-        categories: superAdminProfile?.categories || null,
-        is_active: superAdminProfile?.is_active ?? true,
-      },
-      { onConflict: "id" },
-    );
+    const profilePayload = {
+      user_id: newUser.user.id,
+      email: email,
+      role: role || "admin",
+      owner_id: userId,
+      business_name: superAdminProfile?.business_name || null,
+      business_name_ar:
+        superAdminProfile?.business_name_ar || body.business_name_ar || null,
+      business_name_en: superAdminProfile?.business_name_en || null,
+      slug: null, // Sub-admins don't need the restaurant's unique slug
+      logo: superAdminProfile?.logo || null,
+      whatsapp_number: superAdminProfile?.whatsapp_number || null,
+      categories: superAdminProfile?.categories || null,
+      is_active: superAdminProfile?.is_active ?? true,
+    };
+
+    // Check if profile was already auto-created by a Supabase trigger
+    const { data: existingProfile } = await adminClient
+      .from("profiles")
+      .select("id")
+      .or(`user_id.eq.${newUser.user.id},id.eq.${newUser.user.id}`)
+      .maybeSingle();
+
+    let profileError;
+    if (existingProfile?.id) {
+      const { error } = await adminClient
+        .from("profiles")
+        .update(profilePayload)
+        .eq("id", existingProfile.id);
+      profileError = error;
+    } else {
+      const { error } = await adminClient
+        .from("profiles")
+        .insert({ id: newUser.user.id, ...profilePayload });
+      profileError = error;
+    }
 
     if (profileError) {
       console.error("Profile Upsert Error:", profileError);

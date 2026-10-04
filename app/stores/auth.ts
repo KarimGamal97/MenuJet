@@ -34,9 +34,11 @@ export const useAuthStore = defineStore("auth", {
     // Check for super admin privileges
     isSuperAdmin: (state): boolean => state.profile?.role === "super_admin",
 
-    // Check for any admin level
+    // Check for any restaurant staff/admin level
     isAdmin: (state): boolean =>
-      state.profile?.role === "admin" || state.profile?.role === "super_admin",
+      state.profile?.role === "admin" ||
+      state.profile?.role === "super_admin" ||
+      (state.profile?.role === "user" && !!state.profile?.owner_id),
 
     isLoggedIn: (state): boolean => !!state.user?.value,
   },

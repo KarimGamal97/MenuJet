@@ -406,8 +406,8 @@ const fetchProfile = async (userId) => {
     if (data.plans) {
       data.plan = data.plans;
     }
-    // If this is a regular admin without a business name, fetch the owner's business name for display
-    if (data.role === 'admin' && data.owner_id && !data.business_name_ar) {
+    // If this is a sub-account (admin/user) without a business name, fetch the owner's business name for display
+    if (data.owner_id && !data.business_name_ar) {
       const { data: ownerData } = await client
         .from('profiles')
         .select('business_name_ar, business_name_en')
