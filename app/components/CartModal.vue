@@ -105,9 +105,14 @@
 
             <button
               @click="openCashierCheckout"
-              class="flex-1 flex items-center justify-center py-4 bg-gray-900 text-white rounded-2xl font-black text-[12px]"
+              :disabled="isSubmitting"
+              class="flex-1 flex items-center justify-center py-4 bg-gray-900 text-white rounded-2xl font-black text-[12px] disabled:opacity-50 transition-all active:scale-95"
             >
-              <span>{{ $t("cart.order_cashier") }}</span>
+              <div
+                v-if="isSubmitting"
+                class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"
+              ></div>
+              <span v-else>{{ $t("cart.order_cashier") }}</span>
             </button>
           </div>
         </div>
@@ -181,10 +186,15 @@
       >
         <div class="px-6 pt-8 pb-4 border-b border-gray-50">
           <h2 class="text-2xl font-black text-gray-800 mb-1">{{ $t("cart.order_cashier") }}</h2>
-          <p class="text-xs text-gray-400 font-bold">{{ $t("cart.checkout_subtitle_cashier") }}</p>
+          <p class="text-xs text-gray-400 font-bold">
+            {{ phoneNumberEnabled ? $t("cart.checkout_subtitle_cashier") : $t("cart.checkout_subtitle_cashier_no_phone") }}
+          </p>
         </div>
 
         <div class="flex-1 overflow-y-auto px-6 py-6 space-y-5 custom-scrollbar">
+          <div v-if="!phoneNumberEnabled && !tableNumberEnabled && !queueNumberEnabled" class="text-center py-4 text-gray-500 font-bold text-sm">
+            {{ $t("cart.confirm_order_prompt") }}
+          </div>
           <div v-if="phoneNumberEnabled">
             <label :class="['block text-[10px] font-black uppercase tracking-wider mb-2', errors.cashierPhone ? 'text-red-500' : 'text-gray-400']">{{ $t("cart.phone_label") }}</label>
             <input
@@ -469,13 +479,20 @@ const errors = ref({
 });
 
 const openCashierCheckout = () => {
-  if (cart.value.length === 0) return;
+  if (cart.value.length === 0 || isSubmitting.value) return;
   errors.value.cashierPhone = "";
   errors.value.tableNumber = "";
   errors.value.queueNumber = "";
   cashierPhone.value = "";
   tableNumber.value = "";
   queueNumber.value = "";
+
+  // If no fields are required at all, directly place order without showing an empty popup
+  if (!props.phoneNumberEnabled && !props.tableNumberEnabled && !props.queueNumberEnabled) {
+    placeCashierOrder();
+    return;
+  }
+
   showCashierCheckout.value = true;
 };
 

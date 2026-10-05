@@ -338,6 +338,8 @@
     "checkout_title": "تفاصيل الاستلام",
     "checkout_subtitle_whatsapp": "يرجى إدخال بياناتك لإرسال الطلب عبر واتساب",
     "checkout_subtitle_cashier": "يرجى تسجيل رقم هاتفك لتأكيد الطلب وحجز دورك",
+    "checkout_subtitle_cashier_no_phone": "يرجى استكمال البيانات لتأكيد الطلب وحجز دورك",
+    "confirm_order_prompt": "هل ترغب في تأكيد الطلب وإرساله للكاشير؟",
     "name_label": "الاسم",
     "name_placeholder": "أدخل اسمك",
     "phone_label": "رقم الهاتف",

@@ -283,6 +283,8 @@
     "checkout_title": "Order Details",
     "checkout_subtitle_whatsapp": "Please enter your details to send the order via WhatsApp",
     "checkout_subtitle_cashier": "Please enter your phone number to confirm your order",
+    "checkout_subtitle_cashier_no_phone": "Please complete the details to confirm your order",
+    "confirm_order_prompt": "Would you like to confirm and send the order to the cashier?",
     "name_label": "Name",
     "name_placeholder": "Enter your name",
     "phone_label": "Phone Number",
