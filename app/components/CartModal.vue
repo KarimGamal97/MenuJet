@@ -965,27 +965,31 @@ const handleWhatsappOrderFinal = async () => {
     const paymentSuffix = customerForm.value.paymentMethod ? `_${customerForm.value.paymentMethod}` : "";
     const orderPaymentMethod = `${isDelivery ? "whatsapp_delivery" : "whatsapp_pickup"}${paymentSuffix}`;
 
-    // 2. إرسال الطلب إلى قاعدة بيانات Supabase
+    // 2. إرسال الطلب إلى قاعدة بيانات Supabase مع حماية كاملة من نقص الأعمدة
     const orderData = {
       user_id: restaurantId,
-      session_id: activeSessionId,
       items: cart.value,
       total_price: finalTotal,
       status: "pending",
-      order_number: nextOrderNum,
-      customer_phone: customerForm.value.phone ? customerForm.value.phone.trim() : null,
-      customer_name: customerForm.value.name ? customerForm.value.name.trim() : null,
-      delivery_address: customerForm.value.addressDetail ? customerForm.value.addressDetail.trim() : null,
-      payment_method: orderPaymentMethod,
     };
+    if (activeSessionId) orderData.session_id = activeSessionId;
+    if (nextOrderNum) orderData.order_number = nextOrderNum;
+    if (customerForm.value.phone) orderData.customer_phone = customerForm.value.phone.trim();
+    if (customerForm.value.name) orderData.customer_name = customerForm.value.name.trim();
+    if (customerForm.value.addressDetail) orderData.delivery_address = customerForm.value.addressDetail.trim();
+    if (orderPaymentMethod) orderData.payment_method = orderPaymentMethod;
 
     const { error: insertError } = await client.from("orders").insert(orderData);
 
-    // If customer_name or delivery_address columns don't exist in DB, retry without them
-    if (insertError && (insertError.message?.includes("column") || insertError.code === "PGRST204")) {
-      delete orderData.customer_name;
-      delete orderData.delivery_address;
-      await client.from("orders").insert(orderData);
+    // Fallback: إذا كان جدول orders في Supabase ينقصه بعض الأعمدة، نسجل الطلب بالحقول الأساسية المؤكدة
+    if (insertError) {
+      console.warn("Full order insert failed, attempting safe core insert:", insertError);
+      await client.from("orders").insert({
+        user_id: restaurantId,
+        items: cart.value,
+        total_price: finalTotal,
+        status: "pending",
+      });
     }
   } catch (err) {
     console.error("Supabase Order Insert Error:", err);
@@ -996,8 +1000,16 @@ const handleWhatsappOrderFinal = async () => {
   // Save link before state clears
   const link = whatsappLink.value;
   
-  // 3. ثم فتح محادثة الواتساب كالمعتاد
-  window.open(link, '_blank');
+  // 3. فتح محادثة الواتساب
+  // على أجهزة الموبايل (iPhone / Android) متصفحات الهاتف تحظر window.open كنافذة منبثقة (Popup Blocker)
+  // لذلك نستخدم window.location.href ليفتح تطبيق الواتساب مباشرة وبدون حظر
+  const isMobile = typeof navigator !== "undefined" && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+  if (isMobile) {
+    window.location.href = link;
+  } else {
+    window.open(link, "_blank");
+  }
 
   // Save to local history before clearing
   const displayOrderNum = nextOrderNum
@@ -1017,7 +1029,7 @@ const handleWhatsappOrderFinal = async () => {
     clearCart();
     showWhatsappCheckout.value = false;
     emit("close");
-  }, 200);
+  }, 300);
 };
 
 const closeCashierModal = () => {
@@ -1090,6 +1102,6 @@ ${items}
   }
   phoneStr = phoneStr.replace(/\+/g, '').replace(/\s+/g, '');
 
-  return `https://api.whatsapp.com/send?phone=${phoneStr}&text=${encodeURIComponent(msgText)}`;
+  return `https://wa.me/${phoneStr}?text=${encodeURIComponent(msgText)}`;
 });
 </script>
