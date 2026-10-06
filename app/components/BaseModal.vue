@@ -11,9 +11,7 @@
         :class="maxWidth"
       >
         <!-- Header -->
-        <div
-          class="px-8 pt-8 pb-4 flex flex-col items-center text-center relative"
-        >
+        <div class="px-8 pt-6 pb-2 flex flex-col items-center text-center relative">
           <!-- Close Button -->
           <button
             v-if="showClose"
@@ -48,7 +46,7 @@
         </div>
 
         <!-- Body Content -->
-        <div class="px-8 max-h-[70vh] overflow-y-auto no-scrollbar">
+        <div class="px-8 pb-7 max-h-[70vh] overflow-y-auto no-scrollbar">
           <slot />
         </div>
 

@@ -172,10 +172,12 @@ export const useShifts = () => {
   const closeSession = async ({
     sessionId,
     closingBalance,
+    expenses = 0,
     notes,
   }: {
     sessionId: string;
     closingBalance: number;
+    expenses?: number;
     notes?: string;
   }) => {
     sessionLoading.value = true;
@@ -184,9 +186,10 @@ export const useShifts = () => {
       const stats = await getSessionLiveStats(sessionId);
       const opening = Number(activeSession.value?.opening_balance) || 0;
       const actualCash = Number(closingBalance) || 0;
+      const totalExpenses = Number(expenses) || 0;
 
-      // المفروض في الدرج = العهدة + مبيعات الكاش
-      const expectedCash = opening + stats.cashSales;
+      // المفروض في الدرج = العهدة + مبيعات الكاش - المصاريف
+      const expectedCash = Math.max(0, opening + stats.cashSales - totalExpenses);
       // الفارق = الفعلي - المفروض (سالب = عجز، موجب = زيادة)
       const difference = actualCash - expectedCash;
 

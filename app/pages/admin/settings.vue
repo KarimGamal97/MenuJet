@@ -34,7 +34,7 @@
                 {{ $t(`plans.${currentPlan.id || 'free'}_name`) }}
               </h3>
               <span
-                class="text-xs px-2.5 py-0.5 rounded-full font-black"
+                class="text-xs px-2.5 py-0.5 rounded-full font-black whitespace-nowrap shrink-0"
                 :class="isPro ? 'bg-amber-100 text-amber-800' : isBasic ? 'bg-blue-100 text-blue-800' : 'bg-emerald-100 text-emerald-800'"
               >
                 {{ isFree ? $t("plans.free_trial_badge") : $t("plans.active_badge") }}
@@ -688,6 +688,117 @@
             </div>
           </div>
         </div>
+
+        <!-- بيانات الدفع الإلكتروني (فودافون كاش وإنستا باي) - ميزة الباقة الاحترافية -->
+        <div class="md:col-span-2 relative p-6 bg-gradient-to-br from-gray-50/80 to-white rounded-3xl border border-gray-100 shadow-xs space-y-5 overflow-hidden">
+          <!-- Smart Lock Overlay for Free & Basic Plans -->
+          <div
+            v-if="!isPro"
+            class="absolute inset-0 bg-white/85 backdrop-blur-[3px] z-20 rounded-3xl flex flex-col items-center justify-center p-6 text-center border-2 border-dashed border-amber-200/90 shadow-xs"
+          >
+            <div class="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center text-2xl mb-3 shadow-xs">
+              👑
+            </div>
+            <h4 class="font-black text-gray-900 text-base mb-1">
+              {{ $t("plans.payments_lock_title") }}
+            </h4>
+            <p class="text-xs text-gray-500 font-medium max-w-sm mb-4 leading-relaxed">
+              {{ $t("plans.payments_lock_desc") }}
+            </p>
+            <button
+              type="button"
+              @click="openUpgradeForFeature($t('plans.feat_payments'), $t('plans.pro_badge_short'), $t('plans.payments_modal_msg'))"
+              class="bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-500 hover:to-amber-400 text-white font-black text-xs py-2.5 px-6 rounded-xl shadow-md shadow-orange-500/20 transition-transform active:scale-95 cursor-pointer"
+            >
+              ⚡ {{ $t("plans.payments_lock_btn") }}
+            </button>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center shrink-0">
+                <BaseIcon name="wallet" class="w-5 h-5 text-orange-600" />
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <label class="text-sm font-bold text-gray-800 block">{{ $t("admin.payment_methods_title") }}</label>
+                  <span class="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-black">
+                    👑 {{ $t("plans.pro_name") }}
+                  </span>
+                </div>
+                <p class="text-xs text-gray-400 font-medium mt-0.5">{{ $t("admin.payment_methods_subtitle") }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Select لتحديد الطرق المسموحة للزبائن -->
+          <div class="space-y-1.5">
+            <label class="text-xs font-bold text-gray-700 block px-1">
+              {{ $t("admin.payment_methods_allowed_label") }}
+            </label>
+            <div class="relative">
+              <select
+                v-model="form.payment_methods_allowed"
+                class="w-full px-4 py-3 bg-white border border-gray-200 rounded-2xl text-sm font-bold text-gray-800 outline-none focus:ring-2 focus:ring-orange-500 transition-all appearance-none cursor-pointer"
+              >
+                <option value="all">{{ $t("admin.payment_methods_all") }}</option>
+                <option value="vodafone_cash">{{ $t("admin.payment_methods_vodafone_only") }}</option>
+                <option value="instapay">{{ $t("admin.payment_methods_instapay_only") }}</option>
+                <option value="none">{{ $t("admin.payment_methods_disabled") }}</option>
+              </select>
+              <div class="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                <BaseIcon name="chevron-down" class="w-4 h-4" />
+              </div>
+            </div>
+          </div>
+
+          <!-- حقول الإدخال حسب الاختيار المسموح -->
+          <div v-if="form.payment_methods_allowed !== 'none'" class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+            <!-- Vodafone Cash Input -->
+            <div
+              v-if="['all', 'vodafone_cash'].includes(form.payment_methods_allowed)"
+              class="p-4 bg-white rounded-2xl border border-gray-100 shadow-xs space-y-2"
+            >
+              <div class="flex items-center gap-2 mb-1">
+                <img :src="vodafoneCashLogo" alt="Vodafone Cash" class="h-6 w-auto object-contain" />
+                <span class="text-xs font-black text-gray-800">{{ $t("admin.vodafone_cash_title") }}</span>
+              </div>
+              <label class="text-[11px] font-bold text-gray-500 block px-0.5">
+                {{ $t("admin.vodafone_cash_number_label") }}
+              </label>
+              <input
+                v-model="form.vodafone_cash_number"
+                type="tel"
+                maxlength="15"
+                :placeholder="$t('admin.vodafone_cash_number_placeholder')"
+                dir="ltr"
+                class="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold text-gray-800 outline-none focus:ring-2 focus:ring-red-400 focus:bg-white transition-all text-right"
+              />
+            </div>
+
+            <!-- InstaPay Input -->
+            <div
+              v-if="['all', 'instapay'].includes(form.payment_methods_allowed)"
+              class="p-4 bg-white rounded-2xl border border-gray-100 shadow-xs space-y-2"
+            >
+              <div class="flex items-center gap-2 mb-1">
+                <img :src="instapayLogo" alt="InstaPay" class="h-6 w-auto object-contain" />
+                <span class="text-xs font-black text-gray-800">{{ $t("admin.instapay_title") }}</span>
+              </div>
+              <label class="text-[11px] font-bold text-gray-500 block px-0.5">
+                {{ $t("admin.instapay_account_label") }}
+              </label>
+              <input
+                v-model="form.instapay_account"
+                type="text"
+                maxlength="40"
+                :placeholder="$t('admin.instapay_account_placeholder')"
+                dir="ltr"
+                class="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold text-gray-800 outline-none focus:ring-2 focus:ring-purple-400 focus:bg-white transition-all text-right"
+              />
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="mt-10">
@@ -708,6 +819,9 @@
 
 <script setup>
 definePageMeta({ layout: "admin", middleware: "auth" });
+
+import instapayLogo from "~/assets/instapay-logo.png";
+import vodafoneCashLogo from "~/assets/vodafone-cash-logo.png";
 
 const { ownerId } = useAuthUser();
 const { $toast } = useNuxtApp();
@@ -827,6 +941,9 @@ const form = ref({
   automated_hours_enabled: false,
   opening_time: "09:00",
   closing_time: "23:00",
+  payment_methods_allowed: "all",
+  vodafone_cash_number: "",
+  instapay_account: "",
 });
 
 // Initialize Data
@@ -853,6 +970,9 @@ watch(
           automated_hours_enabled: data.automated_hours_enabled === true,
           opening_time: data.opening_time || "09:00",
           closing_time: data.closing_time || "23:00",
+          payment_methods_allowed: data.payment_methods_allowed || "all",
+          vodafone_cash_number: data.vodafone_cash_number || "",
+          instapay_account: data.instapay_account || "",
         };
       }
     }
@@ -1074,6 +1194,9 @@ const saveSettings = async () => {
     automated_hours_enabled: form.value.automated_hours_enabled === true,
     opening_time: form.value.opening_time,
     closing_time: form.value.closing_time,
+    payment_methods_allowed: form.value.payment_methods_allowed || "all",
+    vodafone_cash_number: form.value.vodafone_cash_number ? form.value.vodafone_cash_number.trim() : "",
+    instapay_account: form.value.instapay_account ? form.value.instapay_account.trim() : "",
   };
 
   const success = await updateProfile(ownerId.value, settingsData);

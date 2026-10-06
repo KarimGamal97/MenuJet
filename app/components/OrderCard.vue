@@ -37,6 +37,17 @@
             />
             <span>{{ orderTypeBadge.label }}</span>
           </div>
+
+          <!-- شارة طريقة الدفع الإلكتروني (فودافون كاش / إنستا باي) -->
+          <div
+            v-if="paymentBadge"
+            :class="[
+              'text-[10px] font-black px-2 py-0.5 rounded-lg border flex items-center gap-1 shrink-0',
+              paymentBadge.classes,
+            ]"
+          >
+            <span>💳 {{ paymentBadge.label }}</span>
+          </div>
         </div>
 
         <!-- Phone & Customer Name -->
@@ -194,15 +205,15 @@ const cleanSize = (size) => {
 };
 
 const orderTypeBadge = computed(() => {
-  const method = props.order?.payment_method;
-  if (method === "whatsapp_delivery") {
+  const method = props.order?.payment_method || "";
+  if (method.startsWith("whatsapp_delivery")) {
     return {
       label: "واتساب توصيل",
       icon: "whatsapp",
       classes: "bg-emerald-50 text-emerald-700 border-emerald-200",
     };
   }
-  if (method === "whatsapp_pickup" || method === "whatsapp") {
+  if (method.startsWith("whatsapp_pickup") || method === "whatsapp") {
     return {
       label: "واتساب كاشير",
       icon: "whatsapp",
@@ -214,6 +225,23 @@ const orderTypeBadge = computed(() => {
     icon: null,
     classes: "bg-gray-100 text-gray-700 border-gray-200",
   };
+});
+
+const paymentBadge = computed(() => {
+  const method = props.order?.payment_method || "";
+  if (method.includes("vodafone")) {
+    return {
+      label: "فودافون كاش",
+      classes: "bg-red-50 text-red-700 border-red-200",
+    };
+  }
+  if (method.includes("instapay")) {
+    return {
+      label: "إنستا باي",
+      classes: "bg-purple-50 text-purple-700 border-purple-200",
+    };
+  }
+  return null;
 });
 
 const timeAgo = ref("");
@@ -287,7 +315,7 @@ const printOrder = () => {
         <div style="font-size: 14px; font-weight: bold; color: #e67e22;">MenuJet</div>
         <div class="order-id">رقم الطلب #${orderNumber}</div>
         <div style="font-size: 13px; font-weight: bold; margin: 4px 0; color: #555;">
-          نوع الطلب: ${orderTypeBadge.value.label}
+          نوع الطلب: ${orderTypeBadge.value.label} ${paymentBadge.value ? `(${paymentBadge.value.label})` : ''}
         </div>
         <div class="info">
           <span>الوقت: ${orderTime}</span>

@@ -38,7 +38,23 @@ export const useSettings = () => {
         .update(updateData)
         .eq("user_id", userId);
 
-      if (error) throw error;
+      if (error) {
+        // Fallback if payment columns don't exist in profiles schema yet
+        if (error.message?.includes("column") || (error as any).code === "PGRST204") {
+          console.warn("Profiles schema missing payment columns, saving other fields:", error.message);
+          const fallbackData = { ...updateData };
+          delete fallbackData.vodafone_cash_number;
+          delete fallbackData.instapay_account;
+          delete fallbackData.payment_methods_allowed;
+          const retryRes = await client
+            .from("profiles")
+            .update(fallbackData)
+            .eq("user_id", userId);
+          if (retryRes.error) throw retryRes.error;
+        } else {
+          throw error;
+        }
+      }
 
       profile.value = { ...profile.value, ...updateData };
       $toast.success(t("admin.settings_success"));

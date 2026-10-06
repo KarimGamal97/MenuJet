@@ -264,9 +264,9 @@
             class="mb-3 p-3.5 bg-gradient-to-br from-orange-500/10 via-amber-500/10 to-orange-500/5 border border-orange-200/80 rounded-2xl"
             :dir="$i18n.locale === 'ar' ? 'rtl' : 'ltr'"
           >
-            <div class="flex items-center justify-between mb-1">
-              <span class="text-xs font-black text-orange-950">{{ $t(`plans.${currentPlan.id || 'free'}_name`) }} 🎁</span>
-              <span class="text-[10px] bg-orange-200 text-orange-800 font-bold px-1.5 py-0.5 rounded-md">{{ $t("plans.trial_badge") }}</span>
+            <div class="flex flex-col items-start gap-1.5 mb-2">
+              <span class="text-xs font-black text-orange-950 leading-snug">{{ $t(`plans.${currentPlan.id || 'free'}_name`) }} </span>
+              <span class="text-[10px] bg-orange-200 text-orange-800 font-bold px-2 py-0.5 rounded-full whitespace-nowrap">{{ $t("plans.trial_badge") }}</span>
             </div>
             <p class="text-[11px] text-orange-800/80 mb-2.5 font-medium leading-tight">
               {{ $t("plans.limit_summary", { items: currentPlan.max_items, categories: currentPlan.max_categories }) }}
@@ -285,9 +285,9 @@
             class="mb-3 p-3.5 bg-gradient-to-br from-slate-900/5 via-slate-800/5 to-slate-900/10 border border-slate-200 rounded-2xl"
             :dir="$i18n.locale === 'ar' ? 'rtl' : 'ltr'"
           >
-            <div class="flex items-center justify-between mb-1">
-              <span class="text-xs font-black text-slate-900">{{ $t(`plans.${currentPlan.id || 'basic'}_name`) }} ⚡</span>
-              <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded-md">{{ $t("plans.active_badge") }}</span>
+            <div class="flex flex-col items-start gap-1.5 mb-2">
+              <span class="text-xs font-black text-slate-900 leading-snug">{{ $t(`plans.${currentPlan.id || 'basic'}_name`) }} ⚡</span>
+              <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full whitespace-nowrap">{{ $t("plans.active_badge") }}</span>
             </div>
             <p class="text-[11px] text-slate-600 mb-2.5 font-medium leading-tight">
               {{ $t("plans.unlimited_items_cats") }}
@@ -297,7 +297,7 @@
               @click="showUpgradeModal = true"
               class="w-full bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-500 hover:to-amber-400 text-white font-black text-xs py-2 px-3 rounded-xl shadow-xs transition-transform active:scale-95 text-center cursor-pointer block"
             >
-              👑 {{ $t("plans.upgrade_pro") }}
+              {{ $t("plans.upgrade_pro") }}
             </button>
           </div>
 
@@ -306,9 +306,9 @@
             class="mb-3 p-3.5 bg-gradient-to-br from-amber-500/10 via-orange-500/10 to-amber-500/5 border border-amber-300/80 rounded-2xl"
             :dir="$i18n.locale === 'ar' ? 'rtl' : 'ltr'"
           >
-            <div class="flex items-center justify-between mb-1">
-              <span class="text-xs font-black text-amber-950">{{ $t(`plans.${currentPlan.id || 'pro'}_name`) }} 👑</span>
-              <span class="text-[10px] bg-amber-200 text-amber-900 font-black px-1.5 py-0.5 rounded-md">{{ $t("plans.vip_badge") }}</span>
+            <div class="flex flex-col items-start gap-1.5 mb-2">
+              <span class="text-xs font-black text-amber-950 leading-snug">{{ $t(`plans.${currentPlan.id || 'pro'}_name`) }} </span>
+              <span class="text-[10px] bg-amber-200 text-amber-900 font-black px-2 py-0.5 rounded-full whitespace-nowrap">{{ $t("plans.vip_badge") }}</span>
             </div>
             <p class="text-[11px] text-amber-900/80 font-medium leading-tight">
               {{ $t("plans.all_features_active") }}

@@ -29,7 +29,7 @@
         @click="showUpgradeModal = true"
         class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black py-4 px-8 rounded-2xl shadow-xl shadow-purple-500/25 transition-transform active:scale-95 text-base cursor-pointer"
       >
-        👑 {{ $t("plans.users_lock_btn") }}
+         {{ $t("plans.users_lock_btn") }}
       </button>
 
       <!-- Upgrade Modal -->

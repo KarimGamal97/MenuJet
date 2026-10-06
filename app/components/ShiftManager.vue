@@ -171,12 +171,33 @@
             <span class="font-black text-blue-600">+ {{ liveStats.cardSales }} {{ $t("currency") }}</span>
           </div>
 
+          <!-- مخصوم المصاريف الخارجية / الفواتير -->
+          <div v-if="Number(closeForm.expenses) > 0" class="flex justify-between items-center text-gray-500 font-bold">
+            <span>{{ $t("shifts.expenses") }}</span>
+            <span class="font-black text-rose-600">- {{ closeForm.expenses }} {{ $t("currency") }}</span>
+          </div>
+
           <div class="border-t border-gray-200 pt-2 flex justify-between items-center text-sm">
             <span class="font-black text-gray-900">{{ $t("shifts.expected_cash") }}</span>
             <span class="font-black text-gray-900 text-base">
               {{ expectedCash }} {{ $t("currency") }}
             </span>
           </div>
+        </div>
+
+        <!-- حقل المصاريف الإضافية / الفواتير (فوق الكاش الفعلي) -->
+        <div class="space-y-1.5">
+          <label class="text-xs font-black text-gray-800 block px-1">
+            {{ $t("shifts.expenses") }} ({{ $t("currency") }})
+          </label>
+          <input
+            type="number"
+            min="0"
+            v-model.number="closeForm.expenses"
+            @input="onExpensesChange"
+            class="w-full px-4 py-2.5 bg-white border-2 border-gray-200 rounded-2xl text-base font-bold text-gray-900 outline-none focus:border-rose-400 focus:ring-2 focus:ring-rose-200 transition-all"
+            placeholder="0"
+          />
         </div>
 
         <!-- Actual Cash Counted Input -->
@@ -265,6 +286,7 @@ const startForm = ref({
 
 const closeForm = ref({
   closingBalance: "",
+  expenses: "",
   notes: "",
 });
 
@@ -284,8 +306,13 @@ const refreshLiveStats = async () => {
 
 const expectedCash = computed(() => {
   const opening = Number(activeSession.value?.opening_balance) || 0;
-  return opening + liveStats.value.cashSales;
+  const expenses = Number(closeForm.value.expenses) || 0;
+  return Math.max(0, opening + liveStats.value.cashSales - expenses);
 });
+
+const onExpensesChange = () => {
+  closeForm.value.closingBalance = expectedCash.value;
+};
 
 const difference = computed(() => {
   if (closeForm.value.closingBalance === "" || closeForm.value.closingBalance === null) return 0;
@@ -342,6 +369,7 @@ const handleConfirmOpenSession = async () => {
 
 const openCloseModal = async () => {
   await refreshLiveStats();
+  closeForm.value.expenses = "";
   closeForm.value.closingBalance = expectedCash.value;
   closeForm.value.notes = "";
   isCloseShiftModalOpen.value = true;
@@ -349,10 +377,19 @@ const openCloseModal = async () => {
 
 const handleConfirmCloseSession = async () => {
   if (!activeSession.value?.id) return;
+
+  const expensesVal = Number(closeForm.value.expenses) || 0;
+  let finalNotes = closeForm.value.notes ? closeForm.value.notes.trim() : "";
+  if (expensesVal > 0) {
+    const expensePrefix = `[مصاريف إضافية / فواتير: ${expensesVal} ${t("currency")}]`;
+    finalNotes = finalNotes ? `${expensePrefix} - ${finalNotes}` : expensePrefix;
+  }
+
   const session = await closeSession({
     sessionId: activeSession.value.id,
     closingBalance: Number(closeForm.value.closingBalance) || 0,
-    notes: closeForm.value.notes,
+    expenses: expensesVal,
+    notes: finalNotes,
   });
 
   if (session) {

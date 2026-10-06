@@ -206,6 +206,9 @@
         :queueNumberEnabled="restaurant.show_queue_number === true"
         :whatsappOrderingEnabled="isWhatsappOrderingAllowed"
         :phoneNumberEnabled="restaurant.show_phone_number !== false"
+        :paymentMethodsAllowed="isElectronicPaymentAllowed ? (restaurant.payment_methods_allowed || 'all') : 'none'"
+        :vodafoneCashNumber="restaurant.vodafone_cash_number || ''"
+        :instapayAccount="restaurant.instapay_account || ''"
         @close="showCart = false"
       />
 
@@ -327,6 +330,14 @@ const isWhatsappOrderingAllowed = computed(() => {
   const planId = p.plan?.id || p.plans?.id || p.plan_id || p.plan_type || "free";
   const allowsWhatsapp = p.plans?.allow_whatsapp_orders ?? p.plan?.allow_whatsapp_orders ?? (planId === "pro");
   return Boolean(allowsWhatsapp) && p.whatsapp_ordering_enabled !== false;
+});
+
+// Electronic payments allowed only for Pro plan
+const isElectronicPaymentAllowed = computed(() => {
+  if (!restaurant.value) return false;
+  const p = restaurant.value;
+  const planId = p.plan?.id || p.plans?.id || p.plan_id || p.plan_type || "free";
+  return planId === "pro";
 });
 
 const isOrderingEnabled = computed(() => {

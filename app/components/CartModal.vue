@@ -398,6 +398,94 @@
               <p v-if="errors.addressDetail" class="text-xs text-red-500 font-bold mt-2 px-1">{{ errors.addressDetail }}</p>
             </div>
           </div>
+
+          <!-- قسم اختيار طريقة الدفع الإلكتروني -->
+          <div v-if="availablePaymentMethods.length > 0" class="pt-4 border-t border-gray-100 space-y-3">
+            <div class="flex items-center justify-between">
+              <label class="block text-[11px] font-black uppercase tracking-wider text-gray-500 text-right">
+                {{ $t("cart.payment_method_label") }}
+              </label>
+              <span class="text-[10px] font-bold text-green-700 bg-green-50 px-2 py-0.5 rounded-full border border-green-200/60">
+                تحويل إلكتروني مباشر
+              </span>
+            </div>
+
+            <!-- Select Menu for Payment Method (كما طلب المستخدم: select مش toggle) -->
+            <div class="relative">
+              <select
+                v-model="customerForm.paymentMethod"
+                class="w-full p-4 bg-gray-50 border-2 border-gray-200 focus:border-green-500 focus:bg-white rounded-2xl outline-none transition-all font-black text-gray-800 text-sm shadow-sm appearance-none cursor-pointer text-right pr-4 pl-10"
+              >
+                <option v-for="method in availablePaymentMethods" :key="method.id" :value="method.id">
+                  {{ method.name }}
+                </option>
+              </select>
+              <div class="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                <BaseIcon name="chevron-down" class="w-4 h-4" />
+              </div>
+            </div>
+
+            <!-- تفاصيل الحساب/المحفظة مع زر النسخ واللوجو -->
+            <div
+              v-if="selectedPaymentMethodDetails"
+              class="p-4 rounded-2xl border-2 transition-all bg-gradient-to-br from-white to-gray-50/70 border-gray-100 shadow-xs space-y-3"
+            >
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <img
+                    :src="selectedPaymentMethodDetails.logo"
+                    :alt="selectedPaymentMethodDetails.name"
+                    class="h-7 w-auto object-contain max-w-[100px]"
+                  />
+                  <div>
+                    <span class="text-xs font-black text-gray-800 block">
+                      {{ selectedPaymentMethodDetails.name }}
+                    </span>
+                    <span class="text-[10px] font-bold text-gray-400">
+                      {{ selectedPaymentMethodDetails.label }}
+                    </span>
+                  </div>
+                </div>
+
+                <!-- زر نسخ الرقم / المعرف -->
+                <button
+                  v-if="selectedPaymentMethodDetails.value"
+                  type="button"
+                  @click="copyToClipboard(selectedPaymentMethodDetails.value, selectedPaymentMethodDetails.id)"
+                  :class="[
+                    'px-3 py-1.5 rounded-xl text-xs font-black flex items-center gap-1.5 transition-all shadow-xs active:scale-95 cursor-pointer',
+                    copiedField === selectedPaymentMethodDetails.id
+                      ? 'bg-emerald-500 text-white shadow-emerald-200'
+                      : 'bg-white hover:bg-gray-100 text-gray-700 border border-gray-200'
+                  ]"
+                >
+                  <BaseIcon
+                    :name="copiedField === selectedPaymentMethodDetails.id ? 'check' : 'copy'"
+                    class="w-3.5 h-3.5"
+                  />
+                  <span>
+                    {{ copiedField === selectedPaymentMethodDetails.id ? $t("cart.copied") : $t("cart.copy_number") }}
+                  </span>
+                </button>
+              </div>
+
+              <!-- عرض الرقم أو المعرف بوضوح -->
+              <div
+                v-if="selectedPaymentMethodDetails.value"
+                class="bg-white p-3 rounded-xl border border-dashed border-gray-200 flex items-center justify-between"
+              >
+                <span class="text-xs font-bold text-gray-400">رقم / حساب التحويل:</span>
+                <span class="text-sm font-black text-gray-900 tracking-wider font-mono select-all" dir="ltr">
+                  {{ selectedPaymentMethodDetails.value }}
+                </span>
+              </div>
+
+              <!-- تنبيه إرسال الإشعار -->
+              <p class="text-[11px] text-gray-500 font-bold leading-relaxed bg-amber-50/70 text-amber-900 p-2.5 rounded-xl border border-amber-100/80">
+                💡 {{ selectedPaymentMethodDetails.instruction }}
+              </p>
+            </div>
+          </div>
         </div>
 
         <div class="px-8 py-6 bg-white border-t border-gray-100 flex gap-3 pb-10 sm:pb-8 sticky bottom-0 z-20">
@@ -429,6 +517,8 @@
 
 <script setup>
 import { toast } from "vue-sonner";
+import instapayLogo from "~/assets/instapay-logo.png";
+import vodafoneCashLogo from "~/assets/vodafone-cash-logo.png";
 
 const props = defineProps({
   isOpen: Boolean,
@@ -438,7 +528,10 @@ const props = defineProps({
   tableNumberEnabled: { type: Boolean, default: false },
   queueNumberEnabled: { type: Boolean, default: false },
   whatsappOrderingEnabled: { type: Boolean, default: true },
-  phoneNumberEnabled: { type: Boolean, default: true }
+  phoneNumberEnabled: { type: Boolean, default: true },
+  paymentMethodsAllowed: { type: String, default: "all" },
+  vodafoneCashNumber: { type: String, default: "" },
+  instapayAccount: { type: String, default: "" },
 });
 
 const emit = defineEmits(["close"]);
@@ -472,8 +565,85 @@ const customerForm = ref({
   name: "",
   phone: "",
   method: "استلام من المحل",
-  addressDetail: ""
+  addressDetail: "",
+  paymentMethod: "vodafone_cash",
 });
+
+const copiedField = ref("");
+const copyToClipboard = async (text, field) => {
+  if (!text) return;
+  try {
+    if (navigator?.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      // Fallback
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
+    }
+    copiedField.value = field;
+    setTimeout(() => {
+      copiedField.value = "";
+    }, 2000);
+  } catch (err) {
+    console.error("Copy failed:", err);
+  }
+};
+
+const availablePaymentMethods = computed(() => {
+  if (props.paymentMethodsAllowed === "none") return [];
+  const list = [];
+
+  if (["all", "vodafone_cash"].includes(props.paymentMethodsAllowed)) {
+    list.push({
+      id: "vodafone_cash",
+      name: t("cart.vodafone_cash"),
+      logo: vodafoneCashLogo,
+      value: props.vodafoneCashNumber,
+      label: t("admin.vodafone_cash_number_label"),
+      instruction: t("cart.payment_instruction_vodafone"),
+    });
+  }
+
+  if (["all", "instapay"].includes(props.paymentMethodsAllowed)) {
+    list.push({
+      id: "instapay",
+      name: t("cart.instapay"),
+      logo: instapayLogo,
+      value: props.instapayAccount,
+      label: t("admin.instapay_account_label"),
+      instruction: t("cart.payment_instruction_instapay"),
+    });
+  }
+
+  return list;
+});
+
+const selectedPaymentMethodDetails = computed(() => {
+  if (!availablePaymentMethods.value.length) return null;
+  return (
+    availablePaymentMethods.value.find(
+      (m) => m.id === customerForm.value.paymentMethod
+    ) || availablePaymentMethods.value[0]
+  );
+});
+
+watch(
+  availablePaymentMethods,
+  (methods) => {
+    if (methods.length > 0) {
+      if (!methods.some((m) => m.id === customerForm.value.paymentMethod)) {
+        customerForm.value.paymentMethod = methods[0].id;
+      }
+    } else {
+      customerForm.value.paymentMethod = "";
+    }
+  },
+  { immediate: true }
+);
 
 const errors = ref({
   name: "",
@@ -791,8 +961,9 @@ const handleWhatsappOrderFinal = async () => {
         ? totalPrice.value + Number(selectedDeliveryArea.value.price)
         : totalPrice.value;
 
-    // تحديد نوع الطلب: واتساب توصيل أو واتساب كاشير (استلام)
-    const orderPaymentMethod = isDelivery ? "whatsapp_delivery" : "whatsapp_pickup";
+    // تحديد نوع الطلب: واتساب توصيل أو واتساب كاشير (استلام) مع طريقة الدفع
+    const paymentSuffix = customerForm.value.paymentMethod ? `_${customerForm.value.paymentMethod}` : "";
+    const orderPaymentMethod = `${isDelivery ? "whatsapp_delivery" : "whatsapp_pickup"}${paymentSuffix}`;
 
     // 2. إرسال الطلب إلى قاعدة بيانات Supabase
     const orderData = {
@@ -905,6 +1076,11 @@ ${items}
 📍 الاستلام: ${customerForm.value.method}
 
 💰 الإجمالي: *${finalTotalText}*`;
+  }
+
+  if (selectedPaymentMethodDetails.value) {
+    msgText += `
+💳 طريقة الدفع: *${selectedPaymentMethodDetails.value.name}* (مرفق إشعار التحويل)`;
   }
 
   // Use api.whatsapp.com as it is more stable for Web and desktop
