@@ -403,10 +403,17 @@
         <div class="px-8 py-6 bg-white border-t border-gray-100 flex gap-3 pb-10 sm:pb-8 sticky bottom-0 z-20">
           <button
             @click="handleWhatsappOrderFinal"
-            class="flex-[2] flex items-center justify-center gap-2 py-4 bg-green-500 text-white rounded-2xl font-black shadow-lg shadow-green-200 hover:bg-green-600 transition-all active:scale-95 text-[15px]"
+            :disabled="isSubmitting"
+            class="flex-[2] flex items-center justify-center gap-2 py-4 bg-green-500 text-white rounded-2xl font-black shadow-lg shadow-green-200 hover:bg-green-600 transition-all active:scale-95 text-[15px] disabled:opacity-50"
           >
-            <BaseIcon name="whatsapp" class="w-6 h-6 fill-current" />
-            {{ $t("cart.confirm_whatsapp") }}
+            <div
+              v-if="isSubmitting"
+              class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"
+            ></div>
+            <template v-else>
+              <BaseIcon name="whatsapp" class="w-6 h-6 fill-current" />
+              {{ $t("cart.confirm_whatsapp") }}
+            </template>
           </button>
           <button
             @click="showWhatsappCheckout = false"
@@ -496,6 +503,70 @@ const openCashierCheckout = () => {
   showCashierCheckout.value = true;
 };
 
+// Calculate Sequential Order Number
+const calculateNextOrderNumber = async (restaurantId, currentSessionId) => {
+  // 1. Fetch profile to get order_reset_type
+  const { data: profile } = await client
+    .from("profiles")
+    .select("order_reset_type")
+    .eq("user_id", restaurantId)
+    .single();
+  
+  const resetType = profile?.order_reset_type || 'shift';
+  
+  // Case A: Reset per shift
+  if (resetType === 'shift') {
+    if (currentSessionId) {
+      const { data: lastOrders } = await client
+        .from("orders")
+        .select("order_number")
+        .eq("user_id", restaurantId)
+        .eq("session_id", currentSessionId)
+        .order("order_number", { ascending: false })
+        .limit(1);
+      return (lastOrders?.[0]?.order_number || 0) + 1;
+    } else {
+      // If no active session, fallback to start of today
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+      const { data: lastOrders } = await client
+        .from("orders")
+        .select("order_number")
+        .eq("user_id", restaurantId)
+        .gt("created_at", todayStart.toISOString())
+        .order("order_number", { ascending: false })
+        .limit(1);
+      return (lastOrders?.[0]?.order_number || 0) + 1;
+    }
+  }
+
+  // Case B: Time-based resets (daily, weekly, monthly, or none)
+  const now = new Date();
+  let startDate = new Date(0); // Default for 'none'
+  
+  if (resetType === 'daily') {
+    startDate = new Date(now.setHours(0, 0, 0, 0));
+  } else if (resetType === 'weekly') {
+    const day = now.getDay();
+    const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+    startDate = new Date(now.setDate(diff));
+    startDate.setHours(0, 0, 0, 0);
+  } else if (resetType === 'monthly') {
+    startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+  }
+
+  // 3. Fetch max order_number since startDate
+  const { data: lastOrders } = await client
+    .from("orders")
+    .select("order_number")
+    .eq("user_id", restaurantId)
+    .gt("created_at", startDate.toISOString())
+    .order("order_number", { ascending: false })
+    .limit(1);
+
+  return (lastOrders?.[0]?.order_number || 0) + 1;
+};
+
 const placeCashierOrder = async () => {
   if (cart.value.length === 0 || isSubmitting.value) return;
 
@@ -576,70 +647,6 @@ const placeCashierOrder = async () => {
       console.warn("Could not query active session for order:", e);
     }
 
-    // Calculate Sequential Order Number
-    const calculateNextOrderNumber = async (restaurantId, currentSessionId) => {
-      // 1. Fetch profile to get order_reset_type
-      const { data: profile } = await client
-        .from("profiles")
-        .select("order_reset_type")
-        .eq("user_id", restaurantId)
-        .single();
-      
-      const resetType = profile?.order_reset_type || 'shift';
-      
-      // Case A: Reset per shift
-      if (resetType === 'shift') {
-        if (currentSessionId) {
-          const { data: lastOrders } = await client
-            .from("orders")
-            .select("order_number")
-            .eq("user_id", restaurantId)
-            .eq("session_id", currentSessionId)
-            .order("order_number", { ascending: false })
-            .limit(1);
-          return (lastOrders?.[0]?.order_number || 0) + 1;
-        } else {
-          // If no active session, fallback to start of today
-          const todayStart = new Date();
-          todayStart.setHours(0, 0, 0, 0);
-          const { data: lastOrders } = await client
-            .from("orders")
-            .select("order_number")
-            .eq("user_id", restaurantId)
-            .gt("created_at", todayStart.toISOString())
-            .order("order_number", { ascending: false })
-            .limit(1);
-          return (lastOrders?.[0]?.order_number || 0) + 1;
-        }
-      }
-
-      // Case B: Time-based resets (daily, weekly, monthly, or none)
-      const now = new Date();
-      let startDate = new Date(0); // Default for 'none'
-      
-      if (resetType === 'daily') {
-        startDate = new Date(now.setHours(0, 0, 0, 0));
-      } else if (resetType === 'weekly') {
-        const day = now.getDay();
-        const diff = now.getDate() - day + (day === 0 ? -6 : 1);
-        startDate = new Date(now.setDate(diff));
-        startDate.setHours(0, 0, 0, 0);
-      } else if (resetType === 'monthly') {
-        startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-      }
-
-      // 3. Fetch max order_number since startDate
-      const { data: lastOrders } = await client
-        .from("orders")
-        .select("order_number")
-        .eq("user_id", restaurantId)
-        .gt("created_at", startDate.toISOString())
-        .order("order_number", { ascending: false })
-        .limit(1);
-
-      return (lastOrders?.[0]?.order_number || 0) + 1;
-    };
-
     const nextOrderNum = await calculateNextOrderNumber(finalRestaurantId, activeSessionId);
 
     const { data: order, error: orderError } = await client
@@ -699,7 +706,7 @@ const openWhatsappCheckout = () => {
   showWhatsappCheckout.value = true;
 };
 
-const handleWhatsappOrderFinal = () => {
+const handleWhatsappOrderFinal = async () => {
   errors.value = { name: "", phone: "", deliveryArea: "", addressDetail: "" };
   let hasError = false;
 
@@ -743,15 +750,91 @@ const handleWhatsappOrderFinal = () => {
 
   if (hasError) return;
 
+  isSubmitting.value = true;
+
+  let nextOrderNum = null;
+
+  try {
+    // 1. Resolve Restaurant ID
+    let restaurantId = props.restaurantUserId;
+    if (!restaurantId && route.params.slug) {
+      const { data: profile } = await client
+        .from("profiles")
+        .select("user_id")
+        .eq("slug", route.params.slug)
+        .single();
+      if (profile?.user_id) restaurantId = profile.user_id;
+    }
+
+    // Fetch active session if open
+    let activeSessionId = null;
+    try {
+      const { data: openSession } = await client
+        .from("cashier_sessions")
+        .select("id")
+        .eq("restaurant_id", restaurantId)
+        .eq("status", "open")
+        .order("opened_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (openSession?.id) activeSessionId = openSession.id;
+    } catch (e) {
+      console.warn("Could not query active session for order:", e);
+    }
+
+    // حساب رقم الطلب المتسلسل (مثال: 15 ثم 16 ثم 17...)
+    nextOrderNum = await calculateNextOrderNumber(restaurantId, activeSessionId);
+
+    const isDelivery = customerForm.value.method === "توصيل";
+    const finalTotal =
+      isDelivery && selectedDeliveryArea.value
+        ? totalPrice.value + Number(selectedDeliveryArea.value.price)
+        : totalPrice.value;
+
+    // تحديد نوع الطلب: واتساب توصيل أو واتساب كاشير (استلام)
+    const orderPaymentMethod = isDelivery ? "whatsapp_delivery" : "whatsapp_pickup";
+
+    // 2. إرسال الطلب إلى قاعدة بيانات Supabase
+    const orderData = {
+      user_id: restaurantId,
+      session_id: activeSessionId,
+      items: cart.value,
+      total_price: finalTotal,
+      status: "pending",
+      order_number: nextOrderNum,
+      customer_phone: customerForm.value.phone ? customerForm.value.phone.trim() : null,
+      customer_name: customerForm.value.name ? customerForm.value.name.trim() : null,
+      delivery_address: customerForm.value.addressDetail ? customerForm.value.addressDetail.trim() : null,
+      payment_method: orderPaymentMethod,
+    };
+
+    const { error: insertError } = await client.from("orders").insert(orderData);
+
+    // If customer_name or delivery_address columns don't exist in DB, retry without them
+    if (insertError && (insertError.message?.includes("column") || insertError.code === "PGRST204")) {
+      delete orderData.customer_name;
+      delete orderData.delivery_address;
+      await client.from("orders").insert(orderData);
+    }
+  } catch (err) {
+    console.error("Supabase Order Insert Error:", err);
+  } finally {
+    isSubmitting.value = false;
+  }
+
   // Save link before state clears
   const link = whatsappLink.value;
   
-  // Open WhatsApp in new tab
+  // 3. ثم فتح محادثة الواتساب كالمعتاد
   window.open(link, '_blank');
 
   // Save to local history before clearing
+  const displayOrderNum = nextOrderNum
+    ? nextOrderNum.toString().padStart(4, "0")
+    : "WA-" + Date.now().toString().slice(-4);
+
   addOrder({
-    id: "WA-" + Date.now().toString().slice(-4),
+    id: displayOrderNum,
     items: [...cart.value],
     total: totalPrice.value,
     type: "whatsapp",

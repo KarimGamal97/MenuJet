@@ -146,34 +146,48 @@
         />
       </div>
 
-      <!-- Pagination Controls -->
+      <!-- Pagination Controls (RTL Friendly) -->
       <div
         v-if="totalPages > 1"
-        class="flex items-center justify-center gap-4 pt-10"
+        class="flex items-center justify-center gap-2 pt-10"
       >
-        <BaseButton
-          variant="outline"
-          size="sm"
-          icon="chevron-right"
+        <!-- Previous Page Button (السابق: points right in RTL) -->
+        <button
+          type="button"
           :disabled="page === 1"
           @click="changePage(page - 1)"
-          class="w-12 h-12 !p-0 !rounded-2xl"
-        />
+          title="الصفحة السابقة"
+          class="w-10 h-10 flex items-center justify-center rounded-2xl border border-gray-200 bg-white text-gray-600 transition-all shadow-xs hover:border-orange-500 hover:text-orange-600 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:border-gray-200 disabled:hover:text-gray-600"
+        >
+          <BaseIcon name="chevron-right" class="w-4 h-4" />
+        </button>
 
-        <div class="flex items-center gap-2">
-          <span class="text-sm font-black text-gray-800">{{ page }}</span>
-          <span class="text-xs font-bold text-gray-400">/</span>
-          <span class="text-sm font-black text-gray-400">{{ totalPages }}</span>
-        </div>
+        <!-- Numbered Pages (1, 2, 3...) -->
+        <button
+          v-for="p in totalPages"
+          :key="p"
+          type="button"
+          @click="changePage(p)"
+          :class="[
+            'w-10 h-10 flex items-center justify-center rounded-2xl font-bold text-sm transition-all shadow-xs active:scale-95',
+            page === p
+              ? 'bg-orange-600 text-white shadow-orange-100 shadow-md pointer-events-none'
+              : 'bg-white border border-gray-200 text-gray-700 hover:border-orange-500 hover:text-orange-600',
+          ]"
+        >
+          {{ p }}
+        </button>
 
-        <BaseButton
-          variant="outline"
-          size="sm"
-          icon="chevron-left"
+        <!-- Next Page Button (التالي: points left in RTL) -->
+        <button
+          type="button"
           :disabled="page >= totalPages"
           @click="changePage(page + 1)"
-          class="w-12 h-12 !p-0 !rounded-2xl"
-        />
+          title="الصفحة التالية"
+          class="w-10 h-10 flex items-center justify-center rounded-2xl border border-gray-200 bg-white text-gray-600 transition-all shadow-xs hover:border-orange-500 hover:text-orange-600 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:border-gray-200 disabled:hover:text-gray-600"
+        >
+          <BaseIcon name="chevron-left" class="w-4 h-4" />
+        </button>
       </div>
     </template>
   </div>
@@ -210,7 +224,7 @@ const cleanupOptions = [
 
 // Pagination State
 const page = ref(1);
-const pageSize = ref(15);
+const pageSize = ref(9);
 
 const {
   orders,
@@ -226,6 +240,13 @@ const {
 const totalPages = computed(() =>
   Math.ceil(totalOrders.value / pageSize.value),
 );
+
+// Keep page in bounds if total orders decrease
+watch(totalPages, (newTotal) => {
+  if (page.value > newTotal && newTotal > 0) {
+    changePage(newTotal);
+  }
+});
 
 const changePage = (newPage) => {
   page.value = newPage;
