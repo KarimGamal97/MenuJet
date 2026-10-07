@@ -690,7 +690,7 @@
         </div>
 
         <!-- بيانات الدفع الإلكتروني (فودافون كاش وإنستا باي) - ميزة الباقة الاحترافية -->
-        <div class="md:col-span-2 relative p-6 bg-gradient-to-br from-gray-50/80 to-white rounded-3xl border border-gray-100 shadow-xs space-y-5 overflow-hidden">
+        <div class="md:col-span-2 relative p-6 bg-gradient-to-br from-gray-50/80 to-white rounded-3xl border border-gray-100 shadow-xs space-y-5">
           <!-- Smart Lock Overlay for Free & Basic Plans -->
           <div
             v-if="!isPro"
@@ -731,25 +731,63 @@
             </div>
           </div>
 
-          <!-- Select لتحديد الطرق المسموحة للزبائن -->
-          <div class="space-y-1.5">
+          <!-- Select لتحديد الطرق المسموحة للزبائن (Custom Dropdown) -->
+          <div class="space-y-1.5 relative">
             <label class="text-xs font-bold text-gray-700 block px-1">
               {{ $t("admin.payment_methods_allowed_label") }}
             </label>
             <div class="relative">
-              <select
-                v-model="form.payment_methods_allowed"
-                class="w-full px-4 py-3 bg-white border border-gray-200 rounded-2xl text-sm font-bold text-gray-800 outline-none focus:ring-2 focus:ring-orange-500 transition-all appearance-none cursor-pointer"
+              <button
+                type="button"
+                @click="isPaymentDropdownOpen = !isPaymentDropdownOpen"
+                class="w-full px-4 py-3 bg-white border border-gray-200 rounded-2xl text-sm font-bold text-gray-800 flex items-center justify-between shadow-xs hover:border-orange-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all cursor-pointer text-right"
               >
-                <option value="all">{{ $t("admin.payment_methods_all") }}</option>
-                <option value="vodafone_cash">{{ $t("admin.payment_methods_vodafone_only") }}</option>
-                <option value="instapay">{{ $t("admin.payment_methods_instapay_only") }}</option>
-                <option value="none">{{ $t("admin.payment_methods_disabled") }}</option>
-              </select>
-              <div class="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-                <BaseIcon name="chevron-down" class="w-4 h-4" />
+                <span>
+                  {{ paymentOptions.find(o => o.value === form.payment_methods_allowed)?.label || $t("admin.payment_methods_all") }}
+                </span>
+                <BaseIcon
+                  name="chevron-down"
+                  class="w-4 h-4 text-gray-400 transition-transform duration-200 shrink-0"
+                  :class="{ 'rotate-180 text-orange-500': isPaymentDropdownOpen }"
+                />
+              </button>
+
+              <!-- خيارات القائمة المنسدلة بتصميم متناسق مع الواجهة -->
+              <div
+                v-if="isPaymentDropdownOpen"
+                class="absolute top-full mt-2 inset-x-0 bg-white rounded-2xl shadow-xl border border-gray-100 p-1.5 z-50 animate-in fade-in zoom-in-95 duration-150 space-y-1"
+              >
+                <button
+                  v-for="opt in paymentOptions"
+                  :key="opt.value"
+                  type="button"
+                  @click="
+                    form.payment_methods_allowed = opt.value;
+                    isPaymentDropdownOpen = false;
+                  "
+                  :class="[
+                    'w-full text-right px-3.5 py-2.5 rounded-xl text-sm font-bold flex items-center justify-between transition-colors cursor-pointer',
+                    form.payment_methods_allowed === opt.value
+                      ? 'bg-orange-50 text-orange-600 font-black'
+                      : 'text-gray-700 hover:bg-gray-50'
+                  ]"
+                >
+                  <span>{{ opt.label }}</span>
+                  <BaseIcon
+                    v-if="form.payment_methods_allowed === opt.value"
+                    name="check"
+                    class="w-4 h-4 text-orange-500 shrink-0"
+                  />
+                </button>
               </div>
             </div>
+
+            <!-- خلفية لإغلاق القائمة عند النقر خارجها -->
+            <div
+              v-if="isPaymentDropdownOpen"
+              @click="isPaymentDropdownOpen = false"
+              class="fixed inset-0 z-40"
+            ></div>
           </div>
 
           <!-- حقول الإدخال حسب الاختيار المسموح -->
@@ -796,6 +834,24 @@
                 dir="ltr"
                 class="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold text-gray-800 outline-none focus:ring-2 focus:ring-purple-400 focus:bg-white transition-all text-right"
               />
+            </div>
+          </div>
+
+          <!-- رسالة توضيحية عند إيقاف الدفع الإلكتروني -->
+          <div
+            v-else
+            class="p-4 bg-amber-50/70 border border-amber-200/80 rounded-2xl flex items-center gap-3.5 text-amber-900 animate-in fade-in duration-200"
+          >
+            <div class="w-10 h-10 rounded-xl bg-amber-100/90 flex items-center justify-center shrink-0 text-amber-700">
+              <BaseIcon name="close" class="w-4 h-4 text-amber-700" />
+            </div>
+            <div>
+              <p class="text-xs font-black text-gray-800">
+                {{ $t("admin.payment_methods_disabled") }}
+              </p>
+              <p class="text-[11px] text-gray-500 font-medium mt-0.5 leading-relaxed">
+                {{ $t("admin.payment_methods_disabled_notice") }}
+              </p>
             </div>
           </div>
         </div>
@@ -945,6 +1001,15 @@ const form = ref({
   vodafone_cash_number: "",
   instapay_account: "",
 });
+
+const isPaymentDropdownOpen = ref(false);
+
+const paymentOptions = computed(() => [
+  { value: "all", label: t("admin.payment_methods_all") },
+  { value: "vodafone_cash", label: t("admin.payment_methods_vodafone_only") },
+  { value: "instapay", label: t("admin.payment_methods_instapay_only") },
+  { value: "none", label: t("admin.payment_methods_disabled") },
+]);
 
 // Initialize Data
 watch(

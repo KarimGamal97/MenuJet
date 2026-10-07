@@ -195,6 +195,7 @@
     "payment_methods_vodafone_only": "Vodafone Cash Only",
     "payment_methods_instapay_only": "InstaPay Only",
     "payment_methods_disabled": "Disable Electronic Payments",
+    "payment_methods_disabled_notice": "Electronic payments are disabled. Transfer numbers will not be shown to customers, and only cash payments will be accepted.",
     "vodafone_cash_title": "Vodafone Cash",
     "vodafone_cash_number_label": "Vodafone Cash Mobile Number",
     "vodafone_cash_number_placeholder": "e.g. 01012345678",

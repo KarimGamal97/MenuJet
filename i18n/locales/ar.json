@@ -202,6 +202,7 @@
     "payment_methods_vodafone_only": "فودافون كاش فقط",
     "payment_methods_instapay_only": "إنستا باي فقط",
     "payment_methods_disabled": "إيقاف الدفع الإلكتروني",
+    "payment_methods_disabled_notice": "تم إيقاف الدفع الإلكتروني. لن تظهر أرقام التحويل للزبائن في المنيو، وسيكون الطلب متاحاً بالدفع نقداً (كاش) فقط.",
     "vodafone_cash_title": "فودافون كاش (Vodafone Cash)",
     "vodafone_cash_number_label": "رقم محفظة فودافون كاش",
     "vodafone_cash_number_placeholder": "مثال: 01012345678",
