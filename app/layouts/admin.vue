@@ -75,86 +75,77 @@
 
       <!-- Sidebar Container -->
       <div
-        class="flex flex-col h-full bg-white transition-opacity duration-200"
-        :class="isCollapsed ? 'p-3' : 'p-6'"
+        class="flex flex-col h-full bg-white transition-opacity duration-200 overflow-hidden"
+        :class="isCollapsed ? 'p-3' : 'p-4'"
       >
-        <!-- Restaurant Name -->
-        <div
-          class="bg-gradient-to-l from-orange-600 to-orange-500 rounded-2xl mb-3 flex items-center justify-center shrink-0 shadow-lg shadow-orange-100 transition-all duration-300 overflow-hidden"
-          :class="isCollapsed ? 'h-14 w-14' : 'p-4'"
-        >
-          <h1
-            class="font-black text-white leading-tight truncate px-2"
-            :class="isCollapsed ? 'text-xl' : 'text-lg'"
+        <!-- Top Section (Fixed - Never scrolls) -->
+        <div class="shrink-0">
+          <!-- Restaurant Name -->
+          <div
+            class="bg-gradient-to-l from-orange-600 to-orange-500 rounded-2xl mb-2.5 flex items-center justify-center shadow-lg shadow-orange-100 transition-all duration-300 overflow-hidden"
+            :class="isCollapsed ? 'h-14 w-14' : 'p-3'"
           >
-            {{
-              isCollapsed && profileName
-                ? profileName[0]
-                : profileName
-            }}
-          </h1>
-        </div>
+            <h1
+              class="font-black text-white leading-tight truncate px-2"
+              :class="isCollapsed ? 'text-xl' : 'text-base'"
+            >
+              {{
+                isCollapsed && profileName
+                  ? profileName[0]
+                  : profileName
+              }}
+            </h1>
+          </div>
 
-        <!-- Trial Countdown Pill (Clickable to Upgrade) -->
-        <div
-          v-if="trialTimeLeft"
-          @click="showUpgradeModal = true"
-          :class="[
-            'cursor-pointer transition-all duration-200 active:scale-[0.98] select-none shadow-xs border',
-            isCollapsed
-              ? 'w-14 h-9 mx-auto mb-4 rounded-xl flex items-center justify-center'
-              : 'w-full p-2.5 mb-4 rounded-2xl flex items-center justify-between gap-2',
-            trialTimeLeft.expired
-              ? 'bg-red-50 hover:bg-red-100 border-red-200 text-red-700'
-              : trialTimeLeft.days <= 3
-                ? 'bg-amber-50 hover:bg-amber-100 border-amber-200 text-amber-800'
-                : 'bg-orange-50/80 hover:bg-orange-100 border-orange-200/70 text-orange-800'
-          ]"
-          :title="isCollapsed ? trialBadgeText : ''"
-        >
-          <template v-if="isCollapsed">
-            <span class="text-sm font-black">{{ trialTimeLeft.expired ? '⚠️' : '⏳' }}</span>
-          </template>
-          <template v-else>
-            <div class="flex items-center gap-2 min-w-0">
-              <span class="text-xs shrink-0" :class="{ 'animate-pulse': trialTimeLeft.days <= 3 }">
-                {{ trialTimeLeft.expired ? '⚠️' : '⏳' }}
-              </span>
-              <div class="flex flex-col min-w-0">
-                <span class="text-[10px] font-bold text-gray-400 leading-none mb-0.5">
+          <!-- Trial Countdown Pill (Clickable to Upgrade) -->
+          <div
+            v-if="trialTimeLeft"
+            @click="showUpgradeModal = true"
+            :class="[
+              'cursor-pointer transition-all duration-200 active:scale-[0.98] select-none shadow-xs border',
+              isCollapsed
+                ? 'w-14 h-9 mx-auto mb-2.5 rounded-xl flex items-center justify-center'
+                : 'w-full py-2.5 px-3 mb-2.5 rounded-2xl flex items-center justify-between',
+              trialTimeLeft.expired
+                ? 'bg-red-50 hover:bg-red-100 border-red-200 text-red-700'
+                : trialTimeLeft.days <= 3
+                  ? 'bg-amber-50 hover:bg-amber-100 border-amber-200 text-amber-800'
+                  : 'bg-orange-50/80 hover:bg-orange-100 border-orange-200/70 text-orange-800'
+            ]"
+            :title="isCollapsed ? trialBadgeText : ''"
+          >
+            <template v-if="isCollapsed">
+              <span class="text-sm font-black">{{ trialTimeLeft.expired ? '⚠️' : '⏳' }}</span>
+            </template>
+            <template v-else>
+              <div class="flex items-center gap-1.5 min-w-0">
+                <span class="text-sm shrink-0" :class="{ 'animate-pulse': trialTimeLeft.days <= 3 }">
+                  {{ trialTimeLeft.expired ? '⚠️' : '⏳' }}
+                </span>
+                <span class="text-xs font-bold text-gray-600 truncate">
                   {{ $t('plans.trial_period_label') }}
                 </span>
-                <span class="text-xs font-black truncate leading-tight">
-                  {{ trialBadgeText }}
-                </span>
               </div>
-            </div>
-            <span
-              class="text-[10px] font-black px-2 py-0.5 rounded-lg shrink-0 whitespace-nowrap"
-              :class="
-                trialTimeLeft.expired || trialTimeLeft.days <= 3
-                  ? 'bg-red-600 text-white'
-                  : 'bg-orange-600 text-white'
-              "
-            >
-              {{ $t('plans.upgrade_badge') }}
-            </span>
-          </template>
+              <span class="text-xs font-black shrink-0">
+                {{ trialBadgeText }}
+              </span>
+            </template>
+          </div>
+
+          <hr class="mb-2.5 opacity-50" />
         </div>
 
-        <hr class="mb-4 opacity-50" />
-
-        <!-- Nav Links -->
-        <nav class="flex-grow space-y-2">
+        <!-- Nav Links (Scrollable if screen height is small) -->
+        <nav class="flex-1 overflow-y-auto min-h-0 space-y-2.5 custom-scrollbar py-1 pe-0.5">
           <NuxtLink
             to="/admin"
-            class="flex items-center gap-3 p-4 rounded-2xl transition-all font-bold hover:bg-orange-50 text-gray-500 overflow-hidden group"
+            class="flex items-center gap-3 px-3.5 py-3.5 rounded-2xl transition-all font-bold hover:bg-orange-50 text-gray-500 overflow-hidden group"
             active-class="bg-orange-50 text-orange-600 shadow-sm shadow-orange-50"
             exact-active-class="bg-orange-50 text-orange-600"
           >
             <BaseIcon
               name="home"
-              class="w-6 h-6 shrink-0 group-hover:scale-110 transition-transform"
+              class="w-5 h-5 shrink-0 group-hover:scale-110 transition-transform"
             />
             <span v-show="!isCollapsed" class="whitespace-nowrap">{{
               $t("admin.dashboard")
@@ -163,12 +154,12 @@
 
           <NuxtLink
             to="/admin/menu"
-            class="flex items-center gap-3 p-4 rounded-2xl transition-all font-bold hover:bg-orange-50 text-gray-500 overflow-hidden group"
+            class="flex items-center gap-3 px-3.5 py-3.5 rounded-2xl transition-all font-bold hover:bg-orange-50 text-gray-500 overflow-hidden group"
             active-class="bg-orange-50 text-orange-600 shadow-sm shadow-orange-50"
           >
             <BaseIcon
               name="food"
-              class="w-6 h-6 shrink-0 group-hover:scale-110 transition-transform"
+              class="w-5 h-5 shrink-0 group-hover:scale-110 transition-transform"
             />
             <span v-show="!isCollapsed" class="whitespace-nowrap">{{
               $t("admin.menu")
@@ -177,12 +168,12 @@
 
           <NuxtLink
             to="/admin/orders"
-            class="flex items-center gap-3 p-4 rounded-2xl transition-all font-bold hover:bg-orange-50 text-gray-500 overflow-hidden group"
+            class="flex items-center gap-3 px-3.5 py-3.5 rounded-2xl transition-all font-bold hover:bg-orange-50 text-gray-500 overflow-hidden group"
             active-class="bg-orange-50 text-orange-600 shadow-sm shadow-orange-50"
           >
             <BaseIcon
               name="cart"
-              class="w-6 h-6 shrink-0 group-hover:scale-110 transition-transform"
+              class="w-5 h-5 shrink-0 group-hover:scale-110 transition-transform"
             />
             <span v-show="!isCollapsed" class="whitespace-nowrap">{{
               $t("admin.orders")
@@ -192,13 +183,13 @@
           <NuxtLink
             v-if="userRole === 'super_admin'"
             to="/admin/sales"
-            class="flex items-center justify-between p-4 rounded-2xl transition-all font-bold hover:bg-orange-50 text-gray-500 overflow-hidden group"
+            class="flex items-center justify-between px-3.5 py-3.5 rounded-2xl transition-all font-bold hover:bg-orange-50 text-gray-500 overflow-hidden group"
             active-class="bg-orange-50 text-orange-600 shadow-sm shadow-orange-50"
           >
             <div class="flex items-center gap-3">
               <BaseIcon
                 name="chart"
-                class="w-6 h-6 shrink-0 group-hover:scale-110 transition-transform"
+                class="w-5 h-5 shrink-0 group-hover:scale-110 transition-transform"
               />
               <span v-show="!isCollapsed" class="whitespace-nowrap">{{ $t("admin.sales") }}</span>
             </div>
@@ -214,12 +205,12 @@
           <NuxtLink
             v-if="userRole === 'super_admin'"
             to="/admin/settings"
-            class="flex items-center gap-3 p-4 rounded-2xl transition-all font-bold hover:bg-orange-50 text-gray-500 overflow-hidden group"
+            class="flex items-center gap-3 px-3.5 py-3.5 rounded-2xl transition-all font-bold hover:bg-orange-50 text-gray-500 overflow-hidden group"
             active-class="bg-orange-50 text-orange-600 shadow-sm shadow-orange-50"
           >
             <BaseIcon
               name="settings"
-              class="w-6 h-6 shrink-0 group-hover:scale-110 transition-transform"
+              class="w-5 h-5 shrink-0 group-hover:scale-110 transition-transform"
             />
             <span v-show="!isCollapsed" class="whitespace-nowrap">{{
               $t("admin.settings")
@@ -229,11 +220,11 @@
           <NuxtLink
             v-if="isSuperAdmin"
             to="/admin/users"
-            class="flex items-center justify-between p-4 rounded-2xl transition-all font-bold hover:bg-purple-50 text-gray-500 overflow-hidden group"
+            class="flex items-center justify-between px-3.5 py-3.5 rounded-2xl transition-all font-bold hover:bg-purple-50 text-gray-500 overflow-hidden group"
             active-class="bg-purple-50 text-purple-600 shadow-sm"
           >
             <div class="flex items-center gap-3">
-              <BaseIcon name="users" class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" />
+              <BaseIcon name="users" class="w-5 h-5 shrink-0 transition-transform group-hover:scale-110" />
               <span v-show="!isCollapsed" class="whitespace-nowrap"> {{ $t("admin.users") }} </span>
             </div>
             <span
@@ -304,18 +295,18 @@
         </nav>
 
         <!-- Sidebar Footer -->
-        <div class="mt-auto pt-4 space-y-2 border-t border-gray-100">
+        <div class="mt-auto pt-3 space-y-2 border-t border-gray-100 shrink-0">
           <!-- Plan Badge / Upgrade Card -->
           <div
             v-if="!isCollapsed && isFree"
-            class="mb-3 p-3.5 bg-gradient-to-br from-orange-500/10 via-amber-500/10 to-orange-500/5 border border-orange-200/80 rounded-2xl"
+            class="mb-2 p-3 bg-gradient-to-br from-orange-500/10 via-amber-500/10 to-orange-500/5 border border-orange-200/80 rounded-2xl"
             :dir="$i18n.locale === 'ar' ? 'rtl' : 'ltr'"
           >
-            <div class="flex flex-col items-start gap-1.5 mb-2">
+            <div class="flex flex-col items-start gap-1 mb-1.5">
               <span class="text-xs font-black text-orange-950 leading-snug">{{ $t(`plans.${currentPlan.id || 'free'}_name`) }} </span>
               <span class="text-[10px] bg-orange-200 text-orange-800 font-bold px-2 py-0.5 rounded-full whitespace-nowrap">{{ $t("plans.trial_badge") }}</span>
             </div>
-            <p class="text-[11px] text-orange-800/80 mb-2.5 font-medium leading-tight">
+            <p class="text-[11px] text-orange-800/80 mb-2 font-medium leading-tight">
               {{ $t("plans.limit_summary", { items: currentPlan.max_items, categories: currentPlan.max_categories }) }}
             </p>
             <button
@@ -329,14 +320,14 @@
 
           <div
             v-else-if="!isCollapsed && isBasic"
-            class="mb-3 p-3.5 bg-gradient-to-br from-slate-900/5 via-slate-800/5 to-slate-900/10 border border-slate-200 rounded-2xl"
+            class="mb-2 p-3 bg-gradient-to-br from-slate-900/5 via-slate-800/5 to-slate-900/10 border border-slate-200 rounded-2xl"
             :dir="$i18n.locale === 'ar' ? 'rtl' : 'ltr'"
           >
-            <div class="flex flex-col items-start gap-1.5 mb-2">
+            <div class="flex flex-col items-start gap-1 mb-1.5">
               <span class="text-xs font-black text-slate-900 leading-snug">{{ $t(`plans.${currentPlan.id || 'basic'}_name`) }} ⚡</span>
               <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full whitespace-nowrap">{{ $t("plans.active_badge") }}</span>
             </div>
-            <p class="text-[11px] text-slate-600 mb-2.5 font-medium leading-tight">
+            <p class="text-[11px] text-slate-600 mb-2 font-medium leading-tight">
               {{ $t("plans.unlimited_items_cats") }}
             </p>
             <button
@@ -350,10 +341,10 @@
 
           <div
             v-else-if="!isCollapsed && isPro"
-            class="mb-3 p-3.5 bg-gradient-to-br from-amber-500/10 via-orange-500/10 to-amber-500/5 border border-amber-300/80 rounded-2xl"
+            class="mb-2 p-3 bg-gradient-to-br from-amber-500/10 via-orange-500/10 to-amber-500/5 border border-amber-300/80 rounded-2xl"
             :dir="$i18n.locale === 'ar' ? 'rtl' : 'ltr'"
           >
-            <div class="flex flex-col items-start gap-1.5 mb-2">
+            <div class="flex flex-col items-start gap-1 mb-1.5">
               <span class="text-xs font-black text-amber-950 leading-snug">{{ $t(`plans.${currentPlan.id || 'pro'}_name`) }} </span>
               <span class="text-[10px] bg-amber-200 text-amber-900 font-black px-2 py-0.5 rounded-full whitespace-nowrap">{{ $t("plans.vip_badge") }}</span>
             </div>
@@ -364,10 +355,10 @@
 
           <button
             @click="showLogoutModal = true"
-            class="flex items-center gap-3 w-full p-4 text-red-700 font-bold hover:bg-red-50 rounded-2xl transition-all overflow-hidden cursor-pointer"
+            class="flex items-center gap-3 w-full p-3 text-red-700 font-bold hover:bg-red-50 rounded-xl transition-all overflow-hidden cursor-pointer"
             :title="isCollapsed ? $t('admin.logout') : ''"
           >
-            <BaseIcon name="logout" class="w-6 h-6 shrink-0" />
+            <BaseIcon name="logout" class="w-5 h-5 shrink-0" />
             <span v-show="!isCollapsed" class="whitespace-nowrap">{{
               $t("admin.logout")
             }}</span>
@@ -413,7 +404,7 @@ const client = useSupabaseClient();
 const user = useSupabaseUser();
 const { userRole } = useAuthUser();
 const { currentPlan, isFree, isBasic, isPro, can } = usePlan();
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const { $toast } = useNuxtApp();
 const isCollapsed = ref(false);
 const isMobileOpen = ref(false);
@@ -515,16 +506,29 @@ const trialBadgeText = computed(() => {
     return t('plans.trial_expired');
   }
   const { days, hours, minutes } = trialTimeLeft.value;
-  if (days >= 2) {
-    return t('plans.trial_days_left', { days });
+  if (locale.value === 'ar') {
+    if (days >= 3 && days <= 10) {
+      return `متبقي ${days} أيام`;
+    }
+    if (days > 10) {
+      return `متبقي ${days} يوم`;
+    }
+    if (days === 2) {
+      return `متبقي يومين`;
+    }
+    if (days === 1) {
+      return hours > 0 ? `متبقي يوم و ${hours} ساعة` : `متبقي يوم واحد`;
+    }
+    if (hours > 0) {
+      return `متبقي ${hours} س و ${minutes} د`;
+    }
+    return `متبقي ${minutes} دقيقة`;
+  } else {
+    if (days > 1) return `${days} days left`;
+    if (days === 1) return `1 day, ${hours}h left`;
+    if (hours > 0) return `${hours}h ${minutes}m left`;
+    return `${minutes}m left`;
   }
-  if (days === 1) {
-    return t('plans.trial_1day_left', { hours });
-  }
-  if (hours > 0) {
-    return t('plans.trial_hours_left', { hours, minutes });
-  }
-  return t('plans.trial_minutes_left', { minutes });
 });
 
 const fetchProfile = async (userId) => {
