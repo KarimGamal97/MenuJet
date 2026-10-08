@@ -80,7 +80,7 @@
       >
         <!-- Restaurant Name -->
         <div
-          class="bg-gradient-to-l from-orange-600 to-orange-500 rounded-2xl mb-8 flex items-center justify-center shrink-0 shadow-lg shadow-orange-100 transition-all duration-300 overflow-hidden"
+          class="bg-gradient-to-l from-orange-600 to-orange-500 rounded-2xl mb-3 flex items-center justify-center shrink-0 shadow-lg shadow-orange-100 transition-all duration-300 overflow-hidden"
           :class="isCollapsed ? 'h-14 w-14' : 'p-4'"
         >
           <h1
@@ -93,6 +93,53 @@
                 : profileName
             }}
           </h1>
+        </div>
+
+        <!-- Trial Countdown Pill (Clickable to Upgrade) -->
+        <div
+          v-if="trialTimeLeft"
+          @click="showUpgradeModal = true"
+          :class="[
+            'cursor-pointer transition-all duration-200 active:scale-[0.98] select-none shadow-xs border',
+            isCollapsed
+              ? 'w-14 h-9 mx-auto mb-4 rounded-xl flex items-center justify-center'
+              : 'w-full p-2.5 mb-4 rounded-2xl flex items-center justify-between gap-2',
+            trialTimeLeft.expired
+              ? 'bg-red-50 hover:bg-red-100 border-red-200 text-red-700'
+              : trialTimeLeft.days <= 3
+                ? 'bg-amber-50 hover:bg-amber-100 border-amber-200 text-amber-800'
+                : 'bg-orange-50/80 hover:bg-orange-100 border-orange-200/70 text-orange-800'
+          ]"
+          :title="isCollapsed ? trialBadgeText : ''"
+        >
+          <template v-if="isCollapsed">
+            <span class="text-sm font-black">{{ trialTimeLeft.expired ? '⚠️' : '⏳' }}</span>
+          </template>
+          <template v-else>
+            <div class="flex items-center gap-2 min-w-0">
+              <span class="text-xs shrink-0" :class="{ 'animate-pulse': trialTimeLeft.days <= 3 }">
+                {{ trialTimeLeft.expired ? '⚠️' : '⏳' }}
+              </span>
+              <div class="flex flex-col min-w-0">
+                <span class="text-[10px] font-bold text-gray-400 leading-none mb-0.5">
+                  {{ $t('plans.trial_period_label') }}
+                </span>
+                <span class="text-xs font-black truncate leading-tight">
+                  {{ trialBadgeText }}
+                </span>
+              </div>
+            </div>
+            <span
+              class="text-[10px] font-black px-2 py-0.5 rounded-lg shrink-0 whitespace-nowrap"
+              :class="
+                trialTimeLeft.expired || trialTimeLeft.days <= 3
+                  ? 'bg-red-600 text-white'
+                  : 'bg-orange-600 text-white'
+              "
+            >
+              {{ $t('plans.upgrade_badge') }}
+            </span>
+          </template>
         </div>
 
         <hr class="mb-4 opacity-50" />
@@ -386,19 +433,113 @@ const profileName = computed(() =>
 
 const isSuperAdmin = computed(() => localProfile.value?.role === 'super_admin');
 
+// Trial Countdown Logic
+const parseDateSafe = (dateStr) => {
+  if (!dateStr) return NaN;
+  if (dateStr instanceof Date) return dateStr.getTime();
+  let s = String(dateStr).trim();
+  if (s.includes(' ') && !s.includes('T')) {
+    s = s.replace(' ', 'T');
+  }
+  s = s.replace(/([+-]\d{2})$/, '$1:00');
+  const timestamp = new Date(s).getTime();
+  if (!isNaN(timestamp)) return timestamp;
+  return new Date(dateStr).getTime();
+};
+
+const isTrial = computed(() => {
+  return localProfile.value?.subscription_status === 'trial' || isFree.value;
+});
+
+const subscriptionEndDate = computed(() => {
+  const p = localProfile.value || authStore.profile || {};
+  return (
+    p.subscription_end_date ||
+    p.subscription_ends_at ||
+    p.trial_end_date ||
+    p.trial_ends_at ||
+    p.trial_end ||
+    p.expires_at ||
+    p.end_date ||
+    null
+  );
+});
+
+const now = ref(Date.now());
+let timerInterval = null;
+
+onMounted(() => {
+  timerInterval = setInterval(() => {
+    now.value = Date.now();
+  }, 1000);
+});
+
+onUnmounted(() => {
+  if (timerInterval) clearInterval(timerInterval);
+});
+
+const trialTimeLeft = computed(() => {
+  if (!subscriptionEndDate.value) return null;
+  const end = parseDateSafe(subscriptionEndDate.value);
+  if (isNaN(end)) return null;
+
+  const diffMs = end - now.value;
+  if (diffMs <= 0) {
+    return {
+      expired: true,
+      days: 0,
+      hours: 0,
+      minutes: 0,
+      seconds: 0
+    };
+  }
+
+  const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+
+  return {
+    expired: false,
+    days,
+    hours,
+    minutes,
+    seconds,
+    diffMs
+  };
+});
+
+const trialBadgeText = computed(() => {
+  if (!trialTimeLeft.value) return '';
+  if (trialTimeLeft.value.expired) {
+    return t('plans.trial_expired');
+  }
+  const { days, hours, minutes } = trialTimeLeft.value;
+  if (days >= 2) {
+    return t('plans.trial_days_left', { days });
+  }
+  if (days === 1) {
+    return t('plans.trial_1day_left', { hours });
+  }
+  if (hours > 0) {
+    return t('plans.trial_hours_left', { hours, minutes });
+  }
+  return t('plans.trial_minutes_left', { minutes });
+});
+
 const fetchProfile = async (userId) => {
   let { data, error } = await client
     .from('profiles')
     .select('*, plans(*)')
-    .eq('user_id', userId)
-    .single();
+    .or(`user_id.eq.${userId},id.eq.${userId}`)
+    .maybeSingle();
 
-  if (error) {
+  if (!data) {
     const res = await client
       .from('profiles')
       .select('*')
-      .eq('user_id', userId)
-      .single();
+      .or(`user_id.eq.${userId},id.eq.${userId}`)
+      .maybeSingle();
     data = res.data;
   }
 
@@ -406,17 +547,21 @@ const fetchProfile = async (userId) => {
     if (data.plans) {
       data.plan = data.plans;
     }
-    // If this is a sub-account (admin/user) without a business name, fetch the owner's business name for display
-    if (data.owner_id && !data.business_name_ar) {
+    // If this is a sub-account (admin/user) without a business name, fetch the owner's info
+    if (data.owner_id) {
       const { data: ownerData } = await client
         .from('profiles')
-        .select('business_name_ar, business_name_en')
-        .eq('user_id', data.owner_id)
-        .single();
+        .select('*')
+        .or(`user_id.eq.${data.owner_id},id.eq.${data.owner_id}`)
+        .maybeSingle();
         
       if (ownerData) {
-        data.business_name_ar = ownerData.business_name_ar;
-        data.business_name_en = ownerData.business_name_en;
+        if (!data.business_name && ownerData.business_name) data.business_name = ownerData.business_name;
+        if (!data.business_name_ar && ownerData.business_name_ar) data.business_name_ar = ownerData.business_name_ar;
+        if (!data.business_name_en && ownerData.business_name_en) data.business_name_en = ownerData.business_name_en;
+        if (!data.subscription_end_date && ownerData.subscription_end_date) {
+          data.subscription_end_date = ownerData.subscription_end_date;
+        }
       }
     }
 
