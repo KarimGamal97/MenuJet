@@ -201,7 +201,7 @@
                   {{ $t("admin.download_qr") }}
                 </BaseButton>
                 <NuxtLink
-                  to="/admin/qr-print"
+                  :to="{ path: '/admin/qr-print', query: { slug: form.slug } }"
                   target="_blank"
                   class="inline-flex items-center gap-1.5 bg-orange-600 hover:bg-orange-700 text-white font-bold px-4 py-2.5 rounded-xl text-[10px] shadow-sm transition-all"
                 >

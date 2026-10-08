@@ -33,29 +33,21 @@
       <!-- Input fields -->
       <div class="flex-1 overflow-y-auto p-4 space-y-3.5 custom-scrollbar text-xs">
         <!-- Restaurant info -->
-        <div class="grid grid-cols-2 gap-2.5">
-          <div>
-            <label class="block text-gray-700 font-bold mb-1 text-[11px]">
-              {{ $t('qr_print.restaurant_name') }}
-            </label>
-            <input
-              v-model="customData.restaurantName"
-              type="text"
-              :placeholder="$t('qr_print.restaurant_name_placeholder')"
-              class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-orange-500 outline-none text-gray-900 text-xs font-bold transition"
-            />
-          </div>
-          <div>
-            <label class="block text-gray-700 font-bold mb-1 text-[11px]">
-              {{ $t('qr_print.slug') }}
-            </label>
-            <input
-              v-model="customData.slug"
-              type="text"
-              :placeholder="$t('qr_print.slug_placeholder')"
-              class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-orange-500 outline-none text-gray-900 text-xs font-mono transition"
-            />
-          </div>
+        <div>
+          <label class="block text-gray-700 font-bold mb-1 text-[11px]">
+            {{ $t('qr_print.restaurant_name') }} <span class="text-red-500 font-bold">*</span>
+          </label>
+          <input
+            v-model="customData.restaurantName"
+            type="text"
+            required
+            :placeholder="$t('qr_print.restaurant_name_placeholder')"
+            class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-orange-500 outline-none text-gray-900 text-xs font-bold transition"
+            :class="{ 'border-red-400': !customData.restaurantName?.trim() }"
+          />
+          <p v-if="!customData.restaurantName?.trim()" class="text-[10px] text-red-500 mt-1 font-bold">
+            {{ locale === 'ar' ? 'اسم المطعم مطلوب' : 'Restaurant name is required' }}
+          </p>
         </div>
 
         <!-- Logo upload -->
@@ -178,9 +170,6 @@
           </svg>
           <span>{{ $t('qr_print.print_btn') }}</span>
         </button>
-        <p class="text-[10px] text-center text-gray-400 mt-2 font-medium">
-          {{ $t('qr_print.print_tip_prefix') }} <b>A4</b> {{ $t('qr_print.print_tip_suffix') }} <b>Background graphics</b>
-        </p>
       </div>
     </aside>
 
@@ -307,15 +296,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 
 definePageMeta({
   layout: false
 });
 
+const route = useRoute();
 const { t, locale } = useI18n();
 const { profile, fetchProfile } = useSettings();
 const { ownerId } = useAuthUser();
+const { $toast } = useNuxtApp();
 
 // Quick presets
 const hookPresets = computed(() => [
@@ -331,36 +322,48 @@ const printSize = ref<'stand' | 'full'>('full');
 // Stand data
 const customData = ref({
   restaurantName: '',
-  slug: '',
   logo: '',
   hook: '',
   phone: ''
 });
 
-// Load profile
-onMounted(async () => {
+// Load profile & slug
+watch(
+  ownerId,
+  async (newId) => {
+    if (newId) {
+      const data = await fetchProfile(newId);
+      if (data) {
+        if (data.business_name && !customData.value.restaurantName) {
+          customData.value.restaurantName = data.business_name;
+        }
+        if (data.logo && !customData.value.logo) {
+          customData.value.logo = data.logo;
+        }
+        if (data.whatsapp_number && !customData.value.phone) {
+          customData.value.phone = data.whatsapp_number;
+        }
+      }
+    }
+  },
+  { immediate: true }
+);
+
+onMounted(() => {
   if (!customData.value.hook) {
     customData.value.hook = t('qr_print.preset_discount15');
-  }
-
-  if (ownerId.value) {
-    await fetchProfile(ownerId.value);
-    if (profile.value) {
-      if (profile.value.business_name) customData.value.restaurantName = profile.value.business_name;
-      if (profile.value.slug) customData.value.slug = profile.value.slug;
-      if (profile.value.logo) customData.value.logo = profile.value.logo;
-      if (profile.value.whatsapp_number) customData.value.phone = profile.value.whatsapp_number;
-    }
   }
 });
 
 // QR URL
 const fullMenuUrl = computed(() => {
-  const cleanSlug = (customData.value.slug || '').trim().replace(/^\/+|\/+$/g, '');
-  if (cleanSlug.startsWith('http://') || cleanSlug.startsWith('https://')) {
-    return cleanSlug;
-  }
-  return `https://getmenujet.com/menu/${cleanSlug || 'demo'}`;
+  const rawSlug = (route.query.slug as string) || profile.value?.slug || '';
+  if (!rawSlug) return 'https://getmenujet.com/menu';
+  const cleanSlug = rawSlug
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '-')
+    .replace(/-+/g, '-');
+  return `https://getmenujet.com/menu/${cleanSlug}`;
 });
 
 const qrCodeUrl = computed(() => {
@@ -381,6 +384,10 @@ const onLogoFileChange = (e: Event) => {
 
 // Print action
 const printPage = () => {
+  if (!customData.value.restaurantName?.trim()) {
+    $toast.error(locale.value === 'ar' ? 'يرجى إدخال اسم المطعم أولاً' : 'Please enter restaurant name first');
+    return;
+  }
   window.print();
 };
 </script>

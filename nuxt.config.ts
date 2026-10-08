@@ -112,7 +112,7 @@ export default defineNuxtConfig({
     redirectOptions: {
       login: "/login",
       callback: "/confirm",
-      exclude: ["/menu/*", "/", "/en", "/en/*", "/ar", "/ar/*"],
+      exclude: ["/menu", "/menu/*", "/", "/en", "/en/*", "/ar", "/ar/*"],
     },
   },
 });
