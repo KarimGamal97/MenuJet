@@ -79,6 +79,7 @@ export interface Plan {
   allow_cashier: boolean;
   allow_multi_languages: boolean;
   allow_users: boolean;
+  allow_bio_hub?: boolean;
 }
 
 export interface Profile {
@@ -98,5 +99,11 @@ export interface Profile {
   max_categories?: number;
   subscription_status?: "active" | "expired" | "trial" | string;
   subscription_end_date?: string;
+  bio_hub_enabled?: boolean;
+  social_instagram?: string;
+  social_facebook?: string;
+  social_tiktok?: string;
+  social_location?: string;
+  social_phone?: string;
 }
 

@@ -332,9 +332,22 @@
     "price_word": "سعر",
     "qty_pieces": "العدد / القطع",
     "the_price": "السعر",
-    "fixed_price": "السعر الثابت",
     "click_image": "انقر لاختيار صوره",
-    "example": "مثال: "
+    "example": "مثال: ",
+    "bio_hub_title": "صفحة الترحيب وروابط التواصل (Bio & Social Hub)",
+    "bio_hub_desc": "صفحة ترحيب تفاعلية تظهر للزبون عند مسح الـ QR تضم روابط حساباتك، الموقع، الاتصال، وزر تصفح المنيو.",
+    "bio_hub_preview": "معاينة صفحة الترحيب",
+    "enable_bio_hub": "تفعيل صفحة الترحيب قبل المنيو",
+    "social_location": "رابط الموقع على خرائط جوجل (Google Maps)",
+    "social_location_placeholder": "https://maps.app.goo.gl/...",
+    "social_phone": "رقم الهاتف للاتصال المباشر",
+    "social_phone_placeholder": "01000000000",
+    "social_instagram": "رابط أو يوزر إنستغرام",
+    "social_instagram_placeholder": "https://instagram.com/yourpage أو yourpage",
+    "social_facebook": "رابط صفحة فيسبوك",
+    "social_facebook_placeholder": "https://facebook.com/yourpage",
+    "social_tiktok": "رابط أو يوزر تيك توك",
+    "social_tiktok_placeholder": "https://tiktok.com/{'@'}yourpage"
   },
   "cart": {
     "title": "طلبك",
@@ -466,7 +479,7 @@
     "vip_badge": "VIP",
     "unlimited": "غير محدود",
     "unlimited_items_cats": "أصناف وأقسام غير محدودة",
-    "all_features_active": "كامل مميزات الباقة مفعلة",
+    "all_features_active": "مميزات الباقة مفعلة بالكامل",
     "pro_badge_short": " برو",
     "basic_badge_short": "أساسية",
     "upgrade_now": "ترقية الباقة الآن",
@@ -527,6 +540,8 @@
     "feat_delivery": "مناطق التوصيل والدليفري",
     "feat_shifts": "نظام الشيفتات والورديات وتقفيل الدرج",
     "feat_users": "إدارة حسابات الموظفين والكاشير",
+    "feat_bio_hub": "صفحة الترحيب وروابط التواصل (Bio & Social Hub)",
+    "bio_hub_modal_msg": "فعّل صفحة ترحيب تفاعلية فخمة تضم روابط السوشيال ميديا وموقعك والاتصال السريع وزر المنيو حصرياً مع الباقة الاحترافية.",
     "users_lock_title": "إدارة موظفي ومستخدمي المطعم",
     "users_lock_desc": "أضف كاشيرات وموظفين لمطعمك، وقم بتعيين الأدوار والصلاحيات لكل مستخدم لتوزيع المهام بأمان وسلاسة. هذه الميزة متاحة حصرياً لأصحاب الباقة الاحترافية.",
     "users_lock_btn": "ترقية الباقة للاحترافية لتفعيل إدارة المستخدمين",
@@ -606,5 +621,19 @@
     "scan_me": "SCAN ME",
     "phone": "رقم هاتف التواصل",
     "phone_placeholder": "01xxxxxxxxx"
+  },
+  "bio_hub": {
+    "welcome_to": "أهلاً بكم في",
+    "welcome_subtext": "يسعدنا تواجدكم معنا! استكشف قائمتنا وتواصل معنا.",
+    "browse_menu": "تصفح قائمة الطعام واطلب الآن",
+    "browse_menu_desc": "استعرض قائمة الأطعمة والمشروبات وتفاصيل الأسعار",
+    "location": "موقعنا على الخريطة",
+    "location_desc": "افتح في Google Maps للوصول المباشر إلينا",
+    "call_us": "اتصل بنا هاتفياً",
+    "whatsapp": "تواصل عبر واتساب",
+    "whatsapp_desc": "للطلبات والاستفسارات السريعة",
+    "follow_us": "تابعنا على منصات التواصل",
+    "back_to_hub": "صفحة الترحيب والروابط",
+    "powered_by": "مشغل بواسطة"
   }
 }

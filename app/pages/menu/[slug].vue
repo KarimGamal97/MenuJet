@@ -9,7 +9,27 @@
     </template>
 
     <template v-else-if="restaurant">
-      <MenuHeader :restaurant="restaurant" :locale="locale" :isOpen="isActuallyOpen" />
+      <RestaurantHub
+        v-if="shouldDisplayBioHub"
+        :restaurant="restaurant"
+        :locale="locale"
+        @open-menu="showBioHub = false"
+      />
+
+      <template v-else>
+        <!-- Floating button to return to Welcome Hub -->
+        <button
+          v-if="isBioHubAllowed"
+          @click="showBioHub = true"
+          type="button"
+          class="fixed bottom-24 right-4 z-40 px-3.5 py-2 rounded-full bg-slate-900/95 hover:bg-slate-900 text-white shadow-xl backdrop-blur-md border border-white/20 text-xs font-bold flex items-center gap-2 active:scale-95 transition-all cursor-pointer"
+          :title="$t('bio_hub.back_to_hub')"
+        >
+          <BaseIcon name="sparkles" class="w-3.5 h-3.5 text-amber-400" />
+          <span>{{ $t('bio_hub.back_to_hub') }}</span>
+        </button>
+
+        <MenuHeader :restaurant="restaurant" :locale="locale" :isOpen="isActuallyOpen" />
       
       <!-- Closed Overlay -->
       <div v-if="!isShopOpen" class="fixed inset-0 z-[100] bg-black/60 backdrop-blur-md flex items-center justify-center p-6 text-center animate-in fade-in duration-500">
@@ -216,6 +236,7 @@
         v-if="restaurant.whatsapp_number && cartCount === 0"
         :whatsappNumber="restaurant.whatsapp_number"
       />
+      </template>
     </template>
 
     <!-- 3. Error or Not Found -->
@@ -338,6 +359,22 @@ const isElectronicPaymentAllowed = computed(() => {
   const p = restaurant.value;
   const planId = p.plan?.id || p.plans?.id || p.plan_id || p.plan_type || "free";
   return planId === "pro";
+});
+
+// Bio / Welcome Hub allowed and enabled
+const showBioHub = ref(true);
+const isBioHubAllowed = computed(() => {
+  if (!restaurant.value) return false;
+  const p = restaurant.value;
+  const planId = p.plan?.id || p.plans?.id || p.plan_id || p.plan_type || "free";
+  const allowsBio = p.plans?.allow_bio_hub ?? p.plan?.allow_bio_hub ?? (planId === "pro");
+  return Boolean(allowsBio) && p.bio_hub_enabled === true;
+});
+
+const shouldDisplayBioHub = computed(() => {
+  if (!isBioHubAllowed.value) return false;
+  if (route.query.view === "menu" || route.query.direct === "1") return false;
+  return showBioHub.value;
 });
 
 const isOrderingEnabled = computed(() => {

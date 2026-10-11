@@ -17,6 +17,7 @@ export const DEFAULT_PLANS: Record<string, Plan> = {
     allow_cashier: false,
     allow_multi_languages: false,
     allow_users: false,
+    allow_bio_hub: false,
   },
   basic: {
     id: "basic",
@@ -34,6 +35,7 @@ export const DEFAULT_PLANS: Record<string, Plan> = {
     allow_cashier: true,
     allow_multi_languages: true,
     allow_users: false,
+    allow_bio_hub: false,
   },
   pro: {
     id: "pro",
@@ -51,6 +53,7 @@ export const DEFAULT_PLANS: Record<string, Plan> = {
     allow_cashier: true,
     allow_multi_languages: true,
     allow_users: true,
+    allow_bio_hub: true,
   },
 };
 
@@ -78,6 +81,7 @@ export const usePlan = () => {
       ...planData,
       allow_shifts: true,
       allow_users: currentPlanId.value === "pro" || Boolean(planData.allow_users),
+      allow_bio_hub: currentPlanId.value === "pro" || Boolean(planData.allow_bio_hub),
     };
   });
 
@@ -113,6 +117,7 @@ export const usePlan = () => {
 
   const can = (featureKey: keyof Plan) => {
     if (featureKey === "allow_shifts") return true;
+    if (featureKey === "allow_bio_hub") return currentPlanId.value === "pro" || Boolean(currentPlan.value.allow_bio_hub);
     return Boolean(currentPlan.value[featureKey]);
   };
 

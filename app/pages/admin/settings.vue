@@ -454,6 +454,128 @@
           </div>
         </div>
 
+        <!-- Bio & Social Hub Settings Section -->
+        <div class="md:col-span-2 pt-6 border-t border-gray-100 mt-4">
+          <div class="flex items-center justify-between gap-3 mb-6 px-1 flex-wrap">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500/10 to-orange-500/20 flex items-center justify-center shrink-0 border border-orange-200">
+                <BaseIcon name="sparkles" class="w-5 h-5 text-orange-600" />
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <label class="text-sm font-bold text-gray-800 block">{{ $t('admin.bio_hub_title') }}</label>
+                </div>
+                <p class="text-[10px] text-gray-400 font-bold mt-0.5">{{ $t('admin.bio_hub_desc') }}</p>
+              </div>
+            </div>
+
+            <a
+              v-if="form.slug"
+              :href="`/menu/${form.slug}`"
+              target="_blank"
+              class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gray-100 hover:bg-orange-50 text-gray-700 hover:text-orange-600 text-xs font-bold transition-all border border-gray-200 hover:border-orange-200 active:scale-95 cursor-pointer"
+            >
+              <BaseIcon name="arrow-up-right" class="w-3.5 h-3.5" />
+              <span>{{ $t('admin.bio_hub_preview') }}</span>
+            </a>
+          </div>
+
+          <div class="space-y-4">
+            <!-- Toggle -->
+            <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+              <BaseToggle
+                v-model="form.bio_hub_enabled"
+                :label="$t('admin.enable_bio_hub')"
+                :locked="!can('allow_bio_hub')"
+                :badge="$t('plans.pro_badge_short')"
+                @lock-click="openUpgradeForFeature($t('plans.feat_bio_hub'), $t('plans.pro_badge_short'), $t('plans.bio_hub_modal_msg'))"
+                class="!bg-transparent"
+              />
+
+              <!-- Social Fields Grid (Only when active & Pro) -->
+              <div
+                v-if="form.bio_hub_enabled && can('allow_bio_hub')"
+                class="px-5 pb-5 pt-3 border-t border-gray-50 grid grid-cols-1 md:grid-cols-2 gap-4 animate-in slide-in-from-top-2 duration-300"
+              >
+                <!-- Location URL -->
+                <div class="flex flex-col gap-1.5 md:col-span-2">
+                  <label class="text-[11px] font-bold text-gray-700 flex items-center gap-1.5">
+                    <BaseIcon name="map-pin" class="w-3.5 h-3.5 text-emerald-600" />
+                    {{ $t('admin.social_location') }}
+                  </label>
+                  <input
+                    type="url"
+                    v-model="form.social_location"
+                    :placeholder="$t('admin.social_location_placeholder')"
+                    dir="ltr"
+                    class="bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-xs font-bold text-gray-800 outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all text-left"
+                  />
+                </div>
+
+                <!-- Contact Phone -->
+                <div class="flex flex-col gap-1.5">
+                  <label class="text-[11px] font-bold text-gray-700 flex items-center gap-1.5">
+                    <BaseIcon name="phone" class="w-3.5 h-3.5 text-blue-600" />
+                    {{ $t('admin.social_phone') }}
+                  </label>
+                  <input
+                    type="tel"
+                    v-model="form.social_phone"
+                    :placeholder="$t('admin.social_phone_placeholder')"
+                    dir="ltr"
+                    class="bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-xs font-bold text-gray-800 outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all text-left"
+                  />
+                </div>
+
+                <!-- Instagram -->
+                <div class="flex flex-col gap-1.5">
+                  <label class="text-[11px] font-bold text-gray-700 flex items-center gap-1.5">
+                    <BaseIcon name="instagram" class="w-3.5 h-3.5 text-pink-600" />
+                    {{ $t('admin.social_instagram') }}
+                  </label>
+                  <input
+                    type="text"
+                    v-model="form.social_instagram"
+                    :placeholder="$t('admin.social_instagram_placeholder')"
+                    dir="ltr"
+                    class="bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-xs font-bold text-gray-800 outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all text-left"
+                  />
+                </div>
+
+                <!-- Facebook -->
+                <div class="flex flex-col gap-1.5">
+                  <label class="text-[11px] font-bold text-gray-700 flex items-center gap-1.5">
+                    <BaseIcon name="facebook" class="w-3.5 h-3.5 text-blue-600" />
+                    {{ $t('admin.social_facebook') }}
+                  </label>
+                  <input
+                    type="text"
+                    v-model="form.social_facebook"
+                    :placeholder="$t('admin.social_facebook_placeholder')"
+                    dir="ltr"
+                    class="bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-xs font-bold text-gray-800 outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all text-left"
+                  />
+                </div>
+
+                <!-- TikTok -->
+                <div class="flex flex-col gap-1.5">
+                  <label class="text-[11px] font-bold text-gray-700 flex items-center gap-1.5">
+                    <BaseIcon name="tiktok" class="w-3.5 h-3.5 text-gray-900" />
+                    {{ $t('admin.social_tiktok') }}
+                  </label>
+                  <input
+                    type="text"
+                    v-model="form.social_tiktok"
+                    :placeholder="$t('admin.social_tiktok_placeholder')"
+                    dir="ltr"
+                    class="bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-xs font-bold text-gray-800 outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all text-left"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Delete Category Confirmation Modal -->
         <BaseModal
           :isOpen="showDeleteCategoryModal"
@@ -1000,6 +1122,12 @@ const form = ref({
   payment_methods_allowed: "all",
   vodafone_cash_number: "",
   instapay_account: "",
+  bio_hub_enabled: false,
+  social_instagram: "",
+  social_facebook: "",
+  social_tiktok: "",
+  social_location: "",
+  social_phone: "",
 });
 
 const isPaymentDropdownOpen = ref(false);
@@ -1038,6 +1166,12 @@ watch(
           payment_methods_allowed: data.payment_methods_allowed || "all",
           vodafone_cash_number: data.vodafone_cash_number || "",
           instapay_account: data.instapay_account || "",
+          bio_hub_enabled: data.bio_hub_enabled === true,
+          social_instagram: data.social_instagram || "",
+          social_facebook: data.social_facebook || "",
+          social_tiktok: data.social_tiktok || "",
+          social_location: data.social_location || "",
+          social_phone: data.social_phone || "",
         };
       }
     }
@@ -1262,6 +1396,12 @@ const saveSettings = async () => {
     payment_methods_allowed: form.value.payment_methods_allowed || "all",
     vodafone_cash_number: form.value.vodafone_cash_number ? form.value.vodafone_cash_number.trim() : "",
     instapay_account: form.value.instapay_account ? form.value.instapay_account.trim() : "",
+    bio_hub_enabled: form.value.bio_hub_enabled === true,
+    social_instagram: form.value.social_instagram ? form.value.social_instagram.trim() : "",
+    social_facebook: form.value.social_facebook ? form.value.social_facebook.trim() : "",
+    social_tiktok: form.value.social_tiktok ? form.value.social_tiktok.trim() : "",
+    social_location: form.value.social_location ? form.value.social_location.trim() : "",
+    social_phone: form.value.social_phone ? form.value.social_phone.trim() : "",
   };
 
   const success = await updateProfile(ownerId.value, settingsData);

@@ -346,7 +346,7 @@
           >
             <div class="flex flex-col items-start gap-1 mb-1.5">
               <span class="text-xs font-black text-amber-950 leading-snug">{{ $t(`plans.${currentPlan.id || 'pro'}_name`) }} </span>
-              <span class="text-[10px] bg-amber-200 text-amber-900 font-black px-2 py-0.5 rounded-full whitespace-nowrap">{{ $t("plans.vip_badge") }}</span>
+              <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full whitespace-nowrap">{{ $t("plans.active_badge") }}</span>
             </div>
             <p class="text-[11px] text-amber-900/80 font-medium leading-tight">
               {{ $t("plans.all_features_active") }}

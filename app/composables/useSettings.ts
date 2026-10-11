@@ -39,13 +39,19 @@ export const useSettings = () => {
         .eq("user_id", userId);
 
       if (error) {
-        // Fallback if payment columns don't exist in profiles schema yet
+        // Fallback if payment or bio hub columns don't exist in profiles schema yet
         if (error.message?.includes("column") || (error as any).code === "PGRST204") {
-          console.warn("Profiles schema missing payment columns, saving other fields:", error.message);
+          console.warn("Profiles schema missing optional columns, saving core fields:", error.message);
           const fallbackData = { ...updateData };
           delete fallbackData.vodafone_cash_number;
           delete fallbackData.instapay_account;
           delete fallbackData.payment_methods_allowed;
+          delete fallbackData.bio_hub_enabled;
+          delete fallbackData.social_instagram;
+          delete fallbackData.social_facebook;
+          delete fallbackData.social_tiktok;
+          delete fallbackData.social_location;
+          delete fallbackData.social_phone;
           const retryRes = await client
             .from("profiles")
             .update(fallbackData)

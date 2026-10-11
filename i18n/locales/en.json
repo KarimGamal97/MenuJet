@@ -279,7 +279,21 @@
     "by_patty": "By Patty",
     "patty_single": "Single",
     "patty_double": "Double",
-    "patty_triple": "Triple"
+    "patty_triple": "Triple",
+    "bio_hub_title": "Welcome Hub & Social Links (Bio Hub)",
+    "bio_hub_desc": "An interactive welcome page shown upon QR scan with socials, location, instant call, and a premium menu button.",
+    "bio_hub_preview": "Preview Welcome Hub",
+    "enable_bio_hub": "Enable Welcome Hub before menu",
+    "social_location": "Google Maps Location Link",
+    "social_location_placeholder": "https://maps.app.goo.gl/...",
+    "social_phone": "Direct Phone Number",
+    "social_phone_placeholder": "01000000000",
+    "social_instagram": "Instagram Profile or Link",
+    "social_instagram_placeholder": "https://instagram.com/yourpage or yourpage",
+    "social_facebook": "Facebook Page Link",
+    "social_facebook_placeholder": "https://facebook.com/yourpage",
+    "social_tiktok": "TikTok Profile or Link",
+    "social_tiktok_placeholder": "https://tiktok.com/{'@'}yourpage"
   },
   "cart": {
     "title": "Your Order",
@@ -446,6 +460,8 @@
     "feat_delivery": "Delivery & Zones Management",
     "feat_shifts": "Shifts & Cashier Drawer Management",
     "feat_users": "Staff & Cashier Accounts Management",
+    "feat_bio_hub": "Welcome Hub & Social Links (Bio Hub)",
+    "bio_hub_modal_msg": "Activate a premium interactive welcome page featuring your social channels, location, direct call, and menu button exclusively on the Pro plan.",
     "users_lock_title": "Staff & User Management",
     "users_lock_desc": "Add cashiers and staff members to your restaurant, and configure roles to streamline operations. This feature is exclusively available on the Pro Plan.",
     "users_lock_btn": "Upgrade to Pro to Manage Users",
@@ -525,5 +541,19 @@
     "scan_me": "SCAN ME",
     "phone": "Contact Phone Number",
     "phone_placeholder": "01xxxxxxxxx"
+  },
+  "bio_hub": {
+    "welcome_to": "Welcome to",
+    "welcome_subtext": "We are glad to have you! Explore our menu and connect with us.",
+    "browse_menu": "Browse Menu & Order Now",
+    "browse_menu_desc": "Explore our food & beverage items with live pricing",
+    "location": "Our Location on Map",
+    "location_desc": "Open in Google Maps for direct directions",
+    "call_us": "Call Us Directly",
+    "whatsapp": "Contact via WhatsApp",
+    "whatsapp_desc": "For direct orders & rapid inquiries",
+    "follow_us": "Follow Us on Social Media",
+    "back_to_hub": "Welcome Hub & Links",
+    "powered_by": "Powered by"
   }
 }
