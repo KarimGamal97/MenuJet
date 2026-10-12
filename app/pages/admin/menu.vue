@@ -91,8 +91,8 @@
       </div>
 
       <!-- Filter Section -->
-      <div class="flex flex-col md:flex-row gap-4">
-        <div class="relative md:w-1/4">
+      <div class="flex flex-col gap-4">
+        <div class="relative w-full">
           <input
             v-model="searchQuery"
             type="text"
@@ -101,37 +101,77 @@
           />
           <BaseIcon
             name="search"
-            class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 opacity-30"
+            class="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 opacity-30"
           />
         </div>
 
-        <div
-          class="flex-1 flex gap-2 overflow-x-auto no-scrollbar pb-1 px-1 min-w-0"
-        >
-          <!-- Skeleton Loading for Categories (Shown while loading OR before profile exists) -->
-          <template v-if="profileLoading || !profile">
-            <div
-              v-for="i in 4"
-              :key="i"
-              class="w-24 h-12 bg-gray-200 animate-pulse rounded-2xl shrink-0"
-            ></div>
-          </template>
+        <!-- Categories Row with Navigation Arrows -->
+        <div class="flex items-center gap-2 w-full">
+          <!-- Scroll Arrow Right (Scrolls back right in RTL) -->
+          <button
+            v-if="hasScrollOverflow"
+            type="button"
+            @click="scrollCategories('right')"
+            :disabled="!canScrollRight"
+            :class="[
+              'w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 transition-all border shadow-xs',
+              canScrollRight
+                ? 'bg-white text-gray-700 hover:bg-orange-50 hover:text-orange-600 hover:border-orange-200 border-gray-100 cursor-pointer active:scale-95'
+                : 'bg-gray-100 text-gray-300 border-gray-100 cursor-not-allowed opacity-40'
+            ]"
+            aria-label="Scroll right"
+          >
+            <BaseIcon name="chevron-right" class="w-4 h-4" />
+          </button>
 
-          <template v-else>
-            <button
-              v-for="(cat, index) in dynamicCategories"
-              :key="index"
-              @click="selectedCategory = cat"
-              :class="[
-                'px-5 py-3 rounded-2xl font-bold transition-all whitespace-nowrap text-sm md:text-base',
-                selectedCategory === cat
-                  ? 'bg-orange-600 text-white shadow-md shadow-orange-100'
-                  : 'bg-white text-gray-400 hover:bg-orange-50 hover:text-orange-600',
-              ]"
-            >
-              {{ cat }}
-            </button>
-          </template>
+          <!-- Categories Container -->
+          <div
+            ref="categoriesContainer"
+            @scroll="checkCategoryScroll"
+            class="flex-1 flex gap-2 overflow-x-auto no-scrollbar py-1 px-1 min-w-0 scroll-smooth"
+          >
+            <!-- Skeleton Loading for Categories (Shown while loading OR before profile exists) -->
+            <template v-if="profileLoading || !profile">
+              <div
+                v-for="i in 4"
+                :key="i"
+                class="w-24 h-12 bg-gray-200 animate-pulse rounded-2xl shrink-0"
+              ></div>
+            </template>
+
+            <template v-else>
+              <button
+                v-for="(cat, index) in dynamicCategories"
+                :key="index"
+                @click="selectCategory(cat, $event)"
+                :class="[
+                  'px-5 py-3 rounded-2xl font-bold transition-all whitespace-nowrap text-sm md:text-base shrink-0 cursor-pointer active:scale-95',
+                  selectedCategory === cat
+                    ? 'bg-orange-600 text-white shadow-md shadow-orange-100'
+                    : 'bg-white text-gray-400 hover:bg-orange-50 hover:text-orange-600',
+                ]"
+              >
+                {{ cat }}
+              </button>
+            </template>
+          </div>
+
+          <!-- Scroll Arrow Left (Scrolls forward left in RTL) -->
+          <button
+            v-if="hasScrollOverflow"
+            type="button"
+            @click="scrollCategories('left')"
+            :disabled="!canScrollLeft"
+            :class="[
+              'w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 transition-all border shadow-xs',
+              canScrollLeft
+                ? 'bg-white text-gray-700 hover:bg-orange-50 hover:text-orange-600 hover:border-orange-200 border-gray-100 cursor-pointer active:scale-95'
+                : 'bg-gray-100 text-gray-300 border-gray-100 cursor-not-allowed opacity-40'
+            ]"
+            aria-label="Scroll left"
+          >
+            <BaseIcon name="chevron-left" class="w-4 h-4" />
+          </button>
         </div>
       </div>
 
@@ -284,6 +324,53 @@
                 :class="newItem.prices[s] ? 'text-gray-700' : 'text-gray-300'"
               >
                 {{ newItem.prices[s] || "—" }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- By Patty / Shots (single/double/triple) -->
+        <div v-else-if="newItem.pricingType === 'patty'" class="space-y-2">
+          <div class="flex gap-2">
+            <button
+              v-for="p in ['single', 'double', 'triple']"
+              :key="p"
+              type="button"
+              @click="newItem.activePatty = p"
+              :class="[
+                'flex-1 py-3 rounded-2xl font-bold text-sm transition-all border-2',
+                newItem.activePatty === p
+                  ? 'bg-orange-600 text-white border-orange-600 shadow-md shadow-orange-100'
+                  : 'bg-gray-50 text-gray-400 border-transparent hover:border-orange-200 hover:text-orange-600',
+              ]"
+            >
+              {{ $t(`admin.patty_${p}`) }}
+            </button>
+          </div>
+          <div class="pt-1">
+            <BaseInput
+              v-model="newItem.prices[newItem.activePatty]"
+              type="number"
+              :label="`${$t('admin.price_word')} ${$t(`admin.patty_${newItem.activePatty}`)}`"
+              oninput="
+                if (this.value.length > 5) this.value = this.value.slice(0, 5);
+              "
+            />
+          </div>
+          <div class="flex gap-2 pt-1">
+            <div
+              v-for="p in ['single', 'double', 'triple']"
+              :key="p"
+              class="flex-1 bg-gray-50 rounded-xl p-2 text-center border border-gray-100"
+            >
+              <p class="text-[10px] font-black text-gray-400 mb-0.5">
+                {{ $t(`admin.patty_${p}`) }}
+              </p>
+              <p
+                class="text-xs font-black"
+                :class="newItem.prices[p] ? 'text-gray-700' : 'text-gray-300'"
+              >
+                {{ newItem.prices[p] || '—' }}
               </p>
             </div>
           </div>
@@ -685,8 +772,9 @@ const imageUrl = ref("");
 const newItem = ref({
   name: "",
   pricingType: "size",
-  prices: { sm: "", md: "", lg: "" },
+  prices: { sm: "", md: "", lg: "", single: "", double: "", triple: "" },
   activeSize: "sm",
+  activePatty: "single",
   weightOptions: [
     { label: "1/8 كيلو", price: "" },
     { label: "1/4 كيلو", price: "" },
@@ -720,8 +808,71 @@ const availableCategories = computed(() => {
 
 const dynamicCategories = computed(() => availableCategories.value);
 
+const categoriesContainer = ref(null);
+const canScrollLeft = ref(false);
+const canScrollRight = ref(false);
+const hasScrollOverflow = ref(false);
+
+const checkCategoryScroll = () => {
+  const el = categoriesContainer.value;
+  if (!el) return;
+  const maxScroll = el.scrollWidth - el.clientWidth;
+  if (maxScroll <= 5) {
+    hasScrollOverflow.value = false;
+    canScrollLeft.value = false;
+    canScrollRight.value = false;
+    return;
+  }
+  hasScrollOverflow.value = true;
+  const current = Math.abs(el.scrollLeft);
+  canScrollLeft.value = current < maxScroll - 8;
+  canScrollRight.value = current > 8;
+};
+
+const scrollCategories = (direction) => {
+  const el = categoriesContainer.value;
+  if (!el) return;
+  const amount = direction === 'left' ? -220 : 220;
+  el.scrollBy({ left: amount, behavior: 'smooth' });
+  setTimeout(checkCategoryScroll, 350);
+};
+
+const selectCategory = (cat, event) => {
+  selectedCategory.value = cat;
+  if (event?.currentTarget) {
+    event.currentTarget.scrollIntoView({
+      behavior: 'smooth',
+      inline: 'center',
+      block: 'nearest',
+    });
+  }
+  setTimeout(checkCategoryScroll, 350);
+};
+
+onMounted(() => {
+  nextTick(() => {
+    checkCategoryScroll();
+  });
+  window.addEventListener('resize', checkCategoryScroll);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('resize', checkCategoryScroll);
+});
+
+watch(
+  () => dynamicCategories.value,
+  () => {
+    nextTick(() => {
+      setTimeout(checkCategoryScroll, 150);
+    });
+  },
+  { deep: true, immediate: true }
+);
+
 const pricingTypes = [
   { value: "size", label: $t("admin.by_size") },
+  { value: "patty", label: $t("admin.by_patty") },
   { value: "weight", label: $t("admin.by_weight") },
   { value: "count", label: $t("admin.by_count") },
   { value: "fixed", label: $t("admin.by_fixed") },
@@ -730,12 +881,12 @@ const pricingTypes = [
 const detectPricingType = (prices) => {
   if (!prices || typeof prices !== 'object') return "fixed";
   const keys = Object.keys(prices).map(k => k.toLowerCase());
+  if (keys.some((k) => ["single", "double", "triple"].includes(k)))
+    return "patty";
   if (keys.some((k) => ["sm", "md", "lg", "s"].includes(k)))
     return "size";
   if (keys.includes("fixed")) return "fixed";
   if (keys.some((k) => /كيلو|جرام|كجم|kg|gram|وزن|ربع|نصف|ثمن|نص/i.test(k)))
-    return "weight";
-  if (keys.some((k) => ["single", "double", "triple"].includes(k)))
     return "weight";
   if (keys.length > 0) return "count";
   return "fixed";
@@ -838,8 +989,9 @@ const openAddModal = () => {
   newItem.value = {
     name: "",
     pricingType: "size",
-    prices: { sm: "", md: "", lg: "" },
+    prices: { sm: "", md: "", lg: "", single: "", double: "", triple: "" },
     activeSize: "sm",
+    activePatty: "single",
     weightOptions: [
       { label: "1/8 كيلو", price: "" },
       { label: "1/4 كيلو", price: "" },
@@ -887,7 +1039,7 @@ const openEditModal = (item) => {
   const type = detectPricingType(item.prices);
 
   const weightOptions = [];
-  if ((type === "weight" || type === "patty") && item.prices) {
+  if (type === "weight" && item.prices) {
     Object.entries(item.prices)
       .map(([label, price]) => ({ label, price: String(price) }))
       .sort((a, b) => Number(a.price || 0) - Number(b.price || 0))
@@ -921,8 +1073,12 @@ const openEditModal = (item) => {
       sm: String(normPrices.sm || normPrices.s || ""),
       md: String(normPrices.md || ""),
       lg: String(normPrices.lg || ""),
+      single: String(normPrices.single || ""),
+      double: String(normPrices.double || ""),
+      triple: String(normPrices.triple || ""),
     },
     activeSize: "sm",
+    activePatty: "single",
     weightOptions,
     countOptions,
     fixedPrice: type === "fixed" ? String(item.prices?.fixed || item.price || "") : "",
@@ -949,6 +1105,12 @@ const handleSaveItem = async () => {
   if (pricingType === "size") {
     for (const s of ["sm", "md", "lg"]) {
       if (prices[s]) cleanPrices[s] = Number(prices[s]);
+    }
+    hasPrices = Object.keys(cleanPrices).length > 0;
+    if (hasPrices) displayPrice = Math.min(...Object.values(cleanPrices));
+  } else if (pricingType === "patty") {
+    for (const p of ["single", "double", "triple"]) {
+      if (prices[p]) cleanPrices[p] = Number(prices[p]);
     }
     hasPrices = Object.keys(cleanPrices).length > 0;
     if (hasPrices) displayPrice = Math.min(...Object.values(cleanPrices));

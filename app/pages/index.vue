@@ -4,7 +4,7 @@
     <main>
       <LandingHeroSection />
       <LandingFeatures />
-      <LandingDemoVideo />
+      <!-- <LandingDemoVideo /> -->
       <LandingPricing />
       <LandingFAQs />
       <LandingContactForm />
