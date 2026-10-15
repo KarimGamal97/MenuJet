@@ -143,24 +143,47 @@
             $t("admin.menu_slug")
           }}</label>
           <div
-            class="flex items-center bg-gray-50 rounded-2xl px-4 focus-within:ring-2 focus-within:ring-orange-500 transition-all shadow-sm"
+            class="flex items-center bg-gray-100/90 rounded-2xl px-3 sm:px-4 border border-gray-200/80 shadow-xs gap-2 transition-all focus-within:ring-2 focus-within:ring-orange-500/20"
             dir="ltr"
           >
-            <span class="text-gray-400 text-sm font-bold opacity-60"
-              >getmenujet.com/menu/</span
-            >
+            <span class="text-gray-400 text-sm select-none" title="مقفل لحماية الباركود">🔒</span>
             <input
-              v-model="form.slug"
-              placeholder="my-restaurant"
-              class="flex-1 py-4 bg-transparent border-none outline-none font-bold placeholder:text-gray-300 text-sm"
+              :value="menuUrl"
+              readonly
+              placeholder="https://getmenujet.com/menu/..."
+              class="flex-1 py-3.5 bg-transparent border-none outline-none font-bold text-gray-700 text-xs sm:text-sm select-all cursor-text"
+              @click="$event.target.select()"
             />
+            <button
+              type="button"
+              @click="copyMenuUrl"
+              class="inline-flex items-center gap-1.5 bg-white hover:bg-orange-50 text-gray-700 hover:text-orange-600 border border-gray-200 hover:border-orange-200 px-3 py-1.5 rounded-xl text-xs font-bold transition-all shadow-2xs shrink-0 cursor-pointer active:scale-95"
+            >
+              <svg class="w-3.5 h-3.5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+              <span>{{ $t("admin.copy_link") }}</span>
+            </button>
           </div>
-          <p
-            class="text-[10px] text-amber-500 font-bold mt-3 px-1 flex items-center gap-1.5"
+
+          <div
+            class="mt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs bg-amber-50/80 border border-amber-200/60 rounded-2xl p-3.5 text-amber-900"
           >
-            <BaseIcon name="alert" class="w-3.5 h-3.5" />
-            {{ $t("admin.slug_qr_warning") }}
-          </p>
+            <div class="flex items-center gap-2">
+              <span class="text-base select-none">🔒</span>
+              <span class="font-medium text-[11px] sm:text-xs leading-relaxed">
+                {{ $t("admin.slug_locked_note") }}
+              </span>
+            </div>
+            <a
+              :href="`https://wa.me/201132234124?text=${encodeURIComponent($i18n.locale === 'ar' ? 'مرحباً، أريد طلب تغيير رابط المنيو لمطعم: ' + (form.business_name || form.slug) : 'Hello, I want to request changing the menu link for: ' + (form.business_name || form.slug))}`"
+              target="_blank"
+              class="inline-flex items-center gap-1.5 text-orange-600 hover:text-orange-700 font-black text-[11px] sm:text-xs shrink-0 hover:underline bg-white/90 px-3.5 py-2 rounded-xl border border-orange-100 shadow-2xs self-start sm:self-auto cursor-pointer transition-colors"
+            >
+              <span>💬</span>
+              <span>{{ $t("admin.contact_support_change") }}</span>
+            </a>
+          </div>
 
           <!-- QR Code Section -->
           <div
@@ -1102,6 +1125,8 @@ watch(
   { immediate: true }
 );
 
+const originalSlug = ref("");
+
 const form = ref({
   business_name: "",
   slug: "",
@@ -1146,6 +1171,7 @@ watch(
     if (newId) {
       const data = await fetchProfile(newId);
       if (data) {
+        originalSlug.value = data.slug || "";
         form.value = {
           business_name: data.business_name || "",
           slug: data.slug || "",
@@ -1375,7 +1401,8 @@ const saveSettings = async () => {
     business_name: form.value.business_name,
     // Sync with localized field to avoid ghosting old names
     business_name_ar: form.value.business_name,
-    slug: form.value.slug
+    // Preserve existing slug to protect printed QR codes from breaking
+    slug: (originalSlug.value || form.value.slug || "")
       .toLowerCase()
       .replace(/[^a-z0-9]/g, "-")
       .replace(/-+/g, "-"),

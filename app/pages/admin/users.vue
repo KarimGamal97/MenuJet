@@ -100,13 +100,16 @@
                 <td class="py-4 ps-4 rounded-s-2xl">
                   <div class="flex items-center gap-3">
                     <div
-                      class="w-10 h-10 bg-white rounded-2xl flex items-center justify-center font-black text-orange-600 shadow-xs border border-orange-100 shrink-0"
+                      class="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 border shadow-xs"
+                      :class="user.role === 'super_admin' ? 'bg-purple-50 text-purple-600 border-purple-100' : 'bg-orange-50 text-orange-600 border-orange-100'"
                     >
-                      {{ (user.email || user.full_name || 'U').charAt(0).toUpperCase() }}
+                      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
                     </div>
                     <div>
                       <div class="font-black text-gray-900 text-sm">
-                        {{ user.full_name || user.email?.split('@')[0] || $t("admin.users_page.default_user") }}
+                        {{ getUserDisplayName(user) }}
                       </div>
                       <div class="text-xs text-gray-400 font-medium dir-ltr text-start">
                         {{ user.email || '—' }}
@@ -182,6 +185,18 @@
             </p>
 
             <div class="space-y-4">
+              <div>
+                <label class="block text-xs font-bold text-gray-700 mb-1.5">
+                  {{ $t("admin.users_page.full_name") }}
+                </label>
+                <BaseInput
+                  v-model="newUser.full_name"
+                  type="text"
+                  :placeholder="$t('admin.users_page.full_name_placeholder')"
+                  class="!border !border-gray-200 !py-3 !px-4 !bg-white !rounded-2xl shadow-none"
+                />
+              </div>
+
               <div>
                 <label class="block text-xs font-bold text-gray-700 mb-1.5">
                   {{ $t("admin.users_page.email") }}
@@ -307,7 +322,7 @@
             </h2>
             <p class="text-gray-500 text-sm leading-relaxed mb-6 font-medium">
               {{ $t("admin.users_page.delete_user_confirm_pt1") }}
-              <span class="font-bold text-gray-900">{{ userToDelete?.email || userToDelete?.full_name || $t("admin.users_page.default_user") }}</span>
+              <span class="font-bold text-gray-900">{{ getUserDisplayName(userToDelete) }}</span>
               {{ $t("admin.users_page.delete_user_confirm_pt2") }}
             </p>
 
@@ -351,7 +366,7 @@ const users = ref<any[]>([]);
 const showAddModal = ref(false);
 const showPassword = ref(false);
 const creating = ref(false);
-const newUser = ref({ email: "", password: "", business_name_ar: "", role: "user" });
+const newUser = ref({ email: "", password: "", full_name: "", role: "user" });
 
 // Delete state
 const showDeleteModal = ref(false);
@@ -379,7 +394,7 @@ const generateStrongPassword = () => {
 const closeModal = () => {
   showAddModal.value = false;
   showPassword.value = false;
-  newUser.value = { email: "", password: "", business_name_ar: "", role: "user" };
+  newUser.value = { email: "", password: "", full_name: "", role: "user" };
 };
 
 const confirmDeleteUser = (user: any) => {
@@ -488,6 +503,27 @@ const getRoleClass = (role: string) => {
     return "bg-purple-100 text-purple-700 font-black";
   }
   return "bg-blue-50 text-blue-700 font-bold";
+};
+
+const getUserDisplayName = (user: any) => {
+  if (!user) return "";
+  if (user.role === "super_admin") {
+    return (
+      user.business_name ||
+      user.business_name_ar ||
+      user.full_name ||
+      user.email?.split("@")[0] ||
+      t("admin.users_page.default_user")
+    );
+  }
+  if (
+    user.full_name &&
+    user.full_name !== "مطعمي" &&
+    user.full_name !== "My Restaurant"
+  ) {
+    return user.full_name;
+  }
+  return user.email?.split("@")[0] || t("admin.users_page.default_user");
 };
 
 onMounted(() => {

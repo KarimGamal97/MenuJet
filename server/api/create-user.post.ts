@@ -57,7 +57,7 @@ export default defineEventHandler(async (event) => {
 
     // Get the new user data from the request body
     const body = await readBody(event);
-    const { email, password, role } = body;
+    const { email, password, role, full_name } = body;
 
     if (!email || !password) {
       throw createError({
@@ -72,7 +72,10 @@ export default defineEventHandler(async (event) => {
         email,
         password,
         email_confirm: true,
-        user_metadata: { role: role || "admin" }, // Store role in metadata too
+        user_metadata: {
+          role: role || "admin",
+          full_name: full_name?.trim() || null,
+        },
       });
 
     if (authError) {
@@ -113,6 +116,7 @@ export default defineEventHandler(async (event) => {
     const profilePayload = {
       user_id: newUser.user.id,
       email: email,
+      full_name: full_name?.trim() || null,
       role: role || "admin",
       owner_id: userId,
       business_name: superAdminProfile?.business_name || null,
