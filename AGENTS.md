@@ -214,3 +214,5 @@ const steps = computed(() => [
 - **Clean Up Debugging:** Remove all temporary `console.log` statements, commented-out dead code, and test traces before completing a task.
 - **Build Verification:** After making changes, run `npm run build` (`vue-tsc + vite build`) to ensure type safety and build integrity.
 - **Status Tracking:** Always update `OVERVIEW.md` (repo root) when your changes complete, progress, or alter feature tasks.
+- **English-Only in Code & Comments:** Never write Arabic comments, variable names, or debug messages in code. All comments, docstrings, and commits MUST be written in clear English.
+- **Strict Localization (No Hardcoded Content):** Never hardcode Arabic or English user-facing text in frontend templates or backend responses. All frontend strings must go through i18n translation keys (`ar.json` and `en.json`), and backend API responses must use standard English messages or localization error codes.
