@@ -108,6 +108,14 @@
           >
             <BaseIcon name="print" class="w-4 h-4" />
           </button>
+          <button
+            v-if="order.status === 'pending'"
+            @click="openEditModal"
+            class="p-1.5 bg-orange-50 hover:bg-orange-100 text-orange-600 rounded-lg transition-colors shrink-0"
+            :title="$t('admin.edit_order_btn')"
+          >
+            <BaseIcon name="edit" class="w-4 h-4" />
+          </button>
           <span
             v-if="order.status === 'pending'"
             class="text-[10px] font-black text-white bg-orange-500 px-2.5 py-1 rounded-full shadow-xs shadow-orange-100 animate-pulse whitespace-nowrap shrink-0 inline-flex items-center justify-center leading-none"
@@ -182,6 +190,86 @@
         </span>
       </div>
     </div>
+
+    <!-- Edit Order Modal for Restaurant Owner -->
+    <BaseModal
+      :isOpen="showEditModal"
+      @close="showEditModal = false"
+      :title="$t('admin.edit_order_modal_title')"
+      :subtitle="`#${(order.order_number || order.id).toString().padStart(4, '0')}`"
+      icon="edit"
+      iconColor="bg-orange-50 text-orange-600"
+    >
+      <div class="space-y-3 pt-2 text-right" dir="rtl">
+        <div
+          v-for="(item, index) in editableItems"
+          :key="item.id || index"
+          class="flex items-center justify-between p-3.5 bg-gray-50 rounded-2xl border border-gray-100"
+        >
+          <div class="flex-1 min-w-0 pr-1">
+            <p class="font-bold text-gray-800 text-sm truncate">{{ item.name }}</p>
+            <p class="text-xs text-orange-600 font-bold mt-0.5">
+              {{ item.price }} {{ $t("currency") }}
+            </p>
+          </div>
+          
+          <div class="flex items-center gap-1.5 shrink-0">
+            <button
+              type="button"
+              @click="decreaseEditQty(index)"
+              class="w-7 h-7 rounded-xl bg-white border border-gray-200 text-gray-600 font-black flex items-center justify-center hover:bg-gray-100 active:scale-95"
+            >
+              <BaseIcon name="minus" class="w-3.5 h-3.5" />
+            </button>
+            <span class="w-6 text-center font-black text-sm text-gray-800">{{ item.quantity }}</span>
+            <button
+              type="button"
+              @click="increaseEditQty(index)"
+              class="w-7 h-7 rounded-xl bg-orange-500 text-white font-black flex items-center justify-center hover:bg-orange-600 active:scale-95"
+            >
+              <BaseIcon name="plus" class="w-3.5 h-3.5" />
+            </button>
+            <button
+              type="button"
+              @click="removeEditItem(index)"
+              class="w-7 h-7 rounded-xl bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-colors ms-1"
+              title="حذف الصنف"
+            >
+              <BaseIcon name="trash" class="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+
+        <div v-if="editableItems.length === 0" class="text-center py-6 text-gray-400 font-bold text-xs">
+          لا توجد أصناف في الطلب
+        </div>
+
+        <!-- Total calculation preview -->
+        <div class="flex justify-between items-center pt-3 border-t border-gray-100 px-1">
+          <span class="text-sm font-bold text-gray-500">{{ $t("admin.order_total") }}:</span>
+          <span class="text-lg font-black text-orange-600">
+            {{ calculatedEditTotal }} {{ $t("currency") }}
+          </span>
+        </div>
+      </div>
+
+      <template #footer>
+        <div class="flex gap-3" dir="rtl">
+          <BaseButton variant="secondary" fullWidth @click="showEditModal = false">
+            {{ $t("admin.cancel") }}
+          </BaseButton>
+          <BaseButton
+            variant="primary"
+            fullWidth
+            :loading="isSavingEdit"
+            :disabled="editableItems.length === 0"
+            @click="saveOrderEdits"
+          >
+            {{ $t("admin.save_order_changes") }}
+          </BaseButton>
+        </div>
+      </template>
+    </BaseModal>
   </div>
 </template>
 
@@ -350,5 +438,60 @@ const printOrder = () => {
   
   printWindow.document.write(html);
   printWindow.document.close();
+};
+
+// Order Editing Logic for Owner
+const { updateOrder } = useOrders();
+const showEditModal = ref(false);
+const editableItems = ref([]);
+const isSavingEdit = ref(false);
+
+const openEditModal = () => {
+  editableItems.value = (props.order.items || []).map((item) => ({ ...item }));
+  showEditModal.value = true;
+};
+
+const increaseEditQty = (index) => {
+  if (editableItems.value[index]) {
+    editableItems.value[index].quantity++;
+  }
+};
+
+const decreaseEditQty = (index) => {
+  if (editableItems.value[index]) {
+    if (editableItems.value[index].quantity > 1) {
+      editableItems.value[index].quantity--;
+    } else {
+      removeEditItem(index);
+    }
+  }
+};
+
+const removeEditItem = (index) => {
+  editableItems.value.splice(index, 1);
+};
+
+const calculatedEditTotal = computed(() => {
+  return editableItems.value.reduce((acc, item) => {
+    const price = Number(item.price) || 0;
+    return acc + price * (item.quantity || 1);
+  }, 0);
+});
+
+const saveOrderEdits = async () => {
+  if (editableItems.value.length === 0) return;
+  isSavingEdit.value = true;
+  const newTotal = calculatedEditTotal.value;
+  const newItems = [...editableItems.value];
+  const success = await updateOrder(props.order.id, {
+    items: newItems,
+    total_price: newTotal,
+  });
+  isSavingEdit.value = false;
+  if (success) {
+    props.order.items = newItems;
+    props.order.total_price = newTotal;
+    showEditModal.value = false;
+  }
 };
 </script>

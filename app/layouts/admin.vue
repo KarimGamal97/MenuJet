@@ -402,7 +402,8 @@
 const authStore = useAuthStore();
 const client = useSupabaseClient();
 const user = useSupabaseUser();
-const { userRole } = useAuthUser();
+const { userRole, ownerId } = useAuthUser();
+const { startGlobalOrderListener, stopGlobalOrderListener } = useOrderNotifications();
 const { currentPlan, isFree, isBasic, isPro, can } = usePlan();
 const { t, locale } = useI18n();
 const { $toast } = useNuxtApp();
@@ -465,8 +466,19 @@ onMounted(() => {
   }, 1000);
 });
 
+watch(
+  ownerId,
+  (newOwnerId) => {
+    if (newOwnerId) {
+      startGlobalOrderListener(newOwnerId);
+    }
+  },
+  { immediate: true }
+);
+
 onUnmounted(() => {
   if (timerInterval) clearInterval(timerInterval);
+  stopGlobalOrderListener();
 });
 
 const trialTimeLeft = computed(() => {

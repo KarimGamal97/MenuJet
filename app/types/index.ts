@@ -105,5 +105,7 @@ export interface Profile {
   social_tiktok?: string;
   social_location?: string;
   social_phone?: string;
+  allow_order_editing?: boolean;
+  order_edit_window_minutes?: number;
 }
 

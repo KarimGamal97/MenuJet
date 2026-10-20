@@ -62,8 +62,29 @@ export const useCart = () => {
     cart.value = [];
   };
 
+  const setCart = (newItems: any[]) => {
+    cart.value = (newItems || []).map((i: any) => ({
+      ...i,
+      cartId: i.cartId || generateCartId(i),
+    }));
+  };
+
+  const editingOrder = useState<any | null>("editingOrder", () => null);
+
+  const startEditingOrder = (order: any) => {
+    editingOrder.value = order;
+    setCart(order.items || []);
+  };
+
+  const cancelEditingOrder = () => {
+    editingOrder.value = null;
+  };
+
   return {
     cart,
+    editingOrder,
+    startEditingOrder,
+    cancelEditingOrder,
     addToCart,
     increaseQty,
     decreaseQty,
@@ -71,5 +92,6 @@ export const useCart = () => {
     totalPrice,
     cartCount,
     clearCart,
+    setCart,
   };
 };

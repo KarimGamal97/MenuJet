@@ -8,10 +8,13 @@ interface OrderItem {
 
 interface Order {
   id: string;
+  dbId?: string | number;
   items: OrderItem[];
   total: number;
   type: "cashier" | "whatsapp";
+  status?: string;
   time?: string;
+  customer?: any;
 }
 
 export const useOrderHistory = () => {
@@ -34,7 +37,7 @@ export const useOrderHistory = () => {
   const addOrder = (order: Order) => {
     const newOrder = {
       ...order,
-      time: new Date().toISOString(),
+      time: order.time || new Date().toISOString(),
     };
     history.value.unshift(newOrder);
     if (typeof window !== "undefined") {
@@ -42,9 +45,22 @@ export const useOrderHistory = () => {
     }
   };
 
+  const updateHistoryOrder = (idOrDbId: string | number, patch: Partial<Order>) => {
+    const idx = history.value.findIndex(
+      (o) => o.id === idOrDbId || (o.dbId && o.dbId === idOrDbId),
+    );
+    if (idx !== -1) {
+      history.value[idx] = { ...history.value[idx], ...patch };
+      if (typeof window !== "undefined") {
+        localStorage.setItem("menujet_order_history", JSON.stringify(history.value));
+      }
+    }
+  };
+
   return {
     history,
     addOrder,
+    updateHistoryOrder,
     loadHistory,
   };
 };

@@ -6,7 +6,7 @@
     >
       <div
         class="absolute inset-0 bg-black/40 backdrop-blur-sm"
-        @click="emit('close')"
+        @click="handleCloseCart"
       />
 
       <div
@@ -14,14 +14,30 @@
       >
         <div class="flex items-center justify-between px-6 pt-6 pb-2">
           <h2 class="text-xl font-black text-gray-800 flex items-center gap-2">
-            <BaseIcon name="cart" class="w-6 h-6 text-orange-600" />
-            {{ $t("cart.title") }}
+            <BaseIcon :name="editingOrder ? 'edit' : 'cart'" class="w-6 h-6 text-orange-600" />
+            <span v-if="editingOrder">{{ locale === 'ar' ? `تعديل الطلب #${editingOrder.id}` : `Edit Order #${editingOrder.id}` }}</span>
+            <span v-else>{{ $t("cart.title") }}</span>
           </h2>
           <button
-            @click="emit('close')"
-            class="w-9 h-9 flex items-center justify-center rounded-2xl bg-gray-100 text-gray-400 hover:bg-gray-200 transition-colors font-bold text-lg"
+            @click="handleCloseCart"
+            class="w-9 h-9 flex items-center justify-center rounded-2xl bg-gray-100 text-gray-400 hover:bg-gray-200 transition-colors font-bold text-lg cursor-pointer"
           >
             <BaseIcon name="close" class="w-5 h-5" />
+          </button>
+        </div>
+
+        <!-- Banner when editing existing order -->
+        <div v-if="editingOrder" class="mx-6 mb-2 p-3 bg-orange-50 border border-orange-200 rounded-2xl flex items-center justify-between gap-2 animate-in fade-in duration-300">
+          <div class="flex items-center gap-2 text-xs font-bold text-orange-900">
+            <span class="w-2 h-2 rounded-full bg-orange-500 animate-pulse shrink-0"></span>
+            <span>{{ locale === 'ar' ? `تعديل أصناف الطلب #${editingOrder.id}` : `Editing items for order #${editingOrder.id}` }}</span>
+          </div>
+          <button
+            type="button"
+            @click="cancelEditingOrder(); clearCart(); emit('close');"
+            class="text-[10px] font-black text-orange-700 bg-white border border-orange-200 px-2.5 py-1 rounded-xl hover:bg-orange-100 transition-colors shrink-0 cursor-pointer"
+          >
+            {{ locale === 'ar' ? 'إلغاء' : 'Cancel' }}
           </button>
         </div>
 
@@ -536,11 +552,25 @@ const props = defineProps({
 
 const emit = defineEmits(["close"]);
 
-const { t } = useI18n();
-const { cart, increaseQty, decreaseQty, totalPrice, clearCart } = useCart();
-const { addOrder } = useOrderHistory();
+const { t, locale } = useI18n();
+const {
+  cart,
+  increaseQty,
+  decreaseQty,
+  totalPrice,
+  clearCart,
+  editingOrder,
+  cancelEditingOrder,
+} = useCart();
+const { addOrder, updateHistoryOrder } = useOrderHistory();
+const { $toast } = useNuxtApp();
 const client = useSupabaseClient();
 const route = useRoute();
+
+const handleCloseCart = () => {
+  cancelEditingOrder();
+  emit("close");
+};
 
 const showCashierModal = ref(false);
 const showWhatsappCheckout = ref(false);
@@ -817,6 +847,53 @@ const placeCashierOrder = async () => {
       console.warn("Could not query active session for order:", e);
     }
 
+    // إذا كان العميل يقوم بتعديل طلب حالي: يتم تحديث نفس الطلب والاحتفاظ بنفس رقم الطلب
+    if (editingOrder.value) {
+      const orderNum = editingOrder.value.id;
+      orderNumber.value = orderNum;
+
+      const patchData = {
+        items: cart.value,
+        total_price: totalPrice.value,
+      };
+      if (cashierPhone.value.trim()) {
+        patchData.customer_phone = cashierPhone.value.trim();
+      }
+
+      let updateQuery = client.from("orders").update(patchData);
+      if (editingOrder.value.dbId) {
+        updateQuery = updateQuery.eq("id", editingOrder.value.dbId);
+      } else {
+        const parsedNum = parseInt(editingOrder.value.id, 10);
+        updateQuery = updateQuery
+          .eq("user_id", finalRestaurantId)
+          .eq("order_number", isNaN(parsedNum) ? editingOrder.value.id : parsedNum);
+      }
+
+      const { error: updateError } = await updateQuery;
+      if (updateError) {
+        console.error("Order Update Error:", updateError);
+        $toast?.error(t("admin.order_updated_failed") || "فشل تعديل الطلب");
+        throw updateError;
+      }
+
+      updateHistoryOrder(editingOrder.value.id, {
+        items: [...cart.value],
+        total: totalPrice.value,
+      });
+
+      showCashierCheckout.value = false;
+      showCashierModal.value = true;
+      $toast?.success(t("history.edit_success") || "تم تحديث الطلب بنجاح");
+
+      setTimeout(() => {
+        clearCart();
+        cancelEditingOrder();
+        emit("close");
+      }, 300);
+      return;
+    }
+
     const nextOrderNum = await calculateNextOrderNumber(finalRestaurantId, activeSessionId);
 
     const { data: order, error: orderError } = await client
@@ -838,8 +915,8 @@ const placeCashierOrder = async () => {
 
     if (orderError) {
       console.error("Supabase Insert Error:", orderError);
-      alert(
-        `عذراً، فشل إرسال الطلب.\nالسبب: ${orderError.message}\nالتفاصيل: ${orderError.hint || "لا يوجد"}`,
+      $toast?.error(
+        `عذراً، فشل إرسال الطلب: ${orderError.message}`
       );
       throw orderError;
     }
@@ -849,9 +926,12 @@ const placeCashierOrder = async () => {
 
     addOrder({
       id: orderNum,
+      dbId: order.id,
       items: [...cart.value],
       total: totalPrice.value,
       type: "cashier",
+      status: "pending",
+      time: new Date().toISOString(),
       customer: { phone: cashierPhone.value.trim() }
     });
 
@@ -861,11 +941,11 @@ const placeCashierOrder = async () => {
     setTimeout(() => {
       clearCart();
       emit("close");
-      toast.success(t("cart.order_success"));
+      $toast?.success(t("cart.order_success"));
     }, 300);
   } catch (err) {
     console.error("Detailed Order Error:", err);
-    toast.error(t("cart.order_error"));
+    $toast?.error(t("cart.order_error"));
   } finally {
     isSubmitting.value = false;
   }
@@ -961,35 +1041,75 @@ const handleWhatsappOrderFinal = async () => {
         ? totalPrice.value + Number(selectedDeliveryArea.value.price)
         : totalPrice.value;
 
-    // تحديد نوع الطلب: واتساب توصيل أو واتساب كاشير (استلام) مع طريقة الدفع
-    const paymentSuffix = customerForm.value.paymentMethod ? `_${customerForm.value.paymentMethod}` : "";
-    const orderPaymentMethod = `${isDelivery ? "whatsapp_delivery" : "whatsapp_pickup"}${paymentSuffix}`;
+    let insertedId = null;
 
-    // 2. إرسال الطلب إلى قاعدة بيانات Supabase مع حماية كاملة من نقص الأعمدة
-    const orderData = {
-      user_id: restaurantId,
-      items: cart.value,
-      total_price: finalTotal,
-      status: "pending",
-    };
-    if (activeSessionId) orderData.session_id = activeSessionId;
-    if (nextOrderNum) orderData.order_number = nextOrderNum;
-    if (customerForm.value.phone) orderData.customer_phone = customerForm.value.phone.trim();
-    if (customerForm.value.name) orderData.customer_name = customerForm.value.name.trim();
-    if (customerForm.value.addressDetail) orderData.delivery_address = customerForm.value.addressDetail.trim();
-    if (orderPaymentMethod) orderData.payment_method = orderPaymentMethod;
+    if (editingOrder.value) {
+      // في حالة تعديل طلب قائم: نحدث نفس السجل ونحتفظ بنفس رقم الطلب
+      nextOrderNum = editingOrder.value.id;
+      const orderData = {
+        items: cart.value,
+        total_price: finalTotal,
+      };
+      if (customerForm.value.phone) orderData.customer_phone = customerForm.value.phone.trim();
+      if (customerForm.value.name) orderData.customer_name = customerForm.value.name.trim();
+      if (customerForm.value.addressDetail) orderData.delivery_address = customerForm.value.addressDetail.trim();
 
-    const { error: insertError } = await client.from("orders").insert(orderData);
+      let updateQuery = client.from("orders").update(orderData);
+      if (editingOrder.value.dbId) {
+        updateQuery = updateQuery.eq("id", editingOrder.value.dbId);
+      } else {
+        const parsedNum = parseInt(editingOrder.value.id, 10);
+        updateQuery = updateQuery
+          .eq("user_id", restaurantId)
+          .eq("order_number", isNaN(parsedNum) ? editingOrder.value.id : parsedNum);
+      }
+      await updateQuery;
 
-    // Fallback: إذا كان جدول orders في Supabase ينقصه بعض الأعمدة، نسجل الطلب بالحقول الأساسية المؤكدة
-    if (insertError) {
-      console.warn("Full order insert failed, attempting safe core insert:", insertError);
-      await client.from("orders").insert({
+      updateHistoryOrder(editingOrder.value.id, {
+        items: [...cart.value],
+        total: finalTotal,
+      });
+    } else {
+      // طلب جديد تماماً
+      // تحديد نوع الطلب: واتساب توصيل أو واتساب كاشير (استلام) مع طريقة الدفع
+      const paymentSuffix = customerForm.value.paymentMethod ? `_${customerForm.value.paymentMethod}` : "";
+      const orderPaymentMethod = `${isDelivery ? "whatsapp_delivery" : "whatsapp_pickup"}${paymentSuffix}`;
+
+      // 2. إرسال الطلب إلى قاعدة بيانات Supabase مع حماية كاملة من نقص الأعمدة
+      const orderData = {
         user_id: restaurantId,
         items: cart.value,
         total_price: finalTotal,
         status: "pending",
-      });
+      };
+      if (activeSessionId) orderData.session_id = activeSessionId;
+      if (nextOrderNum) orderData.order_number = nextOrderNum;
+      if (customerForm.value.phone) orderData.customer_phone = customerForm.value.phone.trim();
+      if (customerForm.value.name) orderData.customer_name = customerForm.value.name.trim();
+      if (customerForm.value.addressDetail) orderData.delivery_address = customerForm.value.addressDetail.trim();
+      if (orderPaymentMethod) orderData.payment_method = orderPaymentMethod;
+
+      const { data: insertedOrder, error: insertError } = await client
+        .from("orders")
+        .insert(orderData)
+        .select("id")
+        .maybeSingle();
+
+      if (insertedOrder?.id) {
+        insertedId = insertedOrder.id;
+      }
+
+      // Fallback: إذا كان جدول orders في Supabase ينقصه بعض الأعمدة، نسجل الطلب بالحقول الأساسية المؤكدة
+      if (insertError) {
+        console.warn("Full order insert failed, attempting safe core insert:", insertError);
+        const { data: fallbackOrder } = await client.from("orders").insert({
+          user_id: restaurantId,
+          items: cart.value,
+          total_price: finalTotal,
+          status: "pending",
+        }).select("id").maybeSingle();
+        if (fallbackOrder?.id) insertedId = fallbackOrder.id;
+      }
     }
   } catch (err) {
     console.error("Supabase Order Insert Error:", err);
@@ -1001,8 +1121,6 @@ const handleWhatsappOrderFinal = async () => {
   const link = whatsappLink.value;
   
   // 3. فتح محادثة الواتساب
-  // على أجهزة الموبايل (iPhone / Android) متصفحات الهاتف تحظر window.open كنافذة منبثقة (Popup Blocker)
-  // لذلك نستخدم window.location.href ليفتح تطبيق الواتساب مباشرة وبدون حظر
   const isMobile = typeof navigator !== "undefined" && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
   if (isMobile) {
@@ -1011,22 +1129,28 @@ const handleWhatsappOrderFinal = async () => {
     window.open(link, "_blank");
   }
 
-  // Save to local history before clearing
-  const displayOrderNum = nextOrderNum
-    ? nextOrderNum.toString().padStart(4, "0")
-    : "WA-" + Date.now().toString().slice(-4);
+  // Save to local history if this was a new order (for edits, it is already updated above)
+  if (!editingOrder.value) {
+    const displayOrderNum = nextOrderNum
+      ? nextOrderNum.toString().padStart(4, "0")
+      : "WA-" + Date.now().toString().slice(-4);
 
-  addOrder({
-    id: displayOrderNum,
-    items: [...cart.value],
-    total: totalPrice.value,
-    type: "whatsapp",
-    customer: { ...customerForm.value }
-  });
+    addOrder({
+      id: displayOrderNum,
+      dbId: insertedId,
+      items: [...cart.value],
+      total: totalPrice.value,
+      type: "whatsapp",
+      status: "pending",
+      time: new Date().toISOString(),
+      customer: { ...customerForm.value }
+    });
+  }
 
   // Small delay before clearing Cart to ensure window opens without issues
   setTimeout(() => {
     clearCart();
+    cancelEditingOrder();
     showWhatsappCheckout.value = false;
     emit("close");
   }, 300);
@@ -1056,7 +1180,9 @@ const whatsappLink = computed(() => {
     )
     .join("\n");
     
-  let header = t("cart.whatsapp_msg_header");
+  let header = editingOrder.value
+    ? `*تعديل طلب رقم #${editingOrder.value.id}*`
+    : t("cart.whatsapp_msg_header");
   if (!header || header === "cart.whatsapp_msg_header") {
     header = "طلب جديد";
   }

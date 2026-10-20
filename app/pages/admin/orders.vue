@@ -269,18 +269,13 @@ const handleCleanup = async () => {
   }
 };
 
-const playNotificationSound = () => {
-  const audio = new Audio("/notification.mp3");
-  audio.play().catch((e) => console.warn("🔊 Sound blocked by browser"));
-};
-
 // 3. The Activation Logic
 watch(
   ownerId,
   async (newId) => {
     if (newId) {
       await fetchOrders(newId, page.value, pageSize.value);
-      setupRealtimeOrders(newId, playNotificationSound);
+      setupRealtimeOrders(newId);
     }
   },
   { immediate: true }

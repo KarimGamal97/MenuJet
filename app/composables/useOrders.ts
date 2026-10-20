@@ -67,6 +67,31 @@ export const useOrders = () => {
     }
   };
 
+  const updateOrder = async (
+    orderId: string | number,
+    patch: { items?: any[]; total_price?: number },
+  ) => {
+    try {
+      const { error } = await client
+        .from("orders")
+        .update(patch)
+        .eq("id", orderId);
+
+      if (error) throw error;
+
+      const idx = orders.value.findIndex((o) => o.id === orderId);
+      if (idx !== -1) {
+        orders.value[idx] = { ...orders.value[idx], ...patch };
+      }
+      $toast.success(t("admin.order_updated_success"));
+      return true;
+    } catch (err: any) {
+      console.error("Update Order Error:", err);
+      $toast.error(t("admin.order_updated_failed"));
+      return false;
+    }
+  };
+
   const cleanupOrders = async (userId: string, type: string) => {
     if (!userId || !type) return;
     try {
@@ -110,6 +135,21 @@ export const useOrders = () => {
           if (onNewOrder) onNewOrder(payload.new);
         },
       )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "orders",
+          filter: `user_id=eq.${userId}`,
+        },
+        (payload: any) => {
+          const idx = orders.value.findIndex((o) => o.id === payload.new.id);
+          if (idx !== -1) {
+            orders.value[idx] = payload.new;
+          }
+        },
+      )
       .subscribe();
   };
 
@@ -126,6 +166,7 @@ export const useOrders = () => {
     loading,
     fetchOrders,
     updateOrderStatus,
+    updateOrder,
     cleanupOrders,
     setupRealtimeOrders,
     stopRealtimeOrders,

@@ -126,18 +126,39 @@
   />
 
   <!-- History Modal -->
-  <OrderHistoryModal :isOpen="showHistory" @close="showHistory = false" />
+  <OrderHistoryModal
+    :isOpen="showHistory"
+    :restaurant="restaurant"
+    @edit-order="handleEditFromHistory"
+    @close="showHistory = false"
+  />
 </template>
 
 <script setup>
 defineProps(["restaurant", "locale", "isOpen"]);
 const { setLocale } = useI18n();
 
-const { totalPrice, cartCount } = useCart();
+const { totalPrice, cartCount, setCart, startEditingOrder } = useCart();
 const { history, loadHistory } = useOrderHistory();
+const { $toast } = useNuxtApp();
 const showCart = ref(false);
 const showHistory = ref(false);
 const { locale } = useI18n();
+
+const handleEditFromHistory = (order) => {
+  if (order?.items?.length) {
+    startEditingOrder(order);
+    showHistory.value = false;
+    showCart.value = true;
+    if ($toast?.success) {
+      $toast.success(
+        locale.value === "ar"
+          ? `تعديل الطلب #${order.id}`
+          : `Editing order #${order.id}`
+      );
+    }
+  }
+};
 
 const hasOrders = computed(() => Boolean(history.value && history.value.length > 0));
 

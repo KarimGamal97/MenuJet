@@ -474,6 +474,41 @@
               :label="$t('plans.enable_phone_number')"
               class="!bg-gray-50/50 !border !border-gray-100"
             />
+
+            <!-- Order Editing Feature Settings -->
+            <div class="sm:col-span-2 bg-gray-50/50 rounded-3xl border border-gray-100 p-4 transition-all">
+              <BaseToggle
+                v-model="form.allow_order_editing"
+                :label="$t('admin.allow_order_editing_label')"
+                class="!bg-transparent !p-0 !border-0"
+              />
+              <p class="text-[11px] text-gray-400 font-bold mt-1 px-1">
+                {{ $t('admin.allow_order_editing_subtitle') }}
+              </p>
+
+              <!-- Edit Window Duration Selector (3, 6, 10 min) -->
+              <div v-if="form.allow_order_editing" class="mt-4 pt-3 border-t border-gray-200/60 animate-in slide-in-from-top-2 duration-300">
+                <label class="text-xs font-bold text-gray-700 block mb-2 px-1">
+                  ⏱️ {{ $t('admin.order_edit_window_label') }}
+                </label>
+                <div class="grid grid-cols-3 gap-2">
+                  <button
+                    v-for="mins in [3, 5, 10]"
+                    :key="mins"
+                    type="button"
+                    @click="form.order_edit_window_minutes = mins"
+                    :class="[
+                      'py-2.5 px-3 rounded-2xl text-xs font-black transition-all border flex items-center justify-center gap-1.5 cursor-pointer',
+                      form.order_edit_window_minutes === mins
+                        ? 'bg-orange-500 text-white border-orange-500 shadow-md shadow-orange-500/20'
+                        : 'bg-white text-gray-700 border-gray-200 hover:border-orange-300'
+                    ]"
+                  >
+                    <span>{{ $t(`admin.edit_window_${mins}`) }}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1153,6 +1188,8 @@ const form = ref({
   social_tiktok: "",
   social_location: "",
   social_phone: "",
+  allow_order_editing: false,
+  order_edit_window_minutes: 5,
 });
 
 const isPaymentDropdownOpen = ref(false);
@@ -1198,6 +1235,8 @@ watch(
           social_tiktok: data.social_tiktok || "",
           social_location: data.social_location || "",
           social_phone: data.social_phone || "",
+          allow_order_editing: data.allow_order_editing === true,
+          order_edit_window_minutes: data.order_edit_window_minutes || 5,
         };
       }
     }
@@ -1429,6 +1468,8 @@ const saveSettings = async () => {
     social_tiktok: form.value.social_tiktok ? form.value.social_tiktok.trim() : "",
     social_location: form.value.social_location ? form.value.social_location.trim() : "",
     social_phone: form.value.social_phone ? form.value.social_phone.trim() : "",
+    allow_order_editing: form.value.allow_order_editing === true,
+    order_edit_window_minutes: Number(form.value.order_edit_window_minutes) || 5,
   };
 
   const success = await updateProfile(ownerId.value, settingsData);

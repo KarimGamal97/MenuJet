@@ -91,6 +91,26 @@
                 </span>
               </div>
             </div>
+
+            <!-- Customer Edit Order Action (if allowed by restaurant and within window) -->
+            <div
+              v-if="canEditOrder(order)"
+              class="mt-4 pt-3 border-t border-gray-200/60 flex items-center justify-between gap-2 flex-wrap"
+            >
+              <div class="flex items-center gap-1.5 text-[11px] font-bold text-orange-600 bg-orange-50 px-2.5 py-1 rounded-xl border border-orange-100">
+                <BaseIcon name="clock" class="w-3.5 h-3.5" />
+                <span>{{ $t("history.edit_window_remaining") }} {{ getRemainingTime(order) }}</span>
+              </div>
+
+              <button
+                type="button"
+                @click="handleRequestEdit(order)"
+                class="flex items-center gap-1.5 px-3.5 py-1.5 bg-orange-500 hover:bg-orange-600 active:scale-95 text-white rounded-xl text-xs font-black transition-all shadow-sm shadow-orange-500/20 cursor-pointer"
+              >
+                <BaseIcon name="edit" class="w-3.5 h-3.5" />
+                <span>{{ $t("history.edit_order") }}</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -99,14 +119,65 @@
 </template>
 
 <script setup>
-defineProps({
+const props = defineProps({
   isOpen: Boolean,
+  restaurant: {
+    type: Object,
+    default: () => ({}),
+  },
 });
 
-defineEmits(["close"]);
+const emit = defineEmits(["close", "edit-order"]);
 
 const { history } = useOrderHistory();
-const { locale } = useI18n();
+const { locale, t } = useI18n();
+
+const currentTime = ref(Date.now());
+let timerInterval = null;
+
+watch(
+  () => props.isOpen,
+  (open) => {
+    if (open) {
+      currentTime.value = Date.now();
+      timerInterval = setInterval(() => {
+        currentTime.value = Date.now();
+      }, 1000);
+    } else if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
+  },
+  { immediate: true }
+);
+
+onUnmounted(() => {
+  if (timerInterval) clearInterval(timerInterval);
+});
+
+const canEditOrder = (order) => {
+  if (!props.restaurant?.allow_order_editing) return false;
+  if (order.status && order.status !== "pending") return false;
+  if (!order.time) return false;
+  const windowMins = Number(props.restaurant.order_edit_window_minutes) || 5;
+  const orderTime = new Date(order.time).getTime();
+  const elapsedMins = (currentTime.value - orderTime) / (1000 * 60);
+  return elapsedMins < windowMins;
+};
+
+const getRemainingTime = (order) => {
+  const windowMins = Number(props.restaurant?.order_edit_window_minutes) || 5;
+  const orderTime = new Date(order.time).getTime();
+  const elapsedSecs = Math.floor((currentTime.value - orderTime) / 1000);
+  const remainingSecs = Math.max(0, windowMins * 60 - elapsedSecs);
+  const mins = Math.floor(remainingSecs / 60);
+  const secs = remainingSecs % 60;
+  return `${mins}:${secs.toString().padStart(2, "0")}`;
+};
+
+const handleRequestEdit = (order) => {
+  emit("edit-order", order);
+};
 
 const formatDate = (dateString) => {
   if (!dateString) return "";

@@ -15,6 +15,8 @@ export type Database = {
           categories: string[] | null
           whatsapp_number: string | null
           is_active: boolean | null
+          allow_order_editing: boolean | null
+          order_edit_window_minutes: number | null
           created_at: string | null
         }
         Insert: Partial<Database['public']['Tables']['profiles']['Row']>
