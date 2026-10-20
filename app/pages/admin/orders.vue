@@ -77,10 +77,6 @@
           </button>
         </div>
 
-        <p class="mt-6 text-[10px] text-red-500 font-bold px-1 text-center">
-          {{ $t("admin.cleanup_confirm") }}
-        </p>
-
         <template #footer>
           <div class="flex gap-3">
             <BaseButton
@@ -218,7 +214,7 @@ const cleanupOptions = [
   {
     type: "all",
     labelKey: "admin.cleanup_all",
-    descKey: "admin.cleanup_confirm",
+    descKey: "admin.cleanup_subtitle",
   },
 ];
 

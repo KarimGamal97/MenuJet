@@ -34,41 +34,54 @@
     }
   },
   "pricing": {
-    "title": "Plans That Fit Your Ambition",
-    "subtitle": "Choose the payment plan that suits you and start your restaurant's transformation today with a fully free week!",
-    "free_trial": {
-      "title": "Free Trial",
-      "price": "Free",
-      "subtitle": "Valid for a full week (7 days)",
-      "feat_1": "Full dashboard access",
-      "feat_2": "Try all available features",
-      "feat_3": "No financial commitment",
-      "cta": "Start Free Trial"
+    "title": "Choose the Perfect Plan for You",
+    "subtitle": "Select the plan that fits your restaurant needs and budget — 0% commission on all orders",
+    "currency_egp": "Egyptian Pound",
+    "currency_sar": "Saudi Riyal",
+    "symbol_egp": "EGP",
+    "symbol_sar": "SAR",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "save_badge": "Save 20%",
+    "per_month": "month",
+    "per_year": "year",
+    "cta_start": "Get Started",
+    "basic": {
+      "title": "Basic Plan",
+      "desc": "Ideal for single restaurants & cafes looking for a smart digital menu and complete operations",
+      "yearly_note_egp": "~208 EGP/month (Save 500 EGP yearly)",
+      "yearly_note_sar": "~16.6 SAR/month (Save 40 SAR yearly)",
+      "feat_unlimited": "Unlimited menu categories and items",
+      "feat_qr_fast": "Instant QR code generation & ultra-fast responsive design",
+      "feat_studio": "Table stand & A4 poster QR print studio",
+      "feat_branding": "Full restaurant branding, logo, and color customization",
+      "feat_shifts": "Shift management & cash drawer reconciliation",
+      "feat_order_edit": "Smart order editing window for customers (3 - 10 mins)",
+      "feat_variants": "Multiple item variations (sizes, portions & extras)",
+      "feat_alerts": "Direct order management with instant audio & vibration alerts",
+      "feat_reports": "Detailed sales, profits, and performance analytics",
+      "feat_languages_reviews": "Unlimited languages, reviews, and discount promotions"
     },
-    "plan_semi_annual": {
-      "title": "Semi-Annual Plan",
-      "price": "9,000",
-      "currency": "EGP",
-      "duration": "6 months subscription",
-      "rate": "(Equivalent to 1,500 EGP/month)",
-      "feat_1": "Custom QR code design",
-      "feat_2": "Continuous tech support",
-      "feat_3": "Free system updates",
-      "cta": "Subscribe Now"
+    "pro": {
+      "popular_badge": "Most Popular",
+      "title": "Pro Plan",
+      "desc": "The complete solution for multi-branches, delivery zones, digital payments & WhatsApp ordering",
+      "yearly_note_egp": "~416 EGP/month (Save 1,000 EGP yearly)",
+      "yearly_note_sar": "~33.3 SAR/month (Save 80 SAR yearly)",
+      "includes_basic": "Includes all Basic Plan features completely +",
+      "feat_bio_hub": "Smart integrated restaurant bio & social hub (Bio Hub)",
+      "feat_payments": "Electronic payments support (InstaPay & Digital Wallets)",
+      "feat_delivery": "Branch management with zone-based delivery pricing",
+      "feat_whatsapp": "Automatic direct order reception and confirmation via WhatsApp",
+      "feat_tables_queue": "Table numbers & takeaway queue management",
+      "feat_hours": "Automated opening/closing hours and ordering controls",
+      "feat_staff": "Staff accounts and cashier permission management",
+      "feat_support": "Top priority 24/7 technical support & system updates"
     },
-    "plan_annual": {
-      "badge": "Best Choice",
-      "title": "Annual Plan\n(Best Choice)",
-      "price": "15,600",
-      "currency": "EGP",
-      "duration": "12 months subscription",
-      "rate": "(Equivalent to 1,300 EGP/month)",
-      "feat_1": "Top priority in technical support",
-      "feat_2": "All system features included",
-      "saving": "Save 2,400 EGP compared to monthly",
-      "cta": "Subscribe Now"
-    },
-    "footer_note": "🎁 All plans include a 7-day completely free trial - cancel anytime with zero fees!"
+    "footer": {
+      "guarantee": "Instant activation in 1 minute — continuous support with 0% commission on orders",
+      "trial_cta": "Start Your 14-Day Free Trial Now"
+    }
   },
   "contact": {
     "title": "Ready to upgrade your restaurant?",

@@ -17,19 +17,13 @@
       />
 
       <template v-else>
-        <!-- Floating button to return to Welcome Hub -->
-        <button
-          v-if="isBioHubAllowed"
-          @click="showBioHub = true"
-          type="button"
-          class="fixed bottom-24 right-4 z-40 px-3.5 py-2 rounded-full bg-slate-900/95 hover:bg-slate-900 text-white shadow-xl backdrop-blur-md border border-white/20 text-xs font-bold flex items-center gap-2 active:scale-95 transition-all cursor-pointer"
-          :title="$t('bio_hub.back_to_hub')"
-        >
-          <BaseIcon name="sparkles" class="w-3.5 h-3.5 text-amber-400" />
-          <span>{{ $t('bio_hub.back_to_hub') }}</span>
-        </button>
-
-        <MenuHeader :restaurant="restaurant" :locale="locale" :isOpen="isActuallyOpen" />
+        <MenuHeader
+          :restaurant="restaurant"
+          :locale="locale"
+          :isOpen="isActuallyOpen"
+          :isBioHubAllowed="isBioHubAllowed"
+          @open-bio-hub="showBioHub = true"
+        />
       
       <!-- Closed Overlay -->
       <div v-if="!isShopOpen" class="fixed inset-0 z-[100] bg-black/60 backdrop-blur-md flex items-center justify-center p-6 text-center animate-in fade-in duration-500">
@@ -117,7 +111,7 @@
             <div
               ref="categoriesContainer"
               @scroll="checkCategoryScroll"
-              class="flex-1 min-w-0 flex gap-2 overflow-x-auto custom-scrollbar-thin py-1.5 scroll-smooth select-none px-0.5"
+              class="flex-1 min-w-0 flex gap-2 overflow-x-auto no-scrollbar py-1.5 scroll-smooth select-none px-0.5"
             >
               <button
                 v-for="cat in categories"
@@ -456,11 +450,19 @@ onMounted(() => {
       checkCategoryScroll();
     });
     window.addEventListener("resize", checkCategoryScroll);
+    if (document.fonts) {
+      document.fonts.ready.then(() => {
+        checkCategoryScroll();
+      });
+    }
   }
 });
 
+let categoriesObserver = null;
+
 onUnmounted(() => {
   if (placeholderTimer) clearInterval(placeholderTimer);
+  if (categoriesObserver) categoriesObserver.disconnect();
   if (process.client) {
     window.removeEventListener("resize", checkCategoryScroll);
   }
@@ -480,25 +482,58 @@ const categories = computed(() => {
 });
 
 const categoriesContainer = ref(null);
-const canScrollLeft = ref(false);
+const canScrollLeft = ref(true);
 const canScrollRight = ref(false);
-const hasScrollOverflow = ref(false);
+const isOverflowing = ref(false);
+
+// Guaranteed to appear immediately if there are more than 3 categories, or when container overflows
+const hasScrollOverflow = computed(() => {
+  if (categories.value.length > 3) return true;
+  return isOverflowing.value;
+});
 
 const checkCategoryScroll = () => {
   const el = categoriesContainer.value;
-  if (!el) return;
+  if (!el) {
+    if (categories.value.length > 3) {
+      canScrollLeft.value = true;
+      canScrollRight.value = false;
+    }
+    return;
+  }
   const maxScroll = el.scrollWidth - el.clientWidth;
   if (maxScroll <= 5) {
-    hasScrollOverflow.value = false;
+    isOverflowing.value = false;
     canScrollLeft.value = false;
     canScrollRight.value = false;
     return;
   }
-  hasScrollOverflow.value = true;
+  isOverflowing.value = true;
   const current = Math.abs(el.scrollLeft);
   canScrollLeft.value = current < maxScroll - 8;
   canScrollRight.value = current > 8;
 };
+
+// Auto-detect as soon as DOM element is rendered or resized
+watch(categoriesContainer, (newEl, oldEl) => {
+  if (oldEl && categoriesObserver) {
+    categoriesObserver.disconnect();
+  }
+  if (newEl && process.client) {
+    if (typeof ResizeObserver !== "undefined") {
+      categoriesObserver = new ResizeObserver(() => {
+        checkCategoryScroll();
+      });
+      categoriesObserver.observe(newEl);
+    }
+    nextTick(() => {
+      checkCategoryScroll();
+      setTimeout(checkCategoryScroll, 80);
+      setTimeout(checkCategoryScroll, 250);
+      setTimeout(checkCategoryScroll, 600);
+    });
+  }
+});
 
 const scrollCategories = (direction) => {
   const el = categoriesContainer.value;
@@ -527,10 +562,12 @@ watch(
       if (!activeCategory.value || !newCats.includes(activeCategory.value)) {
         activeCategory.value = newCats[0];
       }
-      setTimeout(() => {
-        isInitialLoading.value = false;
+      isInitialLoading.value = false;
+      nextTick(() => {
         checkCategoryScroll();
-      }, 100);
+        setTimeout(checkCategoryScroll, 100);
+        setTimeout(checkCategoryScroll, 300);
+      });
     }
   },
   { immediate: true },
@@ -600,21 +637,5 @@ const filteredItems = computed(() => {
 .placeholder-slide-leave-to {
   opacity: 0;
   transform: translateY(-100%);
-}
-
-/* Custom Thin Horizontal Scrollbar */
-.custom-scrollbar-thin::-webkit-scrollbar {
-  height: 4px;
-}
-.custom-scrollbar-thin::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 9999px;
-}
-.custom-scrollbar-thin::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.55);
-  border-radius: 9999px;
-}
-.custom-scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.85);
 }
 </style>
