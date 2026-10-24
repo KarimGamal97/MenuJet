@@ -9,6 +9,33 @@
     </template>
 
     <template v-else-if="restaurant">
+      <!-- Expired Subscription Screen for Customers -->
+      <div
+        v-if="isSubscriptionExpired"
+        class="fixed inset-0 z-[120] bg-white flex flex-col items-center justify-center p-6 text-center animate-in fade-in duration-300"
+      >
+        <div class="w-20 h-20 bg-orange-50 text-orange-600 rounded-3xl flex items-center justify-center mb-5 text-4xl shadow-sm shadow-orange-100">
+          🍽️
+        </div>
+        <h2 class="text-2xl font-black text-gray-900 mb-2">
+          {{ locale === 'ar' ? 'المنيو غير متاح حالياً' : 'Menu Currently Unavailable' }}
+        </h2>
+        <p class="text-sm font-medium text-gray-500 max-w-xs leading-relaxed mb-6">
+          {{ locale === 'ar'
+            ? 'نعتذر لكم، خدمة المنيو الإلكتروني متوقفة مؤقتاً لأعمال التحديث. يُرجى التواصل مباشرة مع إدارة المطعم.'
+            : 'We apologize, the digital menu is temporarily unavailable for maintenance. Please contact the restaurant directly.'
+          }}
+        </p>
+        <a
+          v-if="restaurant?.whatsapp_number"
+          :href="`https://wa.me/${String(restaurant.whatsapp_number).replace(/[^0-9]/g, '')}`"
+          target="_blank"
+          class="py-3.5 px-6 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-2xl shadow-lg shadow-orange-500/25 transition-all active:scale-95"
+        >
+          {{ locale === 'ar' ? 'التواصل مع المطعم' : 'Contact Restaurant' }}
+        </a>
+      </div>
+
       <RestaurantHub
         v-if="shouldDisplayBioHub"
         :restaurant="restaurant"
@@ -336,6 +363,36 @@ const isActuallyOpen = computed(() => {
 
   // 3. If both are OFF, then it's closed
   return false;
+});
+
+// Subscription expiration check
+const isSubscriptionExpired = computed(() => {
+  if (!restaurant.value) return false;
+  if (restaurant.value.role === "super_admin") return false;
+
+  const endDate =
+    restaurant.value.subscription_end_date ||
+    restaurant.value.subscription_ends_at ||
+    restaurant.value.trial_end_date ||
+    restaurant.value.trial_ends_at ||
+    restaurant.value.trial_end ||
+    restaurant.value.expires_at ||
+    restaurant.value.end_date;
+
+  if (!endDate) return false;
+
+  let s = String(endDate).trim();
+  if (s.includes(" ") && !s.includes("T")) {
+    s = s.replace(" ", "T");
+  }
+  s = s.replace(/([+-]\d{2})$/, "$1:00");
+  const timestamp = new Date(s).getTime();
+  if (isNaN(timestamp)) {
+    const fallback = new Date(endDate).getTime();
+    if (isNaN(fallback)) return false;
+    return fallback < Date.now();
+  }
+  return timestamp < Date.now();
 });
 
 // Ordering enabled toggle from restaurant settings
