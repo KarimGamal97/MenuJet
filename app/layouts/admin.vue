@@ -122,9 +122,9 @@
                 <span class="text-sm shrink-0" :class="{ 'animate-pulse': trialTimeLeft.days <= 3 }">
                   {{ trialTimeLeft.expired ? '⚠️' : '⏳' }}
                 </span>
-                <span class="text-xs font-bold text-gray-600 truncate">
-                  {{ $t('plans.trial_period_label') }}
-                </span>
+<span class="text-xs font-bold text-gray-600 truncate">
+  {{ isTrial ? $t('plans.trial_period_label') : 'متبقي على التجديد' }}
+</span>
               </div>
               <span class="text-xs font-black shrink-0">
                 {{ trialBadgeText }}
@@ -520,21 +520,21 @@ const trialBadgeText = computed(() => {
   const { days, hours, minutes } = trialTimeLeft.value;
   if (locale.value === 'ar') {
     if (days >= 3 && days <= 10) {
-      return `متبقي ${days} أيام`;
+      return `${days} أيام`;
     }
     if (days > 10) {
-      return `متبقي ${days} يوم`;
+      return `${days} يوم`;
     }
     if (days === 2) {
-      return `متبقي يومين`;
+      return `يومين`;
     }
     if (days === 1) {
-      return hours > 0 ? `متبقي يوم و ${hours} ساعة` : `متبقي يوم واحد`;
+      return hours > 0 ? `يوم و ${hours} ساعة` : `يوم واحد`;
     }
     if (hours > 0) {
-      return `متبقي ${hours} س و ${minutes} د`;
+      return `${hours} س و ${minutes} د`;
     }
-    return `متبقي ${minutes} دقيقة`;
+    return `${minutes} دقيقة`;
   } else {
     if (days > 1) return `${days} days left`;
     if (days === 1) return `1 day, ${hours}h left`;
