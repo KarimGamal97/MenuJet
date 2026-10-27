@@ -18,13 +18,10 @@
           🍽️
         </div>
         <h2 class="text-2xl font-black text-gray-900 mb-2">
-          {{ locale === 'ar' ? 'المنيو غير متاح حالياً' : 'Menu Currently Unavailable' }}
+          {{ $t('menu.unavailable_title') }}
         </h2>
         <p class="text-sm font-medium text-gray-500 max-w-xs leading-relaxed mb-6">
-          {{ locale === 'ar'
-            ? 'نعتذر لكم، خدمة المنيو الإلكتروني متوقفة مؤقتاً لأعمال التحديث. يُرجى التواصل مباشرة مع إدارة المطعم.'
-            : 'We apologize, the digital menu is temporarily unavailable for maintenance. Please contact the restaurant directly.'
-          }}
+          {{ $t('menu.unavailable_desc') }}
         </p>
         <a
           v-if="restaurant?.whatsapp_number"
@@ -32,7 +29,7 @@
           target="_blank"
           class="py-3.5 px-6 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-2xl shadow-lg shadow-orange-500/25 transition-all active:scale-95"
         >
-          {{ locale === 'ar' ? 'التواصل مع المطعم' : 'Contact Restaurant' }}
+          {{ $t('menu.contact_restaurant') }}
         </a>
       </div>
 
@@ -184,7 +181,7 @@
 
       <main class="flex-grow max-w-3xl mx-auto w-full p-4 lg:p-6">
         <!-- 1. Skeleton Loading (While fetching or calculating initial category) -->
-        <div v-if="pending || isInitialLoading" class="flex flex-col gap-3">
+        <div v-if="pending || isInitialLoading" key="items-skeleton" class="flex flex-col gap-3">
           <div v-for="i in 6" :key="i" class="bg-white p-4 rounded-[2rem] border border-gray-50 flex items-center gap-4 animate-pulse">
             <div class="w-20 h-20 rounded-2xl bg-gray-100 flex-shrink-0"></div>
             <div class="flex-grow space-y-3">
@@ -198,6 +195,7 @@
         <!-- 2. Items List -->
         <div 
           v-else-if="filteredItems.length > 0"
+          key="items-list"
           class="flex flex-col gap-3"
           :class="cartCount > 0 ? 'pb-40' : 'pb-16'"
         >
@@ -211,7 +209,7 @@
         </div>
 
         <!-- 3. No Results -->
-        <div v-else class="text-center py-5">
+        <div v-else key="items-empty" class="text-center py-5">
           <div class="mb-4 flex justify-center">
             <BaseIcon name="boxes" class="w-16 h-16 opacity-20" />
           </div>

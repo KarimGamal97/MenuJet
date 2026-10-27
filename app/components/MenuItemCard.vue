@@ -13,15 +13,16 @@
 
     <div class="flex items-center gap-4 text-right">
       <img
-        v-if="item.image"
+        v-if="item.image && !imageError"
         :src="item.image"
+        @error="imageError = true"
         class="w-16 h-16 rounded-2xl object-cover bg-gray-100 shadow-sm transition-transform group-hover:scale-105 border border-gray-50 shrink-0"
       />
       <div
         v-else
-        class="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-200 border border-gray-50 shrink-0"
+        class="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-300 border border-gray-100 shrink-0"
       >
-        <BaseIcon name="photo" class="w-8 h-8" />
+        <BaseIcon name="photo" class="w-8 h-8 text-gray-300" />
       </div>
 
       <div class="min-w-0">
@@ -81,6 +82,7 @@
 
 <script setup>
 const { addToCart } = useCart();
+const imageError = ref(false);
 
 const props = defineProps({
   item: {
