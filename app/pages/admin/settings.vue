@@ -634,6 +634,53 @@
           </div>
         </div>
 
+        <!-- شريط التنويهات والعروض (ميزة حصرية للباقة الاحترافية) -->
+        <div class="md:col-span-2 pt-6 border-t border-gray-100 mt-4">
+          <div class="flex items-center justify-between gap-3 mb-4 px-1">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center shrink-0">
+                <BaseIcon name="sparkles" class="w-5 h-5 text-orange-600" />
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <label class="text-sm font-bold text-gray-800 block">شريط التنويهات والعروض المتحرك</label>
+                  <span class="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-black">
+                    👑 {{ $t("plans.pro_name") }}
+                  </span>
+                </div>
+                <p class="text-[10px] text-gray-400 font-bold mt-0.5">
+                  إظهار شريط إعلاني متحرك أعلى المنيو للإعلان عن الخصومات والتنبيهات
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-gray-50/50 rounded-3xl border border-gray-100 p-4 space-y-4">
+            <!-- مفتاح التفعيل مع قفل لغير مشتركي Pro -->
+            <BaseToggle
+              v-model="form.announcement_enabled"
+              label="تفعيل شريط التنويهات في المنيو"
+              :locked="!isPro"
+              :badge="$t('plans.pro_badge_short')"
+              @lock-click="openUpgradeForFeature('شريط التنويهات والعروض', $t('plans.pro_badge_short'), 'ميزة شريط التنويهات متاحة حصرياً لمشتركي الباقة الاحترافية')"
+              class="!bg-white"
+            />
+
+            <!-- حقل كتابة نص التنويه (يظهر فقط إذا كانت الباقة Pro والمفتاح مفعل) -->
+            <div v-if="form.announcement_enabled && isPro" class="space-y-1.5 animate-in slide-in-from-top-2 duration-200">
+              <label class="text-xs font-bold text-gray-700 block px-1">
+                نص التنويه أو الخصم
+              </label>
+              <input
+                v-model="form.announcement_text"
+                type="text"
+                placeholder="مثال: خصم 15% على المنيو بالكامل لفترة محدودة 🎉"
+                class="w-full px-4 py-3 bg-white border border-gray-200 rounded-2xl text-sm font-bold text-gray-800 outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all"
+              />
+            </div>
+          </div>
+        </div>
+
         <!-- Delete Category Confirmation Modal -->
         <BaseModal
           :isOpen="showDeleteCategoryModal"
@@ -1190,6 +1237,8 @@ const form = ref({
   social_phone: "",
   allow_order_editing: false,
   order_edit_window_minutes: 5,
+  announcement_enabled: false,
+  announcement_text: "",
 });
 
 const isPaymentDropdownOpen = ref(false);
@@ -1237,6 +1286,8 @@ watch(
           social_phone: data.social_phone || "",
           allow_order_editing: data.allow_order_editing === true,
           order_edit_window_minutes: data.order_edit_window_minutes || 5,
+          announcement_enabled: data.announcement_enabled === true,
+          announcement_text: data.announcement_text || "",
         };
       }
     }
@@ -1470,6 +1521,8 @@ const saveSettings = async () => {
     social_phone: form.value.social_phone ? form.value.social_phone.trim() : "",
     allow_order_editing: form.value.allow_order_editing === true,
     order_edit_window_minutes: Number(form.value.order_edit_window_minutes) || 5,
+    announcement_enabled: form.value.announcement_enabled === true,
+    announcement_text: form.value.announcement_text ? form.value.announcement_text.trim() : "",
   };
 
   const success = await updateProfile(ownerId.value, settingsData);

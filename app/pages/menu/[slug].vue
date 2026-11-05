@@ -73,10 +73,10 @@
       </div>
       
       <nav
-        class="sticky top-20 z-40 backdrop-blur-md border-b border-white/10 flex flex-col py-3 shadow-md transition-all duration-300"
+        class="sticky top-20 z-40 backdrop-blur-md border-b border-white/10 flex flex-col shadow-md transition-all duration-300"
         :style="{ backgroundColor: primaryColor }"
       >
-        <div class="max-w-3xl mx-auto w-full px-4 flex flex-col gap-3">
+        <div class="max-w-3xl mx-auto w-full px-4 flex flex-col gap-3 py-3">
           <!-- Search Input -->
           <div class="relative w-full bg-white rounded-2xl shadow-sm overflow-hidden border border-white/20">
             <input
@@ -175,6 +175,35 @@
             >
               <BaseIcon name="chevron-left" class="w-3.5 h-3.5" />
             </button>
+          </div>
+        </div>
+
+        <!-- شريط التنويه المتحرك: ملتصق بالناف، بنفس لون البراند، بسيط وملء الشاشة في كل الأجهزة -->
+        <div
+          v-if="showAnnouncement"
+          class="w-full bg-black/10 border-t border-white/15 py-1.5 overflow-hidden select-none"
+        >
+          <div class="w-full overflow-hidden whitespace-nowrap flex items-center" dir="ltr">
+            <div class="animate-marquee-scroll font-bold text-xs sm:text-sm text-white flex items-center shrink-0">
+              <span class="px-6">{{ restaurant.announcement_text }}</span>
+              <span class="opacity-60 text-xs">✦</span>
+              <span class="px-6">{{ restaurant.announcement_text }}</span>
+              <span class="opacity-60 text-xs">✦</span>
+              <span class="px-6">{{ restaurant.announcement_text }}</span>
+              <span class="opacity-60 text-xs">✦</span>
+              <span class="px-6">{{ restaurant.announcement_text }}</span>
+              <span class="opacity-60 text-xs">✦</span>
+            </div>
+            <div class="animate-marquee-scroll font-bold text-xs sm:text-sm text-white flex items-center shrink-0" aria-hidden="true">
+              <span class="px-6">{{ restaurant.announcement_text }}</span>
+              <span class="opacity-60 text-xs">✦</span>
+              <span class="px-6">{{ restaurant.announcement_text }}</span>
+              <span class="opacity-60 text-xs">✦</span>
+              <span class="px-6">{{ restaurant.announcement_text }}</span>
+              <span class="opacity-60 text-xs">✦</span>
+              <span class="px-6">{{ restaurant.announcement_text }}</span>
+              <span class="opacity-60 text-xs">✦</span>
+            </div>
           </div>
         </div>
       </nav>
@@ -408,6 +437,20 @@ const isElectronicPaymentAllowed = computed(() => {
   const p = restaurant.value;
   const planId = p.plan?.id || p.plans?.id || p.plan_id || p.plan_type || "free";
   return planId === "pro";
+});
+
+// Announcement banner allowed and enabled (Pro plan only)
+const showAnnouncement = computed(() => {
+  if (!restaurant.value) return false;
+  const p = restaurant.value;
+  const planId = p.plan?.id || p.plans?.id || p.plan_id || p.plan_type || "free";
+  const isPro = planId === "pro";
+  return Boolean(
+    isPro &&
+    p.announcement_enabled &&
+    p.announcement_text &&
+    p.announcement_text.trim().length > 0
+  );
 });
 
 // Bio / Welcome Hub allowed and enabled
@@ -692,5 +735,22 @@ const filteredItems = computed(() => {
 .placeholder-slide-leave-to {
   opacity: 0;
   transform: translateY(-100%);
+}
+
+/* Announcement marquee ticker */
+@keyframes marquee-scroll {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.animate-marquee-scroll {
+  display: flex;
+  white-space: nowrap;
+  animation: marquee-scroll 24s linear infinite;
+  will-change: transform;
 }
 </style>

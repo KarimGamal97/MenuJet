@@ -54,6 +54,8 @@ export const useSettings = () => {
           delete fallbackData.social_phone;
           delete fallbackData.allow_order_editing;
           delete fallbackData.order_edit_window_minutes;
+          delete fallbackData.announcement_enabled;
+          delete fallbackData.announcement_text;
           const retryRes = await client
             .from("profiles")
             .update(fallbackData)

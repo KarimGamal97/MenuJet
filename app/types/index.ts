@@ -107,5 +107,7 @@ export interface Profile {
   social_phone?: string;
   allow_order_editing?: boolean;
   order_edit_window_minutes?: number;
+  announcement_enabled?: boolean;
+  announcement_text?: string;
 }
 
