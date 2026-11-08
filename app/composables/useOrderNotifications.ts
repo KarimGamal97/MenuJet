@@ -1,5 +1,3 @@
-// app/composables/useOrderNotifications.ts
-
 export const useOrderNotifications = () => {
   const client = useSupabaseClient<any>();
   const { $toast } = useNuxtApp();
@@ -47,32 +45,28 @@ export const useOrderNotifications = () => {
     }
   };
 
-  // Mobile Audio Unlock: Triggered on user interaction to satisfy iOS/Android autoplay policy
+  // Mobile Audio Unlock: Triggered on user interaction to satisfy iOS/Android autoplay policy (completely silent)
   const unlockAudio = () => {
     if (!process.client || isAudioUnlocked.value) return;
 
     try {
       const audio = getAudio();
       if (audio) {
-        audio.volume = 0.01;
+        audio.muted = true; 
         const playPromise = audio.play();
         if (playPromise !== undefined) {
           playPromise
             .then(() => {
               audio.pause();
               audio.currentTime = 0;
+              audio.muted = false; 
               audio.volume = 1.0;
               isAudioUnlocked.value = true;
-              console.log("🔊 Audio successfully unlocked for mobile/browser");
             })
-            .catch((err) => {
-              console.warn("Could not unlock audio yet:", err);
-            });
+            .catch(() => {});
         }
       }
-    } catch (e) {
-      console.warn("Audio unlock error:", e);
-    }
+    } catch (e) {}
 
     requestNotificationPermission();
   };
