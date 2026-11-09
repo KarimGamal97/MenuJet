@@ -362,10 +362,10 @@ onMounted(() => {
 const isActuallyOpen = computed(() => {
   if (!restaurant.value) return true;
 
-  // 1. If manual toggle is ON, it's ALWAYS OPEN (overrides everything)
-  if (restaurant.value.is_active === true) return true;
+  // 1. If manual toggle is OFF (disabled by restaurant owner), it's completely closed
+  if (restaurant.value.is_active === false) return false;
 
-  // 2. If manual toggle is OFF, check automated hours
+  // 2. If automated hours are enabled, check if current time is within schedule
   if (restaurant.value.automated_hours_enabled) {
     if (!currentTimeStr.value) return true; // Wait for client hydration
 
@@ -389,8 +389,8 @@ const isActuallyOpen = computed(() => {
     }
   }
 
-  // 3. If both are OFF, then it's closed
-  return false;
+  // 3. Automated hours disabled: restaurant is open based on manual toggle (is_active)
+  return restaurant.value.is_active === true;
 });
 
 // Subscription expiration check
