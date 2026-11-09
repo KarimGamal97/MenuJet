@@ -56,6 +56,7 @@ export const useSettings = () => {
           delete fallbackData.order_edit_window_minutes;
           delete fallbackData.announcement_enabled;
           delete fallbackData.announcement_text;
+          delete fallbackData.cashier_ordering_enabled;
           const retryRes = await client
             .from("profiles")
             .update(fallbackData)

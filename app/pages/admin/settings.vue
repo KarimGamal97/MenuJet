@@ -474,6 +474,11 @@
               :label="$t('plans.enable_phone_number')"
               class="!bg-gray-50/50 !border !border-gray-100"
             />
+            <BaseToggle
+              v-model="form.cashier_ordering_enabled"
+              :label="$t('plans.enable_cashier_ordering')"
+              class="!bg-gray-50/50 !border !border-gray-100"
+            />
 
             <!-- Order Editing Feature Settings -->
             <div class="sm:col-span-2 bg-gray-50/50 rounded-3xl border border-gray-100 p-4 transition-all">
@@ -1239,6 +1244,7 @@ const form = ref({
   order_edit_window_minutes: 5,
   announcement_enabled: false,
   announcement_text: "",
+  cashier_ordering_enabled: true,
 });
 
 const isPaymentDropdownOpen = ref(false);
@@ -1288,6 +1294,7 @@ watch(
           order_edit_window_minutes: data.order_edit_window_minutes || 5,
           announcement_enabled: data.announcement_enabled === true,
           announcement_text: data.announcement_text || "",
+          cashier_ordering_enabled: data.cashier_ordering_enabled !== false,
         };
       }
     }
@@ -1523,6 +1530,7 @@ const saveSettings = async () => {
     order_edit_window_minutes: Number(form.value.order_edit_window_minutes) || 5,
     announcement_enabled: form.value.announcement_enabled === true,
     announcement_text: form.value.announcement_text ? form.value.announcement_text.trim() : "",
+    cashier_ordering_enabled: form.value.cashier_ordering_enabled !== false,
   };
 
   const success = await updateProfile(ownerId.value, settingsData);

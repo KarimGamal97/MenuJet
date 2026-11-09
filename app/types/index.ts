@@ -109,5 +109,6 @@ export interface Profile {
   order_edit_window_minutes?: number;
   announcement_enabled?: boolean;
   announcement_text?: string;
+  cashier_ordering_enabled?: boolean;
 }
 

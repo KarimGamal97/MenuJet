@@ -110,19 +110,26 @@
           </div>
 
           <div class="flex gap-3" v-if="cart.length > 0">
-          <button
-            v-if="whatsappOrderingEnabled !== false"
-            @click="openWhatsappCheckout"
-            class="flex-1 flex items-center justify-center gap-2 py-4 bg-white text-green-600 border border-gray-300 rounded-2xl font-black text-[12px] shadow-sm hover:shadow-md transition-all active:scale-95"
-          >
-            <BaseIcon name="whatsapp" class="w-5 h-5 fill-current" />
-            {{ $t("cart.order_whatsapp") }}
-          </button>
+            <button
+              v-if="whatsappOrderingEnabled !== false"
+              @click="openWhatsappCheckout"
+              :class="[
+                'flex items-center justify-center gap-2 py-4 bg-white text-green-600 border border-gray-300 rounded-2xl font-black shadow-sm hover:shadow-md transition-all active:scale-95',
+                cashierOrderingEnabled !== false ? 'flex-1 text-[12px]' : 'w-full text-sm'
+              ]"
+            >
+              <BaseIcon name="whatsapp" class="w-5 h-5 fill-current" />
+              {{ $t("cart.order_whatsapp") }}
+            </button>
 
             <button
+              v-if="cashierOrderingEnabled !== false"
               @click="openCashierCheckout"
               :disabled="isSubmitting"
-              class="flex-1 flex items-center justify-center py-4 bg-gray-900 text-white rounded-2xl font-black text-[12px] disabled:opacity-50 transition-all active:scale-95"
+              :class="[
+                'flex items-center justify-center py-4 bg-gray-900 text-white rounded-2xl font-black disabled:opacity-50 transition-all active:scale-95',
+                whatsappOrderingEnabled !== false ? 'flex-1 text-[12px]' : 'w-full text-sm'
+              ]"
             >
               <div
                 v-if="isSubmitting"
@@ -544,6 +551,7 @@ const props = defineProps({
   tableNumberEnabled: { type: Boolean, default: false },
   queueNumberEnabled: { type: Boolean, default: false },
   whatsappOrderingEnabled: { type: Boolean, default: true },
+  cashierOrderingEnabled: { type: Boolean, default: true },
   phoneNumberEnabled: { type: Boolean, default: true },
   paymentMethodsAllowed: { type: String, default: "all" },
   vodafoneCashNumber: { type: String, default: "" },

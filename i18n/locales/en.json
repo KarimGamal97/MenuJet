@@ -467,6 +467,7 @@
     "full_upgrade_msg": "Choose the right plan for your restaurant to unlock all platform features without limits.",
     "enable_whatsapp_ordering": "Accept Orders (or browse only)",
     "enable_phone_number": "Enable Phone Number",
+    "enable_cashier_ordering": "Enable Cashier Ordering",
     "reached_limit": "Plan limit reached 🔒",
     "modal_default_title": "Upgrade your plan & unlock limitless features",
     "items_limit_msg": "You have used {current} out of {max} items allowed on the Free plan.",

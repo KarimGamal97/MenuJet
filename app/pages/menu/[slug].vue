@@ -273,6 +273,7 @@
         :tableNumberEnabled="restaurant.show_table_number === true"
         :queueNumberEnabled="restaurant.show_queue_number === true"
         :whatsappOrderingEnabled="isWhatsappOrderingAllowed"
+        :cashierOrderingEnabled="restaurant.cashier_ordering_enabled !== false"
         :phoneNumberEnabled="restaurant.show_phone_number !== false"
         :paymentMethodsAllowed="isElectronicPaymentAllowed ? (restaurant.payment_methods_allowed || 'all') : 'none'"
         :vodafoneCashNumber="restaurant.vodafone_cash_number || ''"
