@@ -387,6 +387,7 @@
     "edit_confirm": "Do you want to edit this order? Cart will open so you can modify items and resubmit."
   },
   "menu": {
+    "item_unavailable": "Currently unavailable",
     "no_items": "No items in this category currently",
     "restaurant_not_found": "Restaurant not found",
     "restaurant_not_found_desc": "Sorry, we couldn't find a menu with this name. Please make sure you scanned the correct restaurant QR code.",

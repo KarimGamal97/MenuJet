@@ -502,6 +502,7 @@ const formatTime12h = (timeStr) => {
 };
 
 const openItemModal = (item) => {
+  if (item?.available === false) return;
   selectedItem.value = item;
   showItemModal.value = true;
 };
@@ -687,9 +688,7 @@ const filteredItems = computed(() => {
     return [];
   }
 
-  let items = restaurant.value.menu_items.filter(
-    (i) => i.available !== false,
-  );
+  let items = restaurant.value.menu_items;
 
   if (searchQuery.value) {
     const q = normalizeArabic(searchQuery.value);
