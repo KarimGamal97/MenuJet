@@ -224,7 +224,7 @@
     "instapay_title": "إنستا باي (InstaPay)",
     "instapay_account_label": "معرف أو رقم إنستا باي (IPA / Account)",
     "instapay_account_placeholder": "مثال: username{'@'}instapay أو 011xxxxxxxx",
-    "hidden": "مخفي",
+    "hidden": "غير متوفر",
     "available": "متوفر للطلب",
     "orders": "الطلبات",
     "qr_code_title": "رمز المنيو (QR Code) الخاص بك",
