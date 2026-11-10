@@ -261,12 +261,14 @@
         :item="selectedItem"
         :isClosed="!isActuallyOpen"
         :allowOrdering="canOrder"
+        :primaryColor="primaryColor"
         @close="showItemModal = false"
       />
 
       <CartModal
         v-if="restaurant && restaurant.user_id"
         :isOpen="showCart"
+        :primaryColor="primaryColor"
         :whatsappNumber="restaurant.whatsapp_number"
         :restaurantUserId="restaurant.user_id"
         :deliveryAreas="restaurant.delivery_areas"
@@ -342,6 +344,15 @@ const {
 const primaryColor = computed(
   () => restaurant.value?.primary_color || "#ea580c",
 );
+
+useHead(() => ({
+  style: [
+    {
+      id: "menu-brand-theme-styles",
+      innerHTML: `:root, body { --p-color: ${primaryColor.value}; }`,
+    },
+  ],
+}));
 
 const isShopOpenOverride = ref(false);
 const currentTimeStr = ref("");
@@ -752,5 +763,51 @@ const filteredItems = computed(() => {
   white-space: nowrap;
   animation: marquee-scroll 24s linear infinite;
   will-change: transform;
+}
+</style>
+
+<style>
+/* Global Brand Theme Override for Menu Page & Teleported Modals */
+.brand-theme-scope .bg-orange-600,
+.brand-theme-scope .bg-orange-500,
+.brand-theme-scope button.bg-orange-600,
+.brand-theme-scope button.bg-orange-500 {
+  background-color: var(--p-color) !important;
+}
+.brand-theme-scope .hover\:bg-orange-700:hover,
+.brand-theme-scope .hover\:bg-orange-600:hover,
+.brand-theme-scope .hover\:bg-orange-500:hover {
+  background-color: color-mix(in srgb, var(--p-color), black 12%) !important;
+}
+.brand-theme-scope .text-orange-600,
+.brand-theme-scope .text-orange-500,
+.brand-theme-scope .text-orange-400,
+.brand-theme-scope .text-orange-700,
+.brand-theme-scope .text-orange-900 {
+  color: var(--p-color) !important;
+}
+.brand-theme-scope .border-orange-600,
+.brand-theme-scope .border-orange-500 {
+  border-color: var(--p-color) !important;
+}
+.brand-theme-scope .focus\:border-orange-400:focus,
+.brand-theme-scope .focus\:border-orange-500:focus,
+.brand-theme-scope .focus\:ring-orange-500:focus {
+  border-color: var(--p-color) !important;
+  --tw-ring-color: var(--p-color) !important;
+}
+.brand-theme-scope .bg-orange-50 {
+  background-color: color-mix(in srgb, var(--p-color), transparent 92%) !important;
+}
+.brand-theme-scope .bg-orange-100 {
+  background-color: color-mix(in srgb, var(--p-color), transparent 85%) !important;
+}
+.brand-theme-scope .border-orange-100,
+.brand-theme-scope .border-orange-200 {
+  border-color: color-mix(in srgb, var(--p-color), transparent 75%) !important;
+}
+.brand-theme-scope .shadow-orange-200,
+.brand-theme-scope .shadow-orange-100 {
+  --tw-shadow-color: color-mix(in srgb, var(--p-color), transparent 75%) !important;
 }
 </style>

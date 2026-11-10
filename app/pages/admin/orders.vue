@@ -158,21 +158,28 @@
           <BaseIcon name="chevron-right" class="w-4 h-4" />
         </button>
 
-        <!-- Numbered Pages (1, 2, 3...) -->
-        <button
-          v-for="p in totalPages"
-          :key="p"
-          type="button"
-          @click="changePage(p)"
-          :class="[
-            'w-10 h-10 flex items-center justify-center rounded-2xl font-bold text-sm transition-all shadow-xs active:scale-95',
-            page === p
-              ? 'bg-orange-600 text-white shadow-orange-100 shadow-md pointer-events-none'
-              : 'bg-white border border-gray-200 text-gray-700 hover:border-orange-500 hover:text-orange-600',
-          ]"
-        >
-          {{ p }}
-        </button>
+        <!-- Numbered Pages (Smart Windowed 1, 2 ... 62) -->
+        <template v-for="(p, idx) in visiblePages" :key="idx">
+          <span
+            v-if="p === '...'"
+            class="w-8 h-10 flex items-center justify-center text-gray-400 font-black tracking-widest select-none text-xs"
+          >
+            •••
+          </span>
+          <button
+            v-else
+            type="button"
+            @click="changePage(p)"
+            :class="[
+              'w-10 h-10 flex items-center justify-center rounded-2xl font-bold text-sm transition-all shadow-xs active:scale-95',
+              page === p
+                ? 'bg-orange-600 text-white shadow-orange-100 shadow-md pointer-events-none'
+                : 'bg-white border border-gray-200 text-gray-700 hover:border-orange-500 hover:text-orange-600',
+            ]"
+          >
+            {{ p }}
+          </button>
+        </template>
 
         <!-- Next Page Button (التالي: points left in RTL) -->
         <button
@@ -229,6 +236,7 @@ const {
   fetchOrders,
   updateOrderStatus,
   cleanupOrders,
+  autoArchiveOldOrders,
   setupRealtimeOrders,
   stopRealtimeOrders,
 } = useOrders();
@@ -236,6 +244,38 @@ const {
 const totalPages = computed(() =>
   Math.ceil(totalOrders.value / pageSize.value),
 );
+
+// Smart Windowed Pagination (e.g. 1 2 3 ... 62 or 1 ... 30 31 32 ... 62)
+const visiblePages = computed(() => {
+  const total = totalPages.value;
+  const current = page.value;
+
+  if (total <= 7) {
+    return Array.from({ length: total }, (_, i) => i + 1);
+  }
+
+  const pages = [];
+
+  if (current <= 4) {
+    for (let i = 1; i <= 5; i++) pages.push(i);
+    pages.push("...");
+    pages.push(total);
+  } else if (current >= total - 3) {
+    pages.push(1);
+    pages.push("...");
+    for (let i = total - 4; i <= total; i++) pages.push(i);
+  } else {
+    pages.push(1);
+    pages.push("...");
+    pages.push(current - 1);
+    pages.push(current);
+    pages.push(current + 1);
+    pages.push("...");
+    pages.push(total);
+  }
+
+  return pages;
+});
 
 // Keep page in bounds if total orders decrease
 watch(totalPages, (newTotal) => {
@@ -270,6 +310,7 @@ watch(
   ownerId,
   async (newId) => {
     if (newId) {
+      await autoArchiveOldOrders(newId, 7);
       await fetchOrders(newId, page.value, pageSize.value);
       setupRealtimeOrders(newId);
     }

@@ -117,6 +117,23 @@ export const useOrders = () => {
     }
   };
 
+  const autoArchiveOldOrders = async (userId: string, days = CLEANUP_DAYS_THRESHOLD) => {
+    if (!userId) return;
+    try {
+      const cutoffDate = new Date();
+      cutoffDate.setDate(cutoffDate.getDate() - days);
+
+      await client
+        .from("orders")
+        .update({ status: "archived" })
+        .eq("user_id", userId)
+        .neq("status", "archived")
+        .lt("created_at", cutoffDate.toISOString());
+    } catch (err) {
+      console.error("Auto Archive Error:", err);
+    }
+  };
+
   const setupRealtimeOrders = (userId: string, onNewOrder?: Function) => {
     if (!userId || realtimeChannel.value) return;
 
@@ -168,6 +185,7 @@ export const useOrders = () => {
     updateOrderStatus,
     updateOrder,
     cleanupOrders,
+    autoArchiveOldOrders,
     setupRealtimeOrders,
     stopRealtimeOrders,
   };

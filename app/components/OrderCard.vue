@@ -26,9 +26,10 @@
       <div class="flex items-center gap-1.5 shrink-0">
         <span
           v-if="order.status === 'pending'"
-          class="text-[10px] font-black text-white bg-orange-500 px-2 py-1 rounded-full shadow-xs shadow-orange-100 animate-pulse whitespace-nowrap shrink-0 inline-flex items-center justify-center leading-none"
+          class="text-[10px] font-black text-white px-2.5 py-1 rounded-full shadow-xs whitespace-nowrap shrink-0 inline-flex items-center justify-center leading-none"
+          :class="isOldOrder ? 'bg-gray-400' : 'bg-orange-500 shadow-orange-100 animate-pulse'"
         >
-          {{ timeAgo === 'الآن' ? 'الآن' : 'منذ ' + timeAgo }}
+          {{ timeAgo }}
         </span>
         <button 
           @click="printOrder"
@@ -326,16 +327,43 @@ const paymentBadge = computed(() => {
 });
 
 const timeAgo = ref("");
+const isOldOrder = ref(false);
 
 const calculateTimeAgo = () => {
-  const diff = Math.floor(
+  const diffMinutes = Math.floor(
     (new Date().getTime() - new Date(props.order.created_at).getTime()) / 60000
   );
-  if (diff < 1) timeAgo.value = "الآن";
-  else if (diff === 1) timeAgo.value = "دقيقة واحدة";
-  else if (diff === 2) timeAgo.value = "دقيقتين";
-  else if (diff <= 10) timeAgo.value = `${diff} دقائق`;
-  else timeAgo.value = `${diff} دقيقة`;
+
+  if (diffMinutes < 1) {
+    timeAgo.value = "الآن";
+    isOldOrder.value = false;
+  } else if (diffMinutes === 1) {
+    timeAgo.value = "منذ دقيقة";
+    isOldOrder.value = false;
+  } else if (diffMinutes === 2) {
+    timeAgo.value = "منذ دقيقتين";
+    isOldOrder.value = false;
+  } else if (diffMinutes <= 10) {
+    timeAgo.value = `منذ ${diffMinutes} دقائق`;
+    isOldOrder.value = false;
+  } else if (diffMinutes < 60) {
+    timeAgo.value = `منذ ${diffMinutes} دقيقة`;
+    isOldOrder.value = false;
+  } else {
+    const hours = Math.floor(diffMinutes / 60);
+    const remMinutes = diffMinutes % 60;
+
+    if (hours >= 3) {
+      timeAgo.value = "+3 ساعات";
+      isOldOrder.value = true;
+    } else if (hours === 1) {
+      timeAgo.value = remMinutes > 0 ? `منذ ساعة و ${remMinutes} د` : "منذ ساعة";
+      isOldOrder.value = false;
+    } else if (hours === 2) {
+      timeAgo.value = remMinutes > 0 ? `منذ ساعتين و ${remMinutes} د` : "منذ ساعتين";
+      isOldOrder.value = false;
+    }
+  }
 };
 
 let timer;

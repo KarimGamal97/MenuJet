@@ -3,7 +3,8 @@
     <Transition name="modal">
       <div
         v-if="isOpen"
-        class="fixed inset-0 z-[200] flex items-end sm:items-center justify-center"
+        class="fixed inset-0 z-[200] flex items-end sm:items-center justify-center brand-theme-scope"
+        :style="{ '--p-color': primaryColor }"
         dir="rtl"
       >
         <!-- Backdrop -->
@@ -273,6 +274,7 @@ const props = defineProps({
   item: { type: Object, default: () => ({}) },
   isClosed: { type: Boolean, default: false },
   allowOrdering: { type: Boolean, default: true },
+  primaryColor: { type: String, default: "#ea580c" },
 });
 
 const emit = defineEmits(["close", "added"]);

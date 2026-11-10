@@ -2,7 +2,8 @@
   <Teleport to="body">
     <div
       v-if="isOpen"
-      class="fixed inset-0 z-[200] flex items-end sm:items-center justify-center"
+      class="fixed inset-0 z-[200] flex items-end sm:items-center justify-center brand-theme-scope"
+      :style="{ '--p-color': primaryColor }"
     >
       <div
         class="absolute inset-0 bg-black/40 backdrop-blur-sm"
@@ -146,7 +147,8 @@
   <Teleport to="body">
     <div
       v-if="showCashierModal"
-      class="fixed inset-0 z-[300] flex items-center justify-center p-4"
+      class="fixed inset-0 z-[300] flex items-center justify-center p-4 brand-theme-scope"
+      :style="{ '--p-color': primaryColor }"
     >
       <div
         class="absolute inset-0 bg-black/60 backdrop-blur-md"
@@ -287,7 +289,8 @@
   <Teleport to="body">
     <div
       v-if="showWhatsappCheckout"
-      class="fixed inset-0 z-[400] flex items-end sm:items-center justify-center sm:p-4"
+      class="fixed inset-0 z-[400] flex items-end sm:items-center justify-center sm:p-4 brand-theme-scope"
+      :style="{ '--p-color': primaryColor }"
       dir="rtl"
     >
       <div
@@ -556,6 +559,7 @@ const props = defineProps({
   paymentMethodsAllowed: { type: String, default: "all" },
   vodafoneCashNumber: { type: String, default: "" },
   instapayAccount: { type: String, default: "" },
+  primaryColor: { type: String, default: "#ea580c" },
 });
 
 const emit = defineEmits(["close"]);
