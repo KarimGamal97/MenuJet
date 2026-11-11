@@ -103,7 +103,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
       <!-- Chart 1: Daily Orders & Revenue Trend (7 / 12) -->
       <div
-        class="lg:col-span-7 bg-white p-6 md:p-8 rounded-[2.5rem] border border-gray-100 shadow-sm flex flex-col justify-between"
+        class="lg:col-span-7 bg-white p-5 sm:p-6 md:p-8 rounded-[2.5rem] border border-gray-100 shadow-sm flex flex-col justify-between"
       >
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
           <div>
@@ -385,6 +385,13 @@ const topDish = computed(() => {
   return topDishesList.value.length ? topDishesList.value[0] : null;
 });
 
+const isMobile = ref(false);
+let mediaQuery = null;
+
+const updateViewportFlag = () => {
+  isMobile.value = Boolean(mediaQuery?.matches);
+};
+
 // Render Trend Chart
 const renderTrendChart = () => {
   if (!trendCanvasRef.value) return;
@@ -395,13 +402,47 @@ const renderTrendChart = () => {
   }
 
   const canvas = trendCanvasRef.value;
-  const labels = daysData.value.map((d) => `${d.dayName} ${d.shortDate}`);
+  const mobile = isMobile.value;
+  const labels = daysData.value.map((d) => [d.dayName, d.shortDate]);
   const isOrders = metricType.value === "orders";
   const dataValues = isOrders
     ? daysData.value.map((d) => d.ordersCount)
     : daysData.value.map((d) => d.revenue);
 
   const maxVal = Math.max(...dataValues, 0);
+  const shouldRotateOrSkip = mobile
+    ? selectedPeriod.value > 7
+    : selectedPeriod.value > 14;
+
+  const baseTooltip = {
+    textDirection: "rtl",
+    backgroundColor: "#1F2937",
+    titleFont: { family: "Tajawal, sans-serif", size: 13, weight: "bold" },
+    bodyFont: { family: "Tajawal, sans-serif", size: 12 },
+    padding: 12,
+    cornerRadius: 12,
+  };
+
+  const formatTooltipTitle = (items) => {
+    const day = daysData.value[items[0]?.dataIndex];
+    return day ? `${day.dayName} - ${day.shortDate}` : "";
+  };
+
+  const xScale = {
+    grid: { display: false },
+    ticks: {
+      font: {
+        family: "Tajawal, sans-serif",
+        size: mobile ? 9 : 11,
+        weight: "bold",
+      },
+      color: "#6B7280",
+      padding: mobile ? 4 : 6,
+      maxRotation: shouldRotateOrSkip ? 45 : 0,
+      minRotation: 0,
+      autoSkip: shouldRotateOrSkip,
+    },
+  };
 
   try {
     if (isOrders) {
@@ -429,13 +470,9 @@ const renderTrendChart = () => {
           plugins: {
             legend: { display: false },
             tooltip: {
-              textDirection: "rtl",
-              backgroundColor: "#1F2937",
-              titleFont: { family: "Tajawal, sans-serif", size: 13, weight: "bold" },
-              bodyFont: { family: "Tajawal, sans-serif", size: 12 },
-              padding: 12,
-              cornerRadius: 12,
+              ...baseTooltip,
               callbacks: {
+                title: formatTooltipTitle,
                 label: (ctx) => `عدد الطلبات: ${ctx.parsed.y} طلب`,
                 afterLabel: (ctx) => {
                   const day = daysData.value[ctx.dataIndex];
@@ -456,15 +493,7 @@ const renderTrendChart = () => {
                 color: "#F3F4F6",
               },
             },
-            x: {
-              grid: { display: false },
-              ticks: {
-                font: { family: "Tajawal, sans-serif", size: 11, weight: "bold" },
-                color: "#6B7280",
-                maxRotation: selectedPeriod.value > 14 ? 45 : 0,
-                autoSkip: selectedPeriod.value > 14,
-              },
-            },
+            x: xScale,
           },
         },
       });
@@ -503,13 +532,9 @@ const renderTrendChart = () => {
           plugins: {
             legend: { display: false },
             tooltip: {
-              textDirection: "rtl",
-              backgroundColor: "#1F2937",
-              titleFont: { family: "Tajawal, sans-serif", size: 13, weight: "bold" },
-              bodyFont: { family: "Tajawal, sans-serif", size: 12 },
-              padding: 12,
-              cornerRadius: 12,
+              ...baseTooltip,
               callbacks: {
+                title: formatTooltipTitle,
                 label: (ctx) => `المبيعات: ${ctx.parsed.y.toLocaleString()} ج.م`,
                 afterLabel: (ctx) => {
                   const day = daysData.value[ctx.dataIndex];
@@ -530,15 +555,7 @@ const renderTrendChart = () => {
                 color: "#F3F4F6",
               },
             },
-            x: {
-              grid: { display: false },
-              ticks: {
-                font: { family: "Tajawal, sans-serif", size: 11, weight: "bold" },
-                color: "#6B7280",
-                maxRotation: selectedPeriod.value > 14 ? 45 : 0,
-                autoSkip: selectedPeriod.value > 14,
-              },
-            },
+            x: xScale,
           },
         },
       });
@@ -555,7 +572,7 @@ const refreshAllCharts = () => {
 };
 
 // Watchers
-watch([daysData, metricType], () => {
+watch([daysData, metricType, isMobile], () => {
   nextTick(() => renderTrendChart());
 });
 
@@ -568,10 +585,19 @@ watch(
 );
 
 onMounted(() => {
+  if (typeof window !== "undefined") {
+    mediaQuery = window.matchMedia("(max-width: 639px)");
+    updateViewportFlag();
+    mediaQuery.addEventListener("change", updateViewportFlag);
+  }
   refreshAllCharts();
 });
 
 onBeforeUnmount(() => {
+  if (mediaQuery) {
+    mediaQuery.removeEventListener("change", updateViewportFlag);
+    mediaQuery = null;
+  }
   if (trendChartInstance) {
     trendChartInstance.destroy();
     trendChartInstance = null;

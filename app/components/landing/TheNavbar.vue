@@ -95,7 +95,7 @@
           class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-slate-200 hover:border-slate-300 bg-slate-50/90 hover:bg-slate-100 text-slate-700 text-xs font-black transition-all cursor-pointer shadow-2xs"
           :title="locale === 'ar' ? 'Switch to English' : 'التحويل للعربية'"
         >
-          <span class="leading-none -translate-y-px">{{ locale === 'ar' ? 'English' : 'العربية' }}</span>
+          <span :class="locale === 'ar' ? 'leading-normal translate-y-[0.5px]' : 'leading-normal'">{{ locale === 'ar' ? 'English' : 'العربية' }}</span>
           <svg class="w-4 h-4 text-sky-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10"></circle>
             <line x1="2" y1="12" x2="22" y2="12"></line>
@@ -128,7 +128,7 @@
           @click="toggleLanguage"
           class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-slate-200 bg-slate-50 text-slate-700 text-xs font-black cursor-pointer"
         >
-          <span class="leading-none -translate-y-px">{{ locale === 'ar' ? 'English' : 'العربية' }}</span>
+          <span :class="locale === 'ar' ? 'leading-normal translate-y-[0.5px]' : 'leading-normal'">{{ locale === 'ar' ? 'English' : 'العربية' }}</span>
           <svg class="w-3.5 h-3.5 text-sky-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10"></circle>
             <line x1="2" y1="12" x2="22" y2="12"></line>
