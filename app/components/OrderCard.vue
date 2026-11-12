@@ -25,11 +25,16 @@
       <!-- Time & Quick Actions -->
       <div class="flex items-center gap-1.5 shrink-0">
         <span
-          v-if="order.status === 'pending'"
-          class="text-[10px] font-black text-white px-2.5 py-1 rounded-full shadow-xs whitespace-nowrap shrink-0 inline-flex items-center justify-center leading-none"
-          :class="isOldOrder ? 'bg-gray-400' : 'bg-orange-500 shadow-orange-100 animate-pulse'"
+          v-if="order.status === 'pending' && !isOldOrder"
+          class="text-[10px] font-black text-white px-2.5 py-1 rounded-full shadow-xs whitespace-nowrap shrink-0 inline-flex items-center justify-center leading-none bg-orange-500 shadow-orange-100 animate-pulse"
         >
           {{ timeAgo }}
+        </span>
+        <span
+          v-else-if="order.status === 'pending'"
+          class="text-[10px] font-bold text-gray-500 bg-gray-100 px-2.5 py-1 rounded-lg whitespace-nowrap shrink-0"
+        >
+          {{ formattedOrderTime }}
         </span>
         <button 
           @click="printOrder"
@@ -326,6 +331,28 @@ const paymentBadge = computed(() => {
   return null;
 });
 
+const formattedOrderTime = computed(() => {
+  if (!props.order?.created_at) return "";
+  const date = new Date(props.order.created_at);
+  const now = new Date();
+  const isToday =
+    date.getDate() === now.getDate() &&
+    date.getMonth() === now.getMonth() &&
+    date.getFullYear() === now.getFullYear();
+
+  const timeStr = date.toLocaleTimeString("ar-EG", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  if (isToday) {
+    return timeStr;
+  }
+
+  const dateStr = `${date.getDate()}/${date.getMonth() + 1}`;
+  return `${dateStr} • ${timeStr}`;
+});
+
 const timeAgo = ref("");
 const isOldOrder = ref(false);
 
@@ -354,7 +381,7 @@ const calculateTimeAgo = () => {
     const remMinutes = diffMinutes % 60;
 
     if (hours >= 3) {
-      timeAgo.value = "+3 ساعات";
+      timeAgo.value = "";
       isOldOrder.value = true;
     } else if (hours === 1) {
       timeAgo.value = remMinutes > 0 ? `منذ ساعة و ${remMinutes} د` : "منذ ساعة";
