@@ -225,8 +225,7 @@
         <div 
           v-else-if="filteredItems.length > 0"
           key="items-list"
-          class="flex flex-col gap-3"
-          :class="cartCount > 0 ? 'pb-40' : 'pb-16'"
+          class="flex flex-col gap-3 pb-32"
         >
           <MenuItemCard
             v-for="item in filteredItems"
@@ -238,7 +237,7 @@
         </div>
 
         <!-- 3. No Results -->
-        <div v-else key="items-empty" class="text-center py-5">
+        <div v-else key="items-empty" class="text-center py-5 pb-32">
           <div class="mb-4 flex justify-center">
             <BaseIcon name="boxes" class="w-16 h-16 opacity-20" />
           </div>
@@ -248,11 +247,17 @@
         </div>
       </main>
 
-      <!-- Floating Cart Bar (Only when ordering is active) -->
-      <FloatingCartBar
-        v-if="canOrder"
-        :whatsappNumber="restaurant.whatsapp_number"
+      <!-- Bottom Fixed Navigation Bar (Cart, Restaurant Info, Previous Orders) -->
+      <MenuBottomBar
+        :cartCount="cartCount"
+        :totalPrice="totalPrice"
+        :orderCount="restaurantOrders?.length || 0"
+        :primaryColor="primaryColor"
+        :activeTab="activeBottomTab"
+        :canOrder="canOrder"
         @openCart="showCart = true"
+        @openHistory="showHistory = true"
+        @openInfo="showInfoModal = true"
       />
 
       <!-- Item Detail Modal -->
@@ -265,12 +270,14 @@
         @close="showItemModal = false"
       />
 
+      <!-- Cart Modal -->
       <CartModal
         v-if="restaurant && restaurant.user_id"
         :isOpen="showCart"
         :primaryColor="primaryColor"
         :whatsappNumber="restaurant.whatsapp_number"
         :restaurantUserId="restaurant.user_id"
+        :restaurantSlug="restaurant.slug || String(route.params.slug || '')"
         :deliveryAreas="restaurant.delivery_areas"
         :tableNumberEnabled="restaurant.show_table_number === true"
         :queueNumberEnabled="restaurant.show_queue_number === true"
@@ -283,8 +290,26 @@
         @close="showCart = false"
       />
 
+      <!-- Order History Modal (Filtered for current restaurant) -->
+      <OrderHistoryModal
+        :isOpen="showHistory"
+        :restaurant="restaurant"
+        @edit-order="handleEditFromHistory"
+        @close="showHistory = false"
+      />
+
+      <!-- Restaurant Info Modal -->
+      <RestaurantInfoModal
+        :isOpen="showInfoModal"
+        :restaurant="restaurant"
+        :primaryColor="primaryColor"
+        :isBioHubAllowed="isBioHubAllowed"
+        @open-bio-hub="showBioHub = true; showInfoModal = false"
+        @close="showInfoModal = false"
+      />
+
       <MenuFooter
-        v-if="restaurant.whatsapp_number && cartCount === 0"
+        v-if="restaurant.whatsapp_number"
         :whatsappNumber="restaurant.whatsapp_number"
       />
       </template>
@@ -311,10 +336,41 @@
 const { locale } = useI18n();
 const route = useRoute();
 const client = useSupabaseClient();
-const { cartCount } = useCart();
+const { $toast } = useNuxtApp();
+const { cartCount, totalPrice, startEditingOrder } = useCart();
+
+const restaurantIdentifier = computed(
+  () => restaurant.value?.user_id || restaurant.value?.id || String(route.params.slug || "")
+);
+const { history: restaurantOrders, loadHistory } = useOrderHistory(restaurantIdentifier);
+
 const showCart = ref(false);
+const showHistory = ref(false);
+const showInfoModal = ref(false);
 const showItemModal = ref(false);
 const selectedItem = ref({});
+
+const activeBottomTab = computed(() => {
+  if (showHistory.value) return "history";
+  if (showCart.value) return "cart";
+  if (showInfoModal.value) return "info";
+  return "";
+});
+
+const handleEditFromHistory = (order) => {
+  if (order?.items?.length) {
+    startEditingOrder(order);
+    showHistory.value = false;
+    showCart.value = true;
+    if ($toast?.success) {
+      $toast.success(
+        locale.value === "ar"
+          ? `تعديل الطلب #${order.id}`
+          : `Editing order #${order.id}`
+      );
+    }
+  }
+};
 
 const {
   data: restaurant,
@@ -358,6 +414,9 @@ const isShopOpenOverride = ref(false);
 const currentTimeStr = ref("");
 
 onMounted(() => {
+  if (process.client) {
+    loadHistory();
+  }
   const updateTime = () => {
     const now = new Date();
     currentTimeStr.value =

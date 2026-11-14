@@ -1,6 +1,6 @@
 <template>
   <footer
-    class="bg-white/80 backdrop-blur-lg border-t border-gray-100 py-3.5 text-center z-40"
+    class="py-6 text-center relative z-10 select-none"
   >
     <div class="flex items-center justify-center gap-1.5 text-xs font-bold text-gray-400">
       <span>مدعوم بواسطة</span>

@@ -1,4 +1,6 @@
-interface OrderItem {
+import type { MaybeRef } from "vue";
+
+export interface OrderItem {
   id: string;
   name: string;
   price: number;
@@ -6,9 +8,11 @@ interface OrderItem {
   image?: string;
 }
 
-interface Order {
+export interface Order {
   id: string;
   dbId?: string | number;
+  restaurantId?: string;
+  restaurantSlug?: string;
   items: OrderItem[];
   total: number;
   type: "cashier" | "whatsapp";
@@ -17,48 +21,57 @@ interface Order {
   customer?: any;
 }
 
-export const useOrderHistory = () => {
-  const history = useState<Order[]>("orderHistory", () => []);
+export const useOrderHistory = (restaurantKey?: MaybeRef<string | null | undefined>) => {
+  const allHistory = useState<Order[]>("allOrderHistory", () => []);
 
   const loadHistory = () => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("menujet_order_history");
       if (saved) {
         try {
-          history.value = JSON.parse(saved);
+          allHistory.value = JSON.parse(saved);
         } catch (e) {
           console.error("Error parsing order history", e);
-          history.value = [];
+          allHistory.value = [];
         }
       }
     }
   };
 
   const addOrder = (order: Order) => {
-    const newOrder = {
+    const newOrder: Order = {
       ...order,
       time: order.time || new Date().toISOString(),
     };
-    history.value.unshift(newOrder);
+    allHistory.value.unshift(newOrder);
     if (typeof window !== "undefined") {
-      localStorage.setItem("menujet_order_history", JSON.stringify(history.value));
+      localStorage.setItem("menujet_order_history", JSON.stringify(allHistory.value));
     }
   };
 
   const updateHistoryOrder = (idOrDbId: string | number, patch: Partial<Order>) => {
-    const idx = history.value.findIndex(
+    const idx = allHistory.value.findIndex(
       (o) => o.id === idOrDbId || (o.dbId && o.dbId === idOrDbId),
     );
     if (idx !== -1) {
-      history.value[idx] = { ...history.value[idx], ...patch };
+      allHistory.value[idx] = { ...allHistory.value[idx], ...patch };
       if (typeof window !== "undefined") {
-        localStorage.setItem("menujet_order_history", JSON.stringify(history.value));
+        localStorage.setItem("menujet_order_history", JSON.stringify(allHistory.value));
       }
     }
   };
 
+  const history = computed(() => {
+    const key = unref(restaurantKey);
+    if (!key) return allHistory.value;
+    return allHistory.value.filter(
+      (o) => o.restaurantId === key || o.restaurantSlug === key
+    );
+  });
+
   return {
     history,
+    allHistory,
     addOrder,
     updateHistoryOrder,
     loadHistory,

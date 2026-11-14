@@ -550,6 +550,7 @@ const props = defineProps({
   isOpen: Boolean,
   whatsappNumber: { type: String, default: "" },
   restaurantUserId: { type: String, default: "" },
+  restaurantSlug: { type: String, default: "" },
   deliveryAreas: { type: Array, default: () => [] },
   tableNumberEnabled: { type: Boolean, default: false },
   queueNumberEnabled: { type: Boolean, default: false },
@@ -939,6 +940,8 @@ const placeCashierOrder = async () => {
     addOrder({
       id: orderNum,
       dbId: order.id,
+      restaurantId: finalRestaurantId || props.restaurantUserId || "",
+      restaurantSlug: props.restaurantSlug || String(route.params.slug || ""),
       items: [...cart.value],
       total: totalPrice.value,
       type: "cashier",
@@ -1150,6 +1153,8 @@ const handleWhatsappOrderFinal = async () => {
     addOrder({
       id: displayOrderNum,
       dbId: insertedId,
+      restaurantId: restaurantId || props.restaurantUserId || "",
+      restaurantSlug: props.restaurantSlug || String(route.params.slug || ""),
       items: [...cart.value],
       total: totalPrice.value,
       type: "whatsapp",

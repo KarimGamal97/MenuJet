@@ -129,7 +129,10 @@ const props = defineProps({
 
 const emit = defineEmits(["close", "edit-order"]);
 
-const { history } = useOrderHistory();
+const restaurantIdentifier = computed(
+  () => props.restaurant?.user_id || props.restaurant?.id || props.restaurant?.slug || ""
+);
+const { history } = useOrderHistory(restaurantIdentifier);
 const { locale, t } = useI18n();
 
 const currentTime = ref(Date.now());

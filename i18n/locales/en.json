@@ -399,6 +399,15 @@
     "edit_confirm": "Do you want to edit this order? Cart will open so you can modify items and resubmit."
   },
   "menu": {
+    "restaurant_info": "About",
+    "open_now": "Open Now",
+    "closed_now": "Closed Now",
+    "opening_hours": "Opening Hours",
+    "whatsapp_chat": "WhatsApp",
+    "call_us": "Call Phone",
+    "visit_bio_hub": "Bio Hub Page",
+    "delivery_areas": "Delivery Areas",
+    "social_media": "Connect with us",
     "item_unavailable": "Currently unavailable",
     "no_items": "No items in this category currently",
     "restaurant_not_found": "Restaurant not found",
