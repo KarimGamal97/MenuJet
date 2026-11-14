@@ -3,16 +3,15 @@
     class="fixed w-full z-50 bg-white/95 backdrop-blur-xl border-b border-gray-200/60 shadow-xs transition-all duration-300" 
     :dir="$i18n.locale === 'ar' ? 'rtl' : 'ltr'"
   >
-    <div class="container relative mx-auto px-4 sm:px-6 py-3.5 flex justify-between items-center">
+    <div class="max-w-7xl relative mx-auto px-4 sm:px-6 lg:px-8 py-1.5 sm:py-2 flex justify-between items-center">
       
       <!-- Right Side (Logo) -->
-      <NuxtLink to="/" class="flex items-center gap-2 group shrink-0">
-        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-orange-600 to-amber-500 text-white flex items-center justify-center font-black text-xl shadow-md shadow-orange-500/20 group-hover:scale-105 transition-transform">
-          ⚡
-        </div>
-        <span class="text-2xl font-black bg-gradient-to-r from-slate-950 via-slate-800 to-orange-600 bg-clip-text text-transparent tracking-tight">
-          MenuJet
-        </span>
+      <NuxtLink to="/" class="flex items-center group shrink-0">
+        <img
+          src="~/assets/navbar-logo.webp"
+          alt="MenuJet"
+          class="h-16 sm:h-20 w-auto object-contain group-hover:scale-105 transition-transform"
+        />
       </NuxtLink>
       
       <!-- Center (Desktop Nav Links) -->
@@ -220,14 +219,18 @@ const toggleLanguage = () => {
   setLocale(nextLocale)
 }
 
-const scrollToSection = (sectionId) => {
+const route = useRoute()
+
+const scrollToSection = async (sectionId) => {
   activeSection.value = sectionId
   isMobileMenuOpen.value = false
   
   const element = document.getElementById(sectionId)
   if (element) {
-    const y = element.getBoundingClientRect().top + window.scrollY - 80 
+    const y = element.getBoundingClientRect().top + window.scrollY - 90 
     window.scrollTo({ top: y, behavior: 'smooth' })
+  } else {
+    await navigateTo(`/#${sectionId}`)
   }
 }
 </script>
