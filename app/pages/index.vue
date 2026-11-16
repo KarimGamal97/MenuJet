@@ -3,6 +3,7 @@
     <LandingTheNavbar />
     <main>
       <LandingHeroSection />
+      <LandingClients />
       <LandingFeatures />
       <!-- <LandingDemoVideo /> -->
       <LandingPricing />

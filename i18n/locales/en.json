@@ -416,13 +416,14 @@
     "notes_placeholder": "No sugar, extra sauce..."
   },
   "nav": {
-    "features": "Features",
+    "features": "How It Works",
     "faqs": "FAQs",
     "pricing": "Pricing",
     "contact": "Contact Us",
     "login": "Login",
     "start_free": "Start Free Trial",
-    "lang_name": "العربية"
+    "lang_name": "العربية",
+    "clients": "Clients"
   },
   "faqs": {
     "title": "Frequently Asked Questions",
@@ -750,6 +751,20 @@
     "link_login": "Sign In",
     "link_register": "Create Free Account",
     "link_whatsapp": "WhatsApp Support",
-    "all_rights": "All rights reserved."
+    "all_rights": "All rights reserved.",
+    "link_clients": "Clients"
+  },
+  "clients": {
+    "badge": "Success Partners",
+    "title_part1": "Restaurants & Cafes",
+    "title_part2": "Trusting MenuJet",
+    "subtitle": "Explore live digital menus successfully operating with our partners and experience seamless ordering",
+    "view_menu": "View Live Menu",
+    "tamim_name": "Tamim Restaurant",
+    "tamim_desc": "Oriental Cuisine & Grills",
+    "bgo_name": "BGO Burger",
+    "bgo_desc": "Burger & Fast Food",
+    "delta_name": "Delta Coffee",
+    "delta_desc": "Specialty Coffee & Beverages"
   }
 }

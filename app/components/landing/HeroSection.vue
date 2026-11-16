@@ -4,6 +4,9 @@
     @mousemove="onMouseMove"
   >
     
+    <!-- WhatsApp-style Subtle Animated Food Pattern -->
+    <div class="food-doodle-bg absolute inset-0 z-0 opacity-[0.1] pointer-events-none"></div>
+
     <!-- Animated Background Elements with Parallax -->
     <div class="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
       <!-- Blob 1 -->
@@ -116,5 +119,20 @@ const scrollToSection = (sectionId) => {
 }
 .animation-delay-4000 {
   animation-delay: 4s;
+}
+
+.food-doodle-bg {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320' viewBox='0 0 320 320' fill='none' stroke='%23ea580c' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(22,22) rotate(-12 20 20)'%3E%3Cpath d='M6 18C6 11 12 7 20 7C28 7 34 11 34 18Z'/%3E%3Cpath d='M5 22C8 20 11 24 14 22C17 20 20 24 23 22C26 20 29 24 35 22'/%3E%3Crect x='6' y='25' width='28' height='5' rx='2.5'/%3E%3Cpath d='M8 30H32V32C32 34 30 35 28 35H12C10 35 8 34 8 32Z'/%3E%3C/g%3E%3Cg transform='translate(132,20) rotate(8 18 18)'%3E%3Ccircle cx='18' cy='18' r='14'/%3E%3Ccircle cx='13' cy='15' r='1.5'/%3E%3Ccircle cx='23' cy='15' r='1.5'/%3E%3Cpath d='M12 21C14 25 22 25 24 21'/%3E%3C/g%3E%3Cg transform='translate(242,26) rotate(14 18 20)'%3E%3Cpath d='M10 14H26L23 36H13Z'/%3E%3Cpath d='M8 14H28'/%3E%3Cpath d='M18 14V5L24 3'/%3E%3Ccircle cx='18' cy='25' r='2.5'/%3E%3C/g%3E%3Cg transform='translate(72,118) rotate(-8 20 20)'%3E%3Crect x='6' y='6' width='28' height='32' rx='3'/%3E%3Cpath d='M12 13H28'/%3E%3Cpath d='M12 19H24'/%3E%3Cpath d='M12 25H26'/%3E%3Cpath d='M12 31H20'/%3E%3C/g%3E%3Cg transform='translate(202,122) rotate(10 18 20)'%3E%3Cpath d='M9 18L12 36H26L29 18C24 20 14 20 9 18Z'/%3E%3Cpath d='M13 18V9H16V18'/%3E%3Cpath d='M18 18V7H21V18'/%3E%3Cpath d='M23 18V10H26V18'/%3E%3C/g%3E%3Cg transform='translate(24,220) rotate(-16 18 18)'%3E%3Cpath d='M6 10C14 5 24 5 32 10L19 35Z'/%3E%3Cpath d='M9 14C15 10 23 10 29 14'/%3E%3Ccircle cx='18' cy='19' r='2'/%3E%3Ccircle cx='22' cy='24' r='1.5'/%3E%3C/g%3E%3Cg transform='translate(136,222) rotate(10 18 18)'%3E%3Cpath d='M8 16H26V26C26 30 22 33 17 33C12 33 8 30 8 26Z'/%3E%3Cpath d='M26 18H29C31 18 32 20 32 22C32 24 31 25 29 25H26'/%3E%3Cpath d='M13 9C13 7 15 7 15 11'/%3E%3Cpath d='M19 8C19 6 21 6 21 10'/%3E%3C/g%3E%3Cg transform='translate(244,222) rotate(-10 16 16)'%3E%3Crect x='4' y='4' width='10' height='10' rx='1.5'/%3E%3Crect x='18' y='4' width='10' height='10' rx='1.5'/%3E%3Crect x='4' y='18' width='10' height='10' rx='1.5'/%3E%3Cpath d='M18 18H22V22H18Z'/%3E%3Cpath d='M24 24H28V28H24Z'/%3E%3Cpath d='M24 18H28'/%3E%3Cpath d='M18 26H22'/%3E%3C/g%3E%3Cpath d='M92 66L94 71L99 73L94 75L92 80L90 75L85 73L90 71Z'/%3E%3Cpath d='M292 154L294 158L298 160L294 162L292 166L290 162L286 160L290 158Z'/%3E%3Ccircle cx='162' cy='175' r='2'/%3E%3Ccircle cx='35' cy='145' r='1.8'/%3E%3Ccircle cx='205' cy='68' r='1.8'/%3E%3Ccircle cx='95' cy='282' r='2'/%3E%3Ccircle cx='208' cy='288' r='1.5'/%3E%3C/svg%3E");
+  background-size: 320px 320px;
+  animation: doodle-drift 48s linear infinite;
+}
+
+@keyframes doodle-drift {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 320px 320px;
+  }
 }
 </style>

@@ -500,13 +500,14 @@
     "notes_placeholder": "بدون سكر، زيادة صوص..."
   },
   "nav": {
-    "features": "المميزات",
+    "features": "كيف يعمل",
     "faqs": "الأسئلة الشائعة",
     "pricing": "الباقات",
     "contact": "تواصل معنا",
     "login": "تسجيل الدخول",
     "start_free": "ابدأ الآن",
-    "lang_name": "English"
+    "lang_name": "English",
+    "clients": "عملاؤنا"
   },
   "faqs": {
     "title": "الأسئلة الشائعة",
@@ -834,6 +835,20 @@
     "link_login": "تسجيل الدخول",
     "link_register": "إنشاء حساب جديد",
     "link_whatsapp": "واتساب الدعم الفني",
-    "all_rights": "جميع الحقوق محفوظة."
+    "all_rights": "جميع الحقوق محفوظة.",
+    "link_clients": "عملاؤنا"
+  },
+  "clients": {
+    "badge": "شركاء النجاح",
+    "title_part1": "مطاعم وكافيهات",
+    "title_part2": "تثق في MenuJet",
+    "subtitle": "تصفح نماذج حية لقوائم طعام رقمية تعمل بكفاءة مع شركائنا واستكشف تجربة الطلب السلسة",
+    "view_menu": "تصفح المنيو الحقيقي",
+    "tamim_name": "مطعم تميم",
+    "tamim_desc": "مأكولات شرقية ومشويات",
+    "bgo_name": "BGO Burger",
+    "bgo_desc": "برجر ومأكولات سريعة",
+    "delta_name": "Delta Coffee",
+    "delta_desc": "قهوة مختصة ومشروبات"
   }
 }

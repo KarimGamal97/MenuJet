@@ -46,6 +46,18 @@
             </li>
             <li>
               <NuxtLink
+                to="/#clients"
+                class="inline-flex items-center gap-2 py-1 px-2.5 -mx-2.5 rounded-xl transition-all"
+                :class="isCurrentRoute('/#clients') 
+                  ? 'bg-orange-50 text-orange-600 font-black shadow-2xs' 
+                  : 'text-slate-600 hover:text-orange-600 hover:bg-slate-50 font-bold'"
+              >
+                <span v-if="isCurrentRoute('/#clients')" class="w-1.5 h-1.5 rounded-full bg-orange-600 shrink-0"></span>
+                <span>{{ $t('landing_footer.link_clients') }}</span>
+              </NuxtLink>
+            </li>
+            <li>
+              <NuxtLink
                 to="/#pricing"
                 class="inline-flex items-center gap-2 py-1 px-2.5 -mx-2.5 rounded-xl transition-all"
                 :class="isCurrentRoute('/#pricing') 
