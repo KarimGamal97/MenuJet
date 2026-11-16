@@ -1,6 +1,6 @@
 <template>
   <nav 
-    class="fixed w-full z-50 bg-white/95 backdrop-blur-xl border-b border-gray-200/60 shadow-xs transition-all duration-300" 
+    class="fixed w-full z-50 bg-white border-b border-slate-200/80 shadow-xs transition-all duration-300" 
     :dir="$i18n.locale === 'ar' ? 'rtl' : 'ltr'"
   >
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-1.5 sm:py-2 flex items-center justify-between">
@@ -9,9 +9,9 @@
       <div class="flex items-center justify-start flex-1 min-w-0">
         <NuxtLink to="/" class="flex items-center group shrink-0">
           <img
-            src="~/assets/navbar-logo.webp"
+            src="~/assets/navbar-logo.png"
             alt="MenuJet"
-            class="h-16 sm:h-20 w-auto object-contain group-hover:scale-105 transition-transform"
+            class="h-12 sm:h-14 w-auto object-contain mix-blend-multiply group-hover:scale-105 transition-transform"
           />
         </NuxtLink>
       </div>
@@ -99,11 +99,7 @@
             :title="locale === 'ar' ? 'تغيير اللغة' : 'Change Language'"
           >
             <!-- Globe Icon -->
-            <svg class="w-5 h-5 text-slate-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="2" y1="12" x2="22" y2="12"></line>
-              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-            </svg>
+            <BaseIcon name="globe" class="w-5 h-5 text-slate-500 shrink-0 stroke-[2]" />
 
             <!-- Current Active Language (AR / EN) -->
             <span class="text-sm font-bold tracking-wide uppercase">
@@ -111,12 +107,10 @@
             </span>
 
             <!-- Chevron Down Icon -->
-            <svg 
-              :class="['w-3.5 h-3.5 text-slate-500 shrink-0 transition-transform duration-200', isLangDropdownOpen ? 'rotate-180' : '']" 
-              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
-            >
-              <path d="m6 9 6 6 6-6"/>
-            </svg>
+            <BaseIcon
+              name="chevron-down"
+              :class="['w-3.5 h-3.5 text-slate-500 shrink-0 transition-transform duration-200 stroke-[2.5]', isLangDropdownOpen ? 'rotate-180' : '']"
+            />
           </button>
 
           <!-- Backdrop to close on click outside -->
@@ -141,9 +135,7 @@
               ]"
             >
               <span>العربية</span>
-              <svg v-if="locale === 'ar'" class="w-4 h-4 text-orange-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
+              <BaseIcon v-if="locale === 'ar'" name="check" class="w-4 h-4 text-orange-600 shrink-0 stroke-[2.5]" />
             </button>
 
             <!-- English Option -->
@@ -156,9 +148,7 @@
               ]"
             >
               <span>English</span>
-              <svg v-if="locale === 'en'" class="w-4 h-4 text-orange-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
+              <BaseIcon v-if="locale === 'en'" name="check" class="w-4 h-4 text-orange-600 shrink-0 stroke-[2.5]" />
             </button>
           </div>
         </div>
@@ -182,15 +172,12 @@
             class="h-10 inline-flex items-center gap-1.5 px-2.5 rounded-xl hover:bg-slate-100 text-slate-700 transition-colors cursor-pointer select-none"
             :title="locale === 'ar' ? 'تغيير اللغة' : 'Change Language'"
           >
-            <svg class="w-4 h-4 text-slate-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="2" y1="12" x2="22" y2="12"></line>
-              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-            </svg>
+            <BaseIcon name="globe" class="w-4 h-4 text-slate-500 shrink-0 stroke-[2]" />
             <span class="text-xs font-bold tracking-wide uppercase">{{ locale === 'ar' ? 'AR' : 'EN' }}</span>
-            <svg :class="['w-3 h-3 text-slate-500 shrink-0 transition-transform duration-200', isLangDropdownOpen ? 'rotate-180' : '']" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="m6 9 6 6 6-6"/>
-            </svg>
+            <BaseIcon
+              name="chevron-down"
+              :class="['w-3 h-3 text-slate-500 shrink-0 transition-transform duration-200 stroke-[2.5]', isLangDropdownOpen ? 'rotate-180' : '']"
+            />
           </button>
 
           <!-- Mobile Dropdown Menu -->
@@ -207,9 +194,7 @@
               ]"
             >
               <span>العربية</span>
-              <svg v-if="locale === 'ar'" class="w-4 h-4 text-orange-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
+              <BaseIcon v-if="locale === 'ar'" name="check" class="w-4 h-4 text-orange-600 shrink-0 stroke-[2.5]" />
             </button>
             <button
               type="button"
@@ -220,9 +205,7 @@
               ]"
             >
               <span>English</span>
-              <svg v-if="locale === 'en'" class="w-4 h-4 text-orange-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
+              <BaseIcon v-if="locale === 'en'" name="check" class="w-4 h-4 text-orange-600 shrink-0 stroke-[2.5]" />
             </button>
           </div>
         </div>
@@ -231,12 +214,7 @@
           @click="isMobileMenuOpen = !isMobileMenuOpen" 
           class="p-2 rounded-xl text-slate-600 hover:text-orange-600 hover:bg-slate-100 focus:outline-none transition-colors"
         >
-          <svg v-if="!isMobileMenuOpen" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-          <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
-          </svg>
+          <BaseIcon :name="isMobileMenuOpen ? 'close' : 'menu'" class="h-6 w-6 stroke-[2.5]" />
         </button>
       </div>
 

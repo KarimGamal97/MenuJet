@@ -84,7 +84,7 @@
               fullWidth
               @click="showCleanupModal = false"
             >
-              {{ $t("admin.cancel") }}
+              {{ $t("common.cancel") }}
             </BaseButton>
             <BaseButton
               variant="danger"
@@ -107,7 +107,7 @@
         <template #footer>
           <div class="flex gap-3">
             <BaseButton variant="secondary" fullWidth @click="showConfirmModal = false">
-              {{ $t("admin.cancel") }}
+              {{ $t("common.cancel") }}
             </BaseButton>
             <BaseButton
               variant="danger"
@@ -115,7 +115,7 @@
               :loading="isCleaning"
               @click="handleCleanup"
             >
-              {{ $t("admin.confirm_delete") }}
+              {{ $t("common.confirm_delete") }}
             </BaseButton>
           </div>
         </template>
@@ -147,7 +147,7 @@
         v-if="totalPages > 1"
         class="flex items-center justify-center gap-2 pt-10"
       >
-        <!-- Previous Page Button (السابق: points right in RTL) -->
+        <!-- Previous Page Button (points right in RTL) -->
         <button
           type="button"
           :disabled="page === 1"
@@ -181,7 +181,7 @@
           </button>
         </template>
 
-        <!-- Next Page Button (التالي: points left in RTL) -->
+        <!-- Next Page Button (points left in RTL) -->
         <button
           type="button"
           :disabled="page >= totalPages"

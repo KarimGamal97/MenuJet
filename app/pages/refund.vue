@@ -17,7 +17,7 @@
             {{ $t('refund_page.subtitle') }}
           </p>
           <div class="mt-4 text-xs font-bold text-slate-400">
-            {{ $t('refund_page.last_updated') }}
+            {{ $t('common.last_updated') }}
           </div>
         </div>
 
@@ -56,7 +56,7 @@
               <li>
                 <span>{{ $t('refund_page.sec3_item1_prefix') }}</span>
                 <a
-                  href="https://wa.me/201132234124"
+                  :href="getSupportWhatsAppUrl()"
                   target="_blank"
                   rel="noopener noreferrer"
                   class="text-orange-600 hover:text-orange-700 underline font-black transition-colors inline-block"
@@ -81,7 +81,7 @@
             <p>{{ $t('refund_page.sec4_desc') }}</p>
             <div class="pt-2">
               <a
-                href="https://wa.me/201132234124"
+                :href="getSupportWhatsAppUrl()"
                 target="_blank"
                 rel="noopener noreferrer"
                 class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs sm:text-sm transition-all shadow-md shadow-orange-500/20"

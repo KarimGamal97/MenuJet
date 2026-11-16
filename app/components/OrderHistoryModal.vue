@@ -64,7 +64,7 @@
               </div>
               <div class="text-right">
                 <p class="text-sm text-gray-400 font-bold">
-                  {{ $t("history.total") }}
+                  {{ $t("common.total") }}
                 </p>
                 <p class="text-lg font-black text-orange-600">
                   {{ order.total }} {{ $t("currency") }}

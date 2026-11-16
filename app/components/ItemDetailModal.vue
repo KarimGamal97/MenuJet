@@ -238,7 +238,7 @@
               class="bg-orange-50 rounded-2xl p-3 border border-orange-100 flex items-center justify-between"
             >
               <p class="text-sm font-bold text-orange-400">
-                {{ allowOrdering ? $t("admin.total") : ($i18n.locale === 'ar' ? 'السعر' : 'Price') }}
+                {{ allowOrdering ? $t("common.total") : ($i18n.locale === 'ar' ? 'السعر' : 'Price') }}
               </p>
               <p class="text-xl font-black text-orange-600">
                 {{ total }} {{ $t("admin.currency") }}
@@ -258,8 +258,9 @@
               <span>📖</span>
               <span>{{ $i18n.locale === 'ar' ? 'تصفح فقط - الطلب متاح مع الويتر' : 'Browse only - Order with your waiter' }}</span>
             </div>
-            <div v-else class="w-full py-4 bg-gray-100 text-gray-400 font-bold rounded-2xl text-sm text-center border-2 border-dashed border-gray-200">
-              🔒 {{ $t('admin.status_closed') }}
+            <div v-else class="w-full py-4 bg-gray-100 text-gray-400 font-bold rounded-2xl text-sm text-center border-2 border-dashed border-gray-200 flex items-center justify-center gap-1.5">
+              <BaseIcon name="lock" class="w-4 h-4" />
+              <span>{{ $t('admin.status_closed') }}</span>
             </div>
           </div>
         </div>

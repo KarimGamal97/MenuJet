@@ -17,7 +17,7 @@
             {{ $t('privacy_page.subtitle') }}
           </p>
           <div class="mt-4 text-xs font-bold text-slate-400">
-            {{ $t('privacy_page.last_updated') }}
+            {{ $t('common.last_updated') }}
           </div>
         </div>
 
@@ -129,7 +129,7 @@
             <p>{{ $t('privacy_page.sec7_desc') }}</p>
             <div class="pt-2">
               <a
-                href="https://wa.me/201132234124"
+                :href="getSupportWhatsAppUrl()"
                 target="_blank"
                 rel="noopener noreferrer"
                 class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm transition-all"

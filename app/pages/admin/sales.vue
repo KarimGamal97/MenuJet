@@ -27,9 +27,10 @@
       <button
         type="button"
         @click="showUpgradeModal = true"
-        class="bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-500 hover:to-amber-400 text-white font-black py-4 px-8 rounded-2xl shadow-xl shadow-orange-500/25 transition-transform active:scale-95 text-base cursor-pointer"
+        class="inline-flex items-center gap-2 bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-500 hover:to-amber-400 text-white font-black py-4 px-8 rounded-2xl shadow-xl shadow-orange-500/25 transition-transform active:scale-95 text-base cursor-pointer"
       >
-        ⚡ {{ $t("plans.sales_lock_btn") }}
+        <BaseIcon name="bolt" class="w-4 h-4" />
+        {{ $t("plans.sales_lock_btn") }}
       </button>
 
       <!-- Upgrade Modal -->
@@ -42,9 +43,9 @@
       />
     </div>
 
-    <!-- المحتوى الفعلي للمشتركين -->
+    <!-- Main content for active subscribers -->
     <template v-else>
-      <!-- العنوان وفلتر التاريخ -->
+      <!-- Header and date filter -->
       <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
@@ -86,7 +87,7 @@
         </div>
       </div>
 
-      <!-- ملخص الأرباح -->
+      <!-- Revenue summary -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="bg-green-50 p-6 rounded-[2rem] border border-green-100 flex items-center gap-4 group hover:shadow-lg transition-all">
           <div class="w-14 h-14 bg-green-600/10 rounded-2xl flex items-center justify-center text-green-600 group-hover:scale-110 transition-transform">
@@ -115,7 +116,7 @@
         </div>
       </div>
 
-      <!-- قائمة الطلبات لهذه الفترة -->
+      <!-- Orders list for selected period -->
       <div v-if="loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div v-for="i in 3" :key="i" class="h-64 bg-gray-100 animate-pulse rounded-[2.5rem]"></div>
       </div>

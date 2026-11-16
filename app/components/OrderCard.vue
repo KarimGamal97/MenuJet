@@ -12,7 +12,7 @@
       <!-- Order ID & Pending Status -->
       <div class="flex items-center gap-2">
         <h3 class="text-2xl font-black text-orange-600 leading-none">
-          #{{ (order.order_number || order.id).toString().padStart(4, "0") }}
+          #{{ formatOrderNumber(order.order_number || order.id) }}
         </h3>
         <div
           v-if="order.status === 'pending'"
@@ -56,9 +56,9 @@
 
     <!-- 2. Compact Metadata Section (Two badges per row) -->
     <div class="space-y-1.5 mb-3 shrink-0 text-xs">
-      <!-- Row 1: Order Type + Payment Method (واتساب توصيل + إنستا باي) -->
+      <!-- Row 1: Order Type + Payment Method -->
       <div class="flex items-center gap-2 flex-wrap">
-        <!-- شارة نوع الطلب -->
+        <!-- Order type badge -->
         <div
           :class="[
             'text-[10px] font-black px-2.5 py-1 rounded-xl border flex items-center gap-1 shrink-0',
@@ -73,7 +73,7 @@
           <span>{{ orderTypeBadge.label }}</span>
         </div>
 
-        <!-- شارة طريقة الدفع الإلكتروني -->
+        <!-- Online payment method badge -->
         <div
           v-if="paymentBadge"
           :class="[
@@ -84,7 +84,7 @@
           <span>💳 {{ paymentBadge.label }}</span>
         </div>
 
-        <!-- ترابيزة أو دور إن وجد -->
+        <!-- Table or floor number if provided -->
         <div v-if="order.table_number" class="flex items-center gap-1 bg-blue-50 px-2.5 py-1 rounded-xl border border-blue-100 text-[10px] font-black text-blue-600 shrink-0">
           <span>ترابيزة {{ order.table_number }}</span>
         </div>
@@ -93,7 +93,7 @@
         </div>
       </div>
 
-      <!-- Row 2: Customer Name + Phone Number (العميل + الموبايل) -->
+      <!-- Row 2: Customer Name + Phone Number -->
       <div v-if="order.customer_name || order.customer_phone" class="flex items-center gap-2 flex-wrap">
         <div
           v-if="order.customer_name"
@@ -112,7 +112,7 @@
         </div>
       </div>
 
-      <!-- Row 3: Delivery Address (العنوان) -->
+      <!-- Row 3: Delivery Address -->
       <div
         v-if="order.delivery_address"
         class="flex items-center gap-1.5 bg-amber-50/80 px-2.5 py-1 rounded-xl border border-amber-200/70 text-[11px] font-bold text-amber-800 w-full"
@@ -191,84 +191,12 @@
     </div>
 
     <!-- Edit Order Modal for Restaurant Owner -->
-    <BaseModal
-      :isOpen="showEditModal"
+    <AdminOrdersEditOrderModal
+      :open="showEditModal"
+      :order="order"
       @close="showEditModal = false"
-      :title="$t('admin.edit_order_modal_title')"
-      :subtitle="`#${(order.order_number || order.id).toString().padStart(4, '0')}`"
-      icon="edit"
-      iconColor="bg-orange-50 text-orange-600"
-    >
-      <div class="space-y-3 pt-2 text-right" dir="rtl">
-        <div
-          v-for="(item, index) in editableItems"
-          :key="item.id || index"
-          class="flex items-center justify-between p-3.5 bg-gray-50 rounded-2xl border border-gray-100"
-        >
-          <div class="flex-1 min-w-0 pr-1">
-            <p class="font-bold text-gray-800 text-sm truncate">{{ item.name }}</p>
-            <p class="text-xs text-orange-600 font-bold mt-0.5">
-              {{ item.price }} {{ $t("currency") }}
-            </p>
-          </div>
-          
-          <div class="flex items-center gap-1.5 shrink-0">
-            <button
-              type="button"
-              @click="decreaseEditQty(index)"
-              class="w-7 h-7 rounded-xl bg-white border border-gray-200 text-gray-600 font-black flex items-center justify-center hover:bg-gray-100 active:scale-95"
-            >
-              <BaseIcon name="minus" class="w-3.5 h-3.5" />
-            </button>
-            <span class="w-6 text-center font-black text-sm text-gray-800">{{ item.quantity }}</span>
-            <button
-              type="button"
-              @click="increaseEditQty(index)"
-              class="w-7 h-7 rounded-xl bg-orange-500 text-white font-black flex items-center justify-center hover:bg-orange-600 active:scale-95"
-            >
-              <BaseIcon name="plus" class="w-3.5 h-3.5" />
-            </button>
-            <button
-              type="button"
-              @click="removeEditItem(index)"
-              class="w-7 h-7 rounded-xl bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-colors ms-1"
-              title="حذف الصنف"
-            >
-              <BaseIcon name="trash" class="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </div>
-
-        <div v-if="editableItems.length === 0" class="text-center py-6 text-gray-400 font-bold text-xs">
-          لا توجد أصناف في الطلب
-        </div>
-
-        <!-- Total calculation preview -->
-        <div class="flex justify-between items-center pt-3 border-t border-gray-100 px-1">
-          <span class="text-sm font-bold text-gray-500">{{ $t("admin.order_total") }}:</span>
-          <span class="text-lg font-black text-orange-600">
-            {{ calculatedEditTotal }} {{ $t("currency") }}
-          </span>
-        </div>
-      </div>
-
-      <template #footer>
-        <div class="flex gap-3" dir="rtl">
-          <BaseButton variant="secondary" fullWidth @click="showEditModal = false">
-            {{ $t("admin.cancel") }}
-          </BaseButton>
-          <BaseButton
-            variant="primary"
-            fullWidth
-            :loading="isSavingEdit"
-            :disabled="editableItems.length === 0"
-            @click="saveOrderEdits"
-          >
-            {{ $t("admin.save_order_changes") }}
-          </BaseButton>
-        </div>
-      </template>
-    </BaseModal>
+      @saved="handleOrderSaved"
+    />
   </div>
 </template>
 
@@ -286,10 +214,7 @@ const props = defineProps({
 
 const emit = defineEmits(["update-status"]);
 
-const cleanSize = (size) => {
-  if (!size) return "";
-  return size.replace(/\s*قطعة/g, "").trim();
-};
+const cleanSize = cleanOrderSize;
 
 const orderTypeBadge = computed(() => {
   const method = props.order?.payment_method || "";
@@ -404,142 +329,17 @@ onUnmounted(() => {
 });
 
 const printOrder = () => {
-  const orderData = props.order;
-  const orderNumber = (orderData.order_number || orderData.id).toString().padStart(4, "0");
-  const orderTime = new Date(orderData.created_at).toLocaleTimeString("ar-EG", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-  
-  const printWindow = window.open('', '_blank', 'width=400,height=600');
-  
-  const itemsHtml = orderData.items.map(item => `
-    <div style="border-bottom: 1px dashed #eee; padding: 8px 0;">
-      <div style="display: flex; justify-content: space-between; font-weight: bold;">
-        <span>${item.quantity}x ${item.name} ${item.size ? `(${cleanSize(item.size)})` : ''}</span>
-        <span>${(item.basePrice || item.price) * item.quantity} جنيه</span>
-      </div>
-      ${item.selectedExtras?.length ? `
-        <div style="font-size: 11px; color: #666; margin-top: 2px;">
-          ${item.selectedExtras.map(ex => `+ ${ex.name}`).join(', ')}
-        </div>
-      ` : ''}
-      ${item.notes ? `
-        <div style="font-size: 11px; color: #e67e22; background: #fffcf0; padding: 2px 5px; margin-top: 4px; border-radius: 4px;">
-          ملاحظة: ${item.notes}
-        </div>
-      ` : ''}
-    </div>
-  `).join('');
-
-  const html = `
-    <html dir="rtl">
-    <head>
-      <title>طلب #${orderNumber}</title>
-      <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; color: #333; line-height: 1.4; }
-        .header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 15px; margin-bottom: 15px; }
-        .order-id { font-size: 24px; font-weight: 900; margin: 5px 0; }
-        .info { display: flex; justify-content: space-between; font-size: 13px; color: #666; margin-bottom: 5px; }
-        .total { margin-top: 15px; padding-top: 10px; border-top: 2px solid #333; font-size: 20px; font-weight: 900; display: flex; justify-content: space-between; }
-        .footer { text-align: center; margin-top: 30px; font-size: 11px; color: #999; }
-        @media print { body { padding: 0; } }
-      </style>
-    </head>
-    <body>
-      <div class="header">
-        <div style="font-size: 14px; font-weight: bold; color: #e67e22;">MenuJet</div>
-        <div class="order-id">رقم الطلب #${orderNumber}</div>
-        <div style="font-size: 13px; font-weight: bold; margin: 4px 0; color: #555;">
-          نوع الطلب: ${orderTypeBadge.value.label} ${paymentBadge.value ? `(${paymentBadge.value.label})` : ''}
-        </div>
-        <div class="info">
-          <span>الوقت: ${orderTime}</span>
-          ${orderData.customer_phone ? `<span>الهاتف: ${orderData.customer_phone}</span>` : ''}
-        </div>
-        ${orderData.customer_name ? `<div style="font-size: 13px; margin-top: 3px;">العميل: ${orderData.customer_name}</div>` : ''}
-        ${orderData.delivery_address ? `<div style="font-size: 13px; margin-top: 3px; font-weight: bold;">العنوان: ${orderData.delivery_address}</div>` : ''}
-        ${orderData.table_number ? `<div style="font-weight: bold; margin-top: 5px;">طاولة رقم: ${orderData.table_number}</div>` : ''}
-      </div>
-      
-      <div class="items">
-        ${itemsHtml}
-      </div>
-      
-      <div class="total">
-        <span>الإجمالي:</span>
-        <span>${orderData.total_price} جنيه</span>
-      </div>
-      
-      <div class="footer">
-        طُبع بواسطة MenuJet
-      </div>
-      
-      <script>
-        window.onload = () => {
-          window.print();
-        };
-      <\/script>
-    </body>
-    </html>
-  `;
-  
-  printWindow.document.write(html);
-  printWindow.document.close();
+  printOrderReceipt(props.order, orderTypeBadge.value.label, paymentBadge.value?.label);
 };
 
-// Order Editing Logic for Owner
-const { updateOrder } = useOrders();
 const showEditModal = ref(false);
-const editableItems = ref([]);
-const isSavingEdit = ref(false);
 
 const openEditModal = () => {
-  editableItems.value = (props.order.items || []).map((item) => ({ ...item }));
   showEditModal.value = true;
 };
 
-const increaseEditQty = (index) => {
-  if (editableItems.value[index]) {
-    editableItems.value[index].quantity++;
-  }
-};
-
-const decreaseEditQty = (index) => {
-  if (editableItems.value[index]) {
-    if (editableItems.value[index].quantity > 1) {
-      editableItems.value[index].quantity--;
-    } else {
-      removeEditItem(index);
-    }
-  }
-};
-
-const removeEditItem = (index) => {
-  editableItems.value.splice(index, 1);
-};
-
-const calculatedEditTotal = computed(() => {
-  return editableItems.value.reduce((acc, item) => {
-    const price = Number(item.price) || 0;
-    return acc + price * (item.quantity || 1);
-  }, 0);
-});
-
-const saveOrderEdits = async () => {
-  if (editableItems.value.length === 0) return;
-  isSavingEdit.value = true;
-  const newTotal = calculatedEditTotal.value;
-  const newItems = [...editableItems.value];
-  const success = await updateOrder(props.order.id, {
-    items: newItems,
-    total_price: newTotal,
-  });
-  isSavingEdit.value = false;
-  if (success) {
-    props.order.items = newItems;
-    props.order.total_price = newTotal;
-    showEditModal.value = false;
-  }
+const handleOrderSaved = ({ items, total_price }) => {
+  props.order.items = items;
+  props.order.total_price = total_price;
 };
 </script>

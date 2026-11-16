@@ -83,7 +83,7 @@
             @click="openWhatsAppUpgrade"
             class="w-full bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-500 hover:to-amber-400 text-white font-black py-4 px-6 rounded-2xl text-center shadow-xl shadow-orange-500/25 transition-all duration-300 transform active:scale-98 text-base sm:text-lg flex items-center justify-center gap-2 cursor-pointer"
           >
-            <span>💬</span>
+            <BaseIcon name="whatsapp" class="w-5 h-5 fill-current" />
             <span>{{ $t("plans.whatsapp_upgrade_btn") }}</span>
           </button>
 

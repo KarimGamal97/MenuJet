@@ -1,15 +1,15 @@
 <template>
   <footer class="bg-white border-t border-slate-200/80 text-slate-600 select-none" :dir="$i18n.locale === 'ar' ? 'rtl' : 'ltr'">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 lg:pt-16 pb-5">
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12">
         
         <!-- Brand Info (2 columns on large) -->
         <div class="lg:col-span-2 space-y-4">
           <NuxtLink to="/" class="flex items-center group inline-flex">
             <img
-              src="~/assets/navbar-logo.webp"
+              src="~/assets/navbar-logo.png"
               alt="MenuJet"
-              class="h-20 sm:h-24 w-auto object-contain group-hover:scale-105 transition-transform"
+              class="h-20 sm:h-24 w-auto object-contain mix-blend-multiply group-hover:scale-105 transition-transform"
             />
           </NuxtLink>
           <p class="text-xs sm:text-sm text-slate-500 leading-relaxed max-w-sm">
@@ -168,7 +168,7 @@
             </li>
             <li>
               <a
-                href="https://wa.me/201132234124"
+                :href="getSupportWhatsAppUrl()"
                 target="_blank"
                 rel="noopener noreferrer"
                 class="inline-flex items-center gap-2 py-1 px-2.5 -mx-2.5 rounded-xl transition-all text-slate-600 hover:text-orange-600 hover:bg-slate-50 font-bold"
@@ -182,42 +182,9 @@
       </div>
 
       <!-- Bottom Bar -->
-      <div class="mt-12 pt-8 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-bold text-slate-400">
+      <div class="mt-10 pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-center text-xs font-bold text-slate-400">
         <div>
           © {{ new Date().getFullYear() }} MenuJet. {{ $t('landing_footer.all_rights') }}
-        </div>
-        <div class="flex items-center gap-2 flex-wrap">
-          <NuxtLink
-            to="/privacy"
-            class="transition-colors py-1 px-2.5 rounded-lg text-xs"
-            :class="isCurrentRoute('/privacy') ? 'text-orange-600 font-black bg-orange-50' : 'text-slate-400 hover:text-slate-700'"
-          >
-            {{ $t('landing_footer.link_privacy') }}
-          </NuxtLink>
-          <span>•</span>
-          <NuxtLink
-            to="/terms"
-            class="transition-colors py-1 px-2.5 rounded-lg text-xs"
-            :class="isCurrentRoute('/terms') ? 'text-orange-600 font-black bg-orange-50' : 'text-slate-400 hover:text-slate-700'"
-          >
-            {{ $t('landing_footer.link_terms') }}
-          </NuxtLink>
-          <span>•</span>
-          <NuxtLink
-            to="/refund"
-            class="transition-colors py-1 px-2.5 rounded-lg text-xs"
-            :class="isCurrentRoute('/refund') ? 'text-orange-600 font-black bg-orange-50' : 'text-slate-400 hover:text-slate-700'"
-          >
-            {{ $t('landing_footer.link_refund') }}
-          </NuxtLink>
-          <span>•</span>
-          <NuxtLink
-            to="/faq"
-            class="transition-colors py-1 px-2.5 rounded-lg text-xs"
-            :class="isCurrentRoute('/faq') ? 'text-orange-600 font-black bg-orange-50' : 'text-slate-400 hover:text-slate-700'"
-          >
-            {{ $t('landing_footer.link_faq') }}
-          </NuxtLink>
         </div>
       </div>
     </div>

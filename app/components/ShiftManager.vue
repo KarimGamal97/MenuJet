@@ -43,7 +43,7 @@
           @click="openCloseModal"
           class="bg-slate-900 hover:bg-slate-800 text-white font-black text-xs py-3 px-5 rounded-2xl shadow-xs transition-transform active:scale-95 cursor-pointer whitespace-nowrap flex items-center gap-2"
         >
-          <span>🔒</span>
+          <BaseIcon name="lock" class="w-4 h-4" />
           <span>{{ $t("shifts.close_shift_btn") }}</span>
         </button>
       </div>
@@ -55,8 +55,8 @@
       class="bg-amber-50/70 border border-dashed border-amber-200 rounded-3xl p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4"
     >
       <div class="flex items-center gap-3.5">
-        <div class="w-10 h-10 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center text-xl shrink-0">
-          ⏱️
+        <div class="w-10 h-10 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+          <BaseIcon name="clock" class="w-5 h-5" />
         </div>
         <div>
           <h4 class="font-black text-gray-900 text-sm">
@@ -73,7 +73,7 @@
         @click="openStartModal"
         class="bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs py-3 px-6 rounded-2xl shadow-md shadow-emerald-600/20 transition-transform active:scale-95 cursor-pointer whitespace-nowrap flex items-center gap-2"
       >
-        <span>⚡</span>
+        <BaseIcon name="bolt" class="w-4 h-4" />
         <span>{{ $t("shifts.open_shift_btn") }}</span>
       </button>
     </div>
@@ -171,7 +171,7 @@
             <span class="font-black text-blue-600">+ {{ liveStats.cardSales }} {{ $t("currency") }}</span>
           </div>
 
-          <!-- مخصوم المصاريف الخارجية / الفواتير -->
+          <!-- Deducted external expenses / bills -->
           <div v-if="Number(closeForm.expenses) > 0" class="flex justify-between items-center text-gray-500 font-bold">
             <span>{{ $t("shifts.expenses") }}</span>
             <span class="font-black text-rose-600">- {{ closeForm.expenses }} {{ $t("currency") }}</span>
@@ -185,7 +185,7 @@
           </div>
         </div>
 
-        <!-- حقل المصاريف الإضافية / الفواتير (فوق الكاش الفعلي) -->
+        <!-- Additional expenses / bills input -->
         <div class="space-y-1.5">
           <label class="text-xs font-black text-gray-800 block px-1">
             {{ $t("shifts.expenses") }} ({{ $t("currency") }})

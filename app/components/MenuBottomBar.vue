@@ -7,7 +7,7 @@
     <div
       class="bg-white/95 backdrop-blur-xl rounded-[2rem] border border-gray-100 shadow-[0_12px_40px_-8px_rgba(0,0,0,0.15)] p-2 flex items-center justify-between gap-1.5 transition-all duration-300"
     >
-      <!-- 1. زر طلباتك السابقة -->
+      <!-- 1. Past Orders Button -->
       <button
         type="button"
         @click="selectTab('history')"
@@ -42,7 +42,7 @@
         </span>
       </button>
 
-      <!-- 2. زر طلبك / السلة (في المنتصف، الأيقونة فوق الكلمة) -->
+      <!-- 2. Cart / Order Button (centered) -->
       <button
         type="button"
         @click="selectTab('cart')"
@@ -77,7 +77,7 @@
         </span>
       </button>
 
-      <!-- 3. زر عن المطعم -->
+      <!-- 3. About Restaurant Button -->
       <button
         type="button"
         @click="selectTab('info')"

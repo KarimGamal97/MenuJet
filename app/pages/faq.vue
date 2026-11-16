@@ -29,9 +29,7 @@
               class="w-full py-3.5 ps-11 pe-4 bg-white rounded-2xl border border-slate-200 shadow-xs focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 text-sm font-bold text-slate-800 transition-all placeholder:text-slate-400"
             />
             <div class="absolute inset-y-0 start-3.5 flex items-center pointer-events-none text-slate-400">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-              </svg>
+              <BaseIcon name="search" class="w-5 h-5" />
             </div>
             <button
               v-if="searchQuery"
@@ -84,9 +82,7 @@
                 class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center shrink-0 text-slate-500 transition-transform duration-200"
                 :class="openIdx === idx ? 'rotate-180 bg-orange-50 text-orange-600' : ''"
               >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-                </svg>
+                <BaseIcon name="chevron-down" class="w-4 h-4" />
               </div>
             </button>
 
@@ -104,9 +100,7 @@
             class="text-center py-12 bg-white rounded-3xl border border-slate-200 p-8"
           >
             <div class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 mx-auto flex items-center justify-center mb-3">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-              </svg>
+              <BaseIcon name="search" class="w-6 h-6" />
             </div>
             <h3 class="text-base font-black text-slate-800 mb-1">
               {{ $t('faq_page.empty_title') }}
@@ -135,7 +129,7 @@
             </p>
           </div>
           <a
-            href="https://wa.me/201132234124"
+            :href="getSupportWhatsAppUrl()"
             target="_blank"
             rel="noopener noreferrer"
             class="px-6 py-3 rounded-2xl bg-orange-600 hover:bg-orange-500 text-white font-black text-xs sm:text-sm transition-all shadow-md shadow-orange-500/20 shrink-0"
@@ -165,7 +159,7 @@ const toggleItem = (idx) => {
 }
 
 const categories = computed(() => [
-  { id: 'all', label: t('faq_page.cat_all') },
+  { id: 'all', label: t('common.all') },
   { id: 'start', label: t('faq_page.cat_start') },
   { id: 'menu', label: t('faq_page.cat_menu') },
   { id: 'qr', label: t('faq_page.cat_qr') },

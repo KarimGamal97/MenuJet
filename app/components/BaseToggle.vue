@@ -10,7 +10,7 @@
         v-if="locked"
         class="inline-flex items-center gap-1 bg-amber-100/80 text-amber-800 text-[10px] font-black px-2 py-0.5 rounded-full border border-amber-200/80 shadow-xs"
       >
-        <span>🔒</span>
+        <BaseIcon name="lock" class="w-3 h-3" />
         <span>{{ badge || $t("plans.pro_badge_short") }}</span>
       </span>
     </div>

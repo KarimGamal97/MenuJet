@@ -31,7 +31,7 @@
             <p
               class="text-[9px] font-black uppercase tracking-[0.2em] opacity-80"
             >
-              {{ $t("cart.total") }}
+              {{ $t("common.total") }}
             </p>
             <p class="text-lg font-black leading-none">
               {{ totalPrice }} {{ $t("currency") }}

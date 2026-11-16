@@ -16,34 +16,30 @@
       </div>
 
       <!-- FAQ Accordion -->
-      <div class="space-y-4">
+      <div class="divide-y divide-slate-200/80 border-b border-slate-200/80">
         <div
           v-for="(faq, index) in faqList"
           :key="index"
-          class="border border-slate-200/90 rounded-3xl overflow-hidden transition-all duration-300 bg-slate-50/50 hover:border-orange-200"
         >
           <button
             type="button"
             @click="toggleFaq(index)"
-            class="w-full p-6 sm:p-7 text-right flex justify-between items-center gap-4 cursor-pointer"
+            class="w-full py-5 text-start flex justify-between items-center gap-4 cursor-pointer group"
             :dir="$i18n.locale === 'ar' ? 'rtl' : 'ltr'"
           >
-            <span class="text-base sm:text-lg font-black text-slate-900 leading-snug">
+            <span class="text-base sm:text-lg font-bold text-slate-900 group-hover:text-orange-600 transition-colors leading-snug">
               {{ $t(faq.qKey) }}
             </span>
-            <div
-              :class="[
-                'w-9 h-9 rounded-2xl flex items-center justify-center shrink-0 text-sm font-black transition-transform duration-300',
-                openIndex === index ? 'bg-orange-600 text-white rotate-180' : 'bg-slate-200/80 text-slate-600'
-              ]"
-            >
-              ▼
-            </div>
+            <BaseIcon
+              name="chevron-down"
+              class="w-4 h-4 text-slate-500 shrink-0 transition-transform duration-200"
+              :class="{ 'rotate-180': openIndex === index }"
+            />
           </button>
 
           <div
             v-show="openIndex === index"
-            class="px-6 sm:px-7 pb-6 text-slate-600 font-medium text-sm sm:text-base leading-relaxed border-t border-slate-100/80 pt-4"
+            class="pb-5 text-slate-500 font-medium text-sm sm:text-base leading-relaxed"
           >
             {{ $t(faq.aKey) }}
           </div>

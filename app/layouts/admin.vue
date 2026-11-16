@@ -8,364 +8,32 @@
     ></div>
 
     <!-- Logout Confirmation Modal -->
-    <Teleport to="body">
-      <div
-        v-if="showLogoutModal"
-        class="fixed inset-0 z-[100] flex items-center justify-center p-6"
-      >
-        <div
-          class="absolute inset-0 bg-black bg-opacity-30 backdrop-blur-sm transition-opacity"
-          @click="showLogoutModal = false"
-        ></div>
-        <div
-          class="bg-white rounded-[2rem] p-8 max-w-sm w-full relative z-[110] shadow-2xl border border-gray-100 animate-in zoom-in-95 duration-200"
-        >
-          <div class="flex justify-center mb-6">
-            <div
-              class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center text-gray-400"
-            >
-              <BaseIcon name="logout" class="w-8 h-8" />
-            </div>
-          </div>
-          <h3 class="text-xl font-black text-gray-900 mb-2 text-center">
-            {{ $t("admin.logout_confirm_title") }}
-          </h3>
-          <p class="text-gray-500 text-sm mb-8 text-center leading-relaxed">
-            {{ $t("admin.dashboard_confirm_msg") }}
-          </p>
+    <AdminLayoutLogoutModal
+      :open="showLogoutModal"
+      @close="showLogoutModal = false"
+      @confirm="handleLogout"
+    />
 
-          <div class="flex gap-3">
-            <button
-              @click="showLogoutModal = false"
-              class="flex-1 py-4 bg-gray-50 text-gray-400 rounded-2xl font-bold hover:bg-gray-100 transition-colors"
-            >
-              {{ $t("admin.cancel") }}
-            </button>
-            <button
-              @click="handleLogout"
-              class="flex-1 py-4 bg-red-600 text-white rounded-2xl font-bold hover:bg-red-700 shadow-lg shadow-red-100 transition-transform active:scale-95"
-            >
-              {{ $t("admin.confirm") }}
-            </button>
-          </div>
-        </div>
-      </div>
-    </Teleport>
-
-    <!-- Sidebar Aside -->
-    <aside
-      :class="[
-        isMobileOpen ? 'translate-x-0' : 'translate-x-full md:translate-x-0',
-        isCollapsed ? 'w-20 md:w-24' : 'w-64',
-      ]"
-      class="fixed inset-y-0 right-0 z-50 bg-white border-l flex flex-col transition-all duration-300 ease-in-out shrink-0 md:sticky md:top-0 md:h-screen md:inset-y-auto"
-    >
-      <!-- Collapse Button -->
-      <button
-        @click="isCollapsed = !isCollapsed"
-        class="flex absolute -left-3 top-12 bg-white border border-gray-200 rounded-full w-7 h-7 items-center justify-center text-gray-400 hover:text-orange-600 shadow-sm z-50"
-      >
-        <span
-          class="text-[10px] transition-transform duration-300"
-          :class="isCollapsed ? 'rotate-0' : 'rotate-180'"
-        >
-          ❯
-        </span>
-      </button>
-
-      <!-- Sidebar Container -->
-      <div
-        class="flex flex-col h-full bg-white transition-opacity duration-200 overflow-hidden"
-        :class="isCollapsed ? 'p-3' : 'p-4'"
-      >
-        <!-- Top Section (Fixed - Never scrolls) -->
-        <div class="shrink-0">
-          <!-- Restaurant Name -->
-          <div
-            class="bg-gradient-to-l from-orange-600 to-orange-500 rounded-2xl mb-2.5 flex items-center justify-center shadow-lg shadow-orange-100 transition-all duration-300 overflow-hidden"
-            :class="isCollapsed ? 'h-14 w-14' : 'p-3'"
-          >
-            <h1
-              class="font-black text-white leading-tight truncate px-2"
-              :class="isCollapsed ? 'text-xl' : 'text-base'"
-            >
-              {{
-                isCollapsed && profileName
-                  ? profileName[0]
-                  : profileName
-              }}
-            </h1>
-          </div>
-
-          <!-- Trial Countdown Pill (Clickable to Upgrade) -->
-          <div
-            v-if="trialTimeLeft"
-            @click="showUpgradeModal = true"
-            :class="[
-              'cursor-pointer transition-all duration-200 active:scale-[0.98] select-none shadow-xs border',
-              isCollapsed
-                ? 'w-14 h-9 mx-auto mb-2.5 rounded-xl flex items-center justify-center'
-                : 'w-full py-2.5 px-3 mb-2.5 rounded-2xl flex items-center justify-between',
-              trialTimeLeft.expired
-                ? 'bg-red-50 hover:bg-red-100 border-red-200 text-red-700'
-                : trialTimeLeft.days <= 3
-                  ? 'bg-amber-50 hover:bg-amber-100 border-amber-200 text-amber-800'
-                  : 'bg-orange-50/80 hover:bg-orange-100 border-orange-200/70 text-orange-800'
-            ]"
-            :title="isCollapsed ? trialBadgeText : ''"
-          >
-            <template v-if="isCollapsed">
-              <span class="text-sm font-black">{{ trialTimeLeft.expired ? '⚠️' : '⏳' }}</span>
-            </template>
-            <template v-else>
-              <div class="flex items-center gap-1.5 min-w-0">
-                <span class="text-sm shrink-0" :class="{ 'animate-pulse': trialTimeLeft.days <= 3 }">
-                  {{ trialTimeLeft.expired ? '⚠️' : '⏳' }}
-                </span>
-<span class="text-xs font-bold text-gray-600 truncate">
-  {{ isTrial ? $t('plans.trial_period_label') : 'متبقي على التجديد' }}
-</span>
-              </div>
-              <span class="text-xs font-black shrink-0">
-                {{ trialBadgeText }}
-              </span>
-            </template>
-          </div>
-
-          <hr class="mb-2.5 opacity-50" />
-        </div>
-
-        <!-- Nav Links (Scrollable if screen height is small) -->
-        <nav class="flex-1 overflow-y-auto min-h-0 space-y-2.5 custom-scrollbar py-1 pe-0.5">
-          <NuxtLink
-            to="/admin"
-            class="flex items-center gap-3 px-3.5 py-3.5 rounded-2xl transition-all font-bold hover:bg-orange-50 text-gray-500 overflow-hidden group"
-            active-class="bg-orange-50 text-orange-600 shadow-sm shadow-orange-50"
-            exact-active-class="bg-orange-50 text-orange-600"
-          >
-            <BaseIcon
-              name="home"
-              class="w-5 h-5 shrink-0 group-hover:scale-110 transition-transform"
-            />
-            <span v-show="!isCollapsed" class="whitespace-nowrap">{{
-              $t("admin.dashboard")
-            }}</span>
-          </NuxtLink>
-
-          <NuxtLink
-            to="/admin/menu"
-            class="flex items-center gap-3 px-3.5 py-3.5 rounded-2xl transition-all font-bold hover:bg-orange-50 text-gray-500 overflow-hidden group"
-            active-class="bg-orange-50 text-orange-600 shadow-sm shadow-orange-50"
-          >
-            <BaseIcon
-              name="food"
-              class="w-5 h-5 shrink-0 group-hover:scale-110 transition-transform"
-            />
-            <span v-show="!isCollapsed" class="whitespace-nowrap">{{
-              $t("admin.menu")
-            }}</span>
-          </NuxtLink>
-
-          <NuxtLink
-            to="/admin/orders"
-            class="flex items-center gap-3 px-3.5 py-3.5 rounded-2xl transition-all font-bold hover:bg-orange-50 text-gray-500 overflow-hidden group"
-            active-class="bg-orange-50 text-orange-600 shadow-sm shadow-orange-50"
-          >
-            <BaseIcon
-              name="cart"
-              class="w-5 h-5 shrink-0 group-hover:scale-110 transition-transform"
-            />
-            <span v-show="!isCollapsed" class="whitespace-nowrap">{{
-              $t("admin.orders")
-            }}</span>
-          </NuxtLink>
-
-          <NuxtLink
-            v-if="userRole === 'super_admin'"
-            to="/admin/sales"
-            class="flex items-center justify-between px-3.5 py-3.5 rounded-2xl transition-all font-bold hover:bg-orange-50 text-gray-500 overflow-hidden group"
-            active-class="bg-orange-50 text-orange-600 shadow-sm shadow-orange-50"
-          >
-            <div class="flex items-center gap-3">
-              <BaseIcon
-                name="chart"
-                class="w-5 h-5 shrink-0 group-hover:scale-110 transition-transform"
-              />
-              <span v-show="!isCollapsed" class="whitespace-nowrap">{{ $t("admin.sales") }}</span>
-            </div>
-            <span
-              v-if="!isCollapsed && !can('allow_analytics')"
-              class="text-xs bg-amber-100/90 text-amber-800 px-2 py-0.5 rounded-full font-black text-[10px] border border-amber-200/80 shadow-xs shrink-0 flex items-center gap-1"
-            >
-              <span>🔒</span>
-              <span>{{ $t("plans.basic_badge_short") }}</span>
-            </span>
-          </NuxtLink>
-
-          <NuxtLink
-            v-if="userRole === 'super_admin'"
-            to="/admin/settings"
-            class="flex items-center gap-3 px-3.5 py-3.5 rounded-2xl transition-all font-bold hover:bg-orange-50 text-gray-500 overflow-hidden group"
-            active-class="bg-orange-50 text-orange-600 shadow-sm shadow-orange-50"
-          >
-            <BaseIcon
-              name="settings"
-              class="w-5 h-5 shrink-0 group-hover:scale-110 transition-transform"
-            />
-            <span v-show="!isCollapsed" class="whitespace-nowrap">{{
-              $t("admin.settings")
-            }}</span>
-          </NuxtLink>
-
-          <NuxtLink
-            v-if="isSuperAdmin"
-            to="/admin/users"
-            class="flex items-center justify-between px-3.5 py-3.5 rounded-2xl transition-all font-bold hover:bg-purple-50 text-gray-500 overflow-hidden group"
-            active-class="bg-purple-50 text-purple-600 shadow-sm"
-          >
-            <div class="flex items-center gap-3">
-              <BaseIcon name="users" class="w-5 h-5 shrink-0 transition-transform group-hover:scale-110" />
-              <span v-show="!isCollapsed" class="whitespace-nowrap"> {{ $t("admin.users") }} </span>
-            </div>
-            <span
-              v-if="!isCollapsed && !can('allow_users')"
-              class="text-xs bg-amber-100/90 text-amber-800 px-2 py-0.5 rounded-full font-black text-[10px] border border-amber-200/80 shadow-xs shrink-0 flex items-center gap-1"
-            >
-              <span>🔒</span>
-              <span>{{ $t("plans.pro_badge_short") }}</span>
-            </span>
-          </NuxtLink>
-
-          <!-- Language Switcher Dropdown -->
-          <!-- <div class="relative">
-            <button
-              @click="isLangDropdownOpen = !isLangDropdownOpen"
-              class="flex items-center gap-3 w-full p-4 text-gray-500 font-bold hover:bg-gray-50 rounded-2xl transition-all overflow-hidden"
-              :class="
-                isLangDropdownOpen ? 'bg-gray-50 ring-1 ring-gray-100' : ''
-              "
-            >
-              <BaseIcon name="globe" class="w-6 h-6 shrink-0" />
-              <span
-                v-show="!isCollapsed"
-                class="whitespace-nowrap flex-grow text-right"
-              >
-                {{ locale === "ar" ? "العربية" : "English" }}
-              </span>
-              <span
-                v-show="!isCollapsed"
-                class="text-[10px] text-gray-300 group-hover:text-gray-400"
-              >
-                {{ isLangDropdownOpen ? "▲" : "▼" }}
-              </span>
-            </button>
-            <transition
-              enter-active-class="transition duration-100 ease-out"
-              enter-from-class="transform scale-95 opacity-0"
-              enter-to-class="transform scale-100 opacity-100"
-              leave-active-class="transition duration-75 ease-in"
-              leave-from-class="transform scale-100 opacity-100"
-              leave-to-class="transform scale-95 opacity-0"
-            >
-              <div
-                v-if="isLangDropdownOpen"
-                class="absolute bottom-full left-0 right-0 mb-2 bg-white border border-gray-100 rounded-2xl shadow-xl z-[60] overflow-hidden"
-              >
-                <div class="p-2 space-y-1">
-                  <button
-                    v-for="item in locales"
-                    :key="item.code"
-                    @click="changeLanguage(item.code)"
-                    class="flex items-center gap-3 w-full p-3 rounded-xl transition-all font-bold"
-                    :class="
-                      locale === item.code
-                        ? 'bg-orange-50 text-orange-600'
-                        : 'text-gray-500 hover:bg-gray-50'
-                    "
-                  >
-                    <span class="text-lg">{{
-                      item.code === "ar" ? "🇪🇬" : "🇺🇸"
-                    }}</span>
-                    <span>{{ item.name }}</span>
-                  </button>
-                </div>
-              </div>
-            </transition>
-          </div> -->
-        </nav>
-
-        <!-- Sidebar Footer -->
-        <div class="mt-auto pt-3 space-y-2 border-t border-gray-100 shrink-0">
-          <!-- Plan Badge / Upgrade Card -->
-          <div
-            v-if="!isCollapsed && isFree"
-            class="mb-2 p-3 bg-gradient-to-br from-orange-500/10 via-amber-500/10 to-orange-500/5 border border-orange-200/80 rounded-2xl"
-            :dir="$i18n.locale === 'ar' ? 'rtl' : 'ltr'"
-          >
-            <div class="flex flex-col items-start gap-1 mb-1.5">
-              <span class="text-xs font-black text-orange-950 leading-snug">{{ $t(`plans.${currentPlan.id || 'free'}_name`) }} </span>
-              <span class="text-[10px] bg-orange-200 text-orange-800 font-bold px-2 py-0.5 rounded-full whitespace-nowrap">{{ $t("plans.trial_badge") }}</span>
-            </div>
-            <p class="text-[11px] text-orange-800/80 mb-2 font-medium leading-tight">
-              {{ $t("plans.limit_summary", { items: currentPlan.max_items, categories: currentPlan.max_categories }) }}
-            </p>
-            <button
-              type="button"
-              @click="showUpgradeModal = true"
-              class="w-full bg-orange-600 hover:bg-orange-500 text-white font-black text-xs py-2 px-3 rounded-xl shadow-xs transition-transform active:scale-95 text-center cursor-pointer block"
-            >
-              ⚡ {{ $t("plans.upgrade_now") }}
-            </button>
-          </div>
-
-          <div
-            v-else-if="!isCollapsed && isBasic"
-            class="mb-2 p-3 bg-gradient-to-br from-slate-900/5 via-slate-800/5 to-slate-900/10 border border-slate-200 rounded-2xl"
-            :dir="$i18n.locale === 'ar' ? 'rtl' : 'ltr'"
-          >
-            <div class="flex flex-col items-start gap-1 mb-1.5">
-              <span class="text-xs font-black text-slate-900 leading-snug">{{ $t(`plans.${currentPlan.id || 'basic'}_name`) }} ⚡</span>
-              <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full whitespace-nowrap">{{ $t("plans.active_badge") }}</span>
-            </div>
-            <p class="text-[11px] text-slate-600 mb-2 font-medium leading-tight">
-              {{ $t("plans.unlimited_items_cats") }}
-            </p>
-            <button
-              type="button"
-              @click="showUpgradeModal = true"
-              class="w-full bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-500 hover:to-amber-400 text-white font-black text-xs py-2 px-3 rounded-xl shadow-xs transition-transform active:scale-95 text-center cursor-pointer block"
-            >
-              {{ $t("plans.upgrade_pro") }}
-            </button>
-          </div>
-
-          <div
-            v-else-if="!isCollapsed && isPro"
-            class="mb-2 p-3 bg-gradient-to-br from-amber-500/10 via-orange-500/10 to-amber-500/5 border border-amber-300/80 rounded-2xl"
-            :dir="$i18n.locale === 'ar' ? 'rtl' : 'ltr'"
-          >
-            <div class="flex flex-col items-start gap-1 mb-1.5">
-              <span class="text-xs font-black text-amber-950 leading-snug">{{ $t(`plans.${currentPlan.id || 'pro'}_name`) }} </span>
-              <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full whitespace-nowrap">{{ $t("plans.active_badge") }}</span>
-            </div>
-            <p class="text-[11px] text-amber-900/80 font-medium leading-tight">
-              {{ $t("plans.all_features_active") }}
-            </p>
-          </div>
-
-          <button
-            @click="showLogoutModal = true"
-            class="flex items-center gap-3 w-full p-3 text-red-700 font-bold hover:bg-red-50 rounded-xl transition-all overflow-hidden cursor-pointer"
-            :title="isCollapsed ? $t('admin.logout') : ''"
-          >
-            <BaseIcon name="logout" class="w-5 h-5 shrink-0" />
-            <span v-show="!isCollapsed" class="whitespace-nowrap">{{
-              $t("admin.logout")
-            }}</span>
-          </button>
-        </div>
-      </div>
-    </aside>
+    <!-- Sidebar -->
+    <AdminLayoutAdminSidebar
+      :isMobileOpen="isMobileOpen"
+      :isCollapsed="isCollapsed"
+      :profileName="profileName"
+      :userRole="userRole"
+      :isSuperAdmin="isSuperAdmin"
+      :isTrial="isTrial"
+      :trialTimeLeft="trialTimeLeft"
+      :trialBadgeText="trialBadgeText"
+      :currentPlan="currentPlan"
+      :isFree="isFree"
+      :isBasic="isBasic"
+      :isPro="isPro"
+      :canAllowAnalytics="can('allow_analytics')"
+      :canAllowUsers="can('allow_users')"
+      @toggleCollapse="isCollapsed = !isCollapsed"
+      @openUpgrade="showUpgradeModal = true"
+      @openLogout="showLogoutModal = true"
+    />
 
     <!-- Upgrade Plan Modal in Layout -->
     <UpgradeModal
@@ -376,59 +44,15 @@
     />
 
     <!-- Paywall / Expired Subscription Modal -->
-    <Teleport to="body">
-      <div
-        v-if="trialTimeLeft?.expired"
-        class="fixed inset-0 z-[9999] bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4"
-        :dir="$i18n.locale === 'ar' ? 'rtl' : 'ltr'"
-      >
-        <div class="bg-white rounded-[2.5rem] p-6 sm:p-8 max-w-md w-full text-center shadow-2xl border border-gray-100 animate-in zoom-in-95 duration-200">
-          <!-- Icon -->
-          <div class="w-16 h-16 bg-red-50 text-red-600 rounded-3xl flex items-center justify-center mx-auto mb-4 text-3xl shadow-sm shadow-red-100">
-            🔒
-          </div>
-
-          <h2 class="text-2xl font-black text-gray-900 mb-2">
-            {{ $i18n.locale === 'ar' ? 'انتهت فترة الاشتراك' : 'Subscription Expired' }}
-          </h2>
-
-          <p class="text-sm font-medium text-gray-500 mb-6 leading-relaxed">
-            <template v-if="$i18n.locale === 'ar'">
-              عزيزنا صاحب مطعم <span class="font-bold text-gray-800">{{ profileName }}</span>، لقد انتهت فترة اشتراكك الحالية. لتجديد الاشتراك واستئناف إدارة المنيو والطلبات، يُرجى التواصل معنا للتفعيل الفوري.
-            </template>
-            <template v-else>
-              Dear owner of <span class="font-bold text-gray-800">{{ profileName }}</span>, your subscription period has expired. To renew and continue managing your menu and orders, please contact support.
-            </template>
-          </p>
-
-          <!-- Action Buttons -->
-          <div class="space-y-3">
-            <a
-              :href="`https://wa.me/201132234124?text=${encodeURIComponent($i18n.locale === 'ar' ? 'مرحباً، أود تجديد اشتراك مطعم: ' + profileName : 'Hello, I want to renew subscription for: ' + profileName)}`"
-              target="_blank"
-              class="w-full flex items-center justify-center gap-2 py-3.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-2xl shadow-lg shadow-emerald-600/25 transition-all active:scale-95"
-            >
-              <span>💬 {{ $i18n.locale === 'ar' ? 'تجديد الاشتراك عبر واتساب' : 'Renew via WhatsApp' }}</span>
-            </a>
-
-            <button
-              type="button"
-              @click="handleLogout"
-              class="w-full py-3 px-4 text-sm font-bold text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-2xl transition-all cursor-pointer"
-            >
-              {{ $t('admin.logout') }}
-            </button>
-          </div>
-        </div>
-      </div>
-    </Teleport>
+    <AdminLayoutExpiredPaywallModal
+      :open="Boolean(trialTimeLeft?.expired)"
+      :profileName="profileName"
+      @logout="handleLogout"
+    />
 
     <!-- Main Content Area -->
     <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
-      <!-- Mobile Top Bar -->
-      <header
-        class="md:hidden h-16 bg-white border-b px-6 flex items-center justify-between z-30"
-      >
+      <header class="md:hidden h-16 bg-white border-b px-6 flex items-center justify-between z-30">
         <button
           @click="isMobileOpen = true"
           class="p-2 -mr-2 text-gray-400 hover:text-orange-600 transition-colors"
@@ -438,7 +62,6 @@
         <span class="font-black text-orange-600">MenuJet</span>
       </header>
 
-      <!-- Main Scrollable Area -->
       <main dir="ltr" class="flex-1 p-4 md:p-10 overflow-y-auto">
         <slot />
       </main>
@@ -449,18 +72,16 @@
 <script setup>
 const authStore = useAuthStore();
 const client = useSupabaseClient();
-const user = useSupabaseUser();
 const { userRole, ownerId } = useAuthUser();
 const { startGlobalOrderListener, stopGlobalOrderListener } = useOrderNotifications();
 const { currentPlan, isFree, isBasic, isPro, can } = usePlan();
 const { t, locale } = useI18n();
 const { $toast } = useNuxtApp();
+
 const isCollapsed = ref(false);
 const isMobileOpen = ref(false);
 const showLogoutModal = ref(false);
 const showUpgradeModal = ref(false);
-
-// Local profile ref — direct fetch, no store dependency for display
 const localProfile = ref(null);
 
 const profileName = computed(() =>
@@ -473,7 +94,6 @@ const profileName = computed(() =>
 
 const isSuperAdmin = computed(() => localProfile.value?.role === 'super_admin');
 
-// Trial Countdown Logic
 const parseDateSafe = (dateStr) => {
   if (!dateStr) return NaN;
   if (dateStr instanceof Date) return dateStr.getTime();
@@ -536,63 +156,40 @@ const trialTimeLeft = computed(() => {
 
   const diffMs = end - now.value;
   if (diffMs <= 0) {
-    return {
-      expired: true,
-      days: 0,
-      hours: 0,
-      minutes: 0,
-      seconds: 0
-    };
+    return { expired: true, days: 0, hours: 0, minutes: 0, seconds: 0 };
   }
-
-  const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-  const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-  const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
 
   return {
     expired: false,
-    days,
-    hours,
-    minutes,
-    seconds,
-    diffMs
+    days: Math.floor(diffMs / (1000 * 60 * 60 * 24)),
+    hours: Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+    minutes: Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60)),
+    seconds: Math.floor((diffMs % (1000 * 60)) / 1000),
+    diffMs,
   };
 });
 
 const trialBadgeText = computed(() => {
   if (!trialTimeLeft.value) return '';
-  if (trialTimeLeft.value.expired) {
-    return t('plans.trial_expired');
-  }
+  if (trialTimeLeft.value.expired) return t('plans.trial_expired');
+
   const { days, hours, minutes } = trialTimeLeft.value;
   if (locale.value === 'ar') {
-    if (days >= 3 && days <= 10) {
-      return `${days} أيام`;
-    }
-    if (days > 10) {
-      return `${days} يوم`;
-    }
-    if (days === 2) {
-      return `يومين`;
-    }
-    if (days === 1) {
-      return hours > 0 ? `يوم و ${hours} ساعة` : `يوم واحد`;
-    }
-    if (hours > 0) {
-      return `${hours} س و ${minutes} د`;
-    }
+    if (days >= 3 && days <= 10) return `${days} أيام`;
+    if (days > 10) return `${days} يوم`;
+    if (days === 2) return 'يومين';
+    if (days === 1) return hours > 0 ? `يوم و ${hours} ساعة` : 'يوم واحد';
+    if (hours > 0) return `${hours} س و ${minutes} د`;
     return `${minutes} دقيقة`;
-  } else {
-    if (days > 1) return `${days} days left`;
-    if (days === 1) return `1 day, ${hours}h left`;
-    if (hours > 0) return `${hours}h ${minutes}m left`;
-    return `${minutes}m left`;
   }
+  if (days > 1) return `${days} days left`;
+  if (days === 1) return `1 day, ${hours}h left`;
+  if (hours > 0) return `${hours}h ${minutes}m left`;
+  return `${minutes}m left`;
 });
 
 const fetchProfile = async (userId) => {
-  let { data, error } = await client
+  let { data } = await client
     .from('profiles')
     .select('*, plans(*)')
     .or(`user_id.eq.${userId},id.eq.${userId}`)
@@ -608,17 +205,14 @@ const fetchProfile = async (userId) => {
   }
 
   if (data) {
-    if (data.plans) {
-      data.plan = data.plans;
-    }
-    // If this is a sub-account (admin/user) without a business name, fetch the owner's info
+    if (data.plans) data.plan = data.plans;
     if (data.owner_id) {
       const { data: ownerData } = await client
         .from('profiles')
         .select('*')
         .or(`user_id.eq.${data.owner_id},id.eq.${data.owner_id}`)
         .maybeSingle();
-        
+
       if (ownerData) {
         if (!data.business_name && ownerData.business_name) data.business_name = ownerData.business_name;
         if (!data.business_name_ar && ownerData.business_name_ar) data.business_name_ar = ownerData.business_name_ar;
@@ -634,7 +228,6 @@ const fetchProfile = async (userId) => {
   }
 };
 
-// Use client.auth.getUser() — more reliable than useSupabaseUser() in layouts
 onMounted(async () => {
   const { data: { user: authUser } } = await client.auth.getUser();
   if (authUser?.id) {
@@ -651,11 +244,3 @@ const handleLogout = async () => {
   navigateTo('/login');
 };
 </script>
-
-<style scoped>
-@media (min-width: 768px) {
-  aside {
-    border-left: 1px solid rgba(0, 0, 0, 0.05);
-  }
-}
-</style>

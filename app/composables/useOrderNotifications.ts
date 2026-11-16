@@ -118,7 +118,7 @@ export const useOrderNotifications = () => {
     }
 
     // 3. In-App Toast Alert (Clickable to navigate to orders)
-    const orderNum = (order.order_number || order.id || "").toString().padStart(4, "0");
+    const orderNum = formatOrderNumber(order.order_number || order.id || "");
     const total = order.total_price || 0;
     const isAr = locale.value === "ar";
 

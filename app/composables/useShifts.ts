@@ -10,7 +10,7 @@ export const useShifts = () => {
   const loading = ref(false);
   const sessionLoading = ref(false);
 
-  // 1. جلب فترات الشيفتات للمطعم
+  // 1. Fetch restaurant shift definitions
   const fetchShifts = async (restaurantId: string) => {
     if (!restaurantId) return [];
     loading.value = true;
@@ -32,7 +32,7 @@ export const useShifts = () => {
     }
   };
 
-  // 2. جلب الجلسة المفتوحة حالياً للكاشير
+  // 2. Fetch currently open cashier session
   const fetchActiveSession = async (restaurantId: string) => {
     if (!restaurantId) return null;
     sessionLoading.value = true;
@@ -57,7 +57,7 @@ export const useShifts = () => {
     }
   };
 
-  // 3. تحديد الشيفت التلقائي بناءً على الوقت الحالي (يدعم الشيفت الليلي اللي بيمتد لليوم التالي)
+  // 3. Auto-detect current shift based on time (supports overnight shifts)
   const autoDetectShift = (shiftsList: RestaurantShift[]): RestaurantShift | null => {
     if (!shiftsList || shiftsList.length === 0) return null;
 
@@ -72,24 +72,24 @@ export const useShifts = () => {
       const startMinutes = startH * 60 + (startM || 0);
       const endMinutes = endH * 60 + (endM || 0);
 
-      // الشيفت الطبيعي داخل نفس اليوم (مثلاً: 08:00 إلى 16:00)
+      // Normal same-day shift (e.g., 08:00 to 16:00)
       if (startMinutes < endMinutes) {
         if (currentMinutes >= startMinutes && currentMinutes < endMinutes) {
           return shift;
         }
       } else {
-        // الشيفت الليلي الممتد لليوم التالي (مثلاً: 18:00 إلى 02:00)
+        // Overnight shift spanning midnight (e.g., 18:00 to 02:00)
         if (currentMinutes >= startMinutes || currentMinutes < endMinutes) {
           return shift;
         }
       }
     }
 
-    // لو ملقاش فترة متطابقة، يقترح أول شيفت متاح
+    // Fallback to first available shift if none match
     return shiftsList.find((s) => s.is_active) || shiftsList[0] || null;
   };
 
-  // 4. فتح جلسة كاشير جديدة (بداية الوردية بالعهدة)
+  // 4. Open a new cashier session with opening float
   const openSession = async ({
     restaurantId,
     userId,
@@ -134,7 +134,7 @@ export const useShifts = () => {
     }
   };
 
-  // 5. حساب مبيعات الجلسة الحالية من جدول الطلبات (لحظياً)
+  // 5. Calculate live sales for current session from orders table
   const getSessionLiveStats = async (sessionId: string) => {
     if (!sessionId) return { cashSales: 0, cardSales: 0, totalSales: 0, count: 0 };
 
@@ -168,7 +168,7 @@ export const useShifts = () => {
     }
   };
 
-  // 6. تقفيل الوردية ومطابقة الكاش والـ Z-Report
+  // 6. Close shift and reconcile cash / Z-Report
   const closeSession = async ({
     sessionId,
     closingBalance,
@@ -182,15 +182,15 @@ export const useShifts = () => {
   }) => {
     sessionLoading.value = true;
     try {
-      // 1. حساب مبيعات الجلسة الفعلية
+      // 1. Compute actual session sales
       const stats = await getSessionLiveStats(sessionId);
       const opening = Number(activeSession.value?.opening_balance) || 0;
       const actualCash = Number(closingBalance) || 0;
       const totalExpenses = Number(expenses) || 0;
 
-      // المفروض في الدرج = العهدة + مبيعات الكاش - المصاريف
+      // Expected drawer cash = opening float + cash sales - expenses
       const expectedCash = Math.max(0, opening + stats.cashSales - totalExpenses);
-      // الفارق = الفعلي - المفروض (سالب = عجز، موجب = زيادة)
+      // Variance = actual - expected (negative = shortage, positive = surplus)
       const difference = actualCash - expectedCash;
 
       const updateData = {
@@ -227,7 +227,7 @@ export const useShifts = () => {
     }
   };
 
-  // 7. إدارة فترات الشيفتات (إضافة، تعديل، حذف)
+  // 7. Manage shift definitions (create, update, delete)
   const addShift = async (restaurantId: string, shiftData: Partial<RestaurantShift>) => {
     try {
       const { data, error } = await client

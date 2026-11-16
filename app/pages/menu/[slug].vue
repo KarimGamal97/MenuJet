@@ -178,7 +178,7 @@
           </div>
         </div>
 
-        <!-- شريط التنويه المتحرك: ملتصق بالناف، بنفس لون البراند، بسيط وملء الشاشة في كل الأجهزة -->
+        <!-- Announcement marquee bar -->
         <div
           v-if="showAnnouncement"
           class="w-full bg-black/10 border-t border-white/15 py-1.5 overflow-hidden select-none"
@@ -222,7 +222,7 @@
         </div>
 
         <!-- 2. Items List -->
-        <div 
+        <section
           v-else-if="filteredItems.length > 0"
           key="items-list"
           class="flex flex-col gap-3 pb-32"
@@ -234,7 +234,7 @@
             :allowOrdering="canOrder"
             @select="openItemModal"
           />
-        </div>
+        </section>
 
         <!-- 3. No Results -->
         <div v-else key="items-empty" class="text-center py-5 pb-32">
@@ -464,60 +464,29 @@ const isActuallyOpen = computed(() => {
 });
 
 // Subscription expiration check
-const isSubscriptionExpired = computed(() => {
-  if (!restaurant.value) return false;
-  if (restaurant.value.role === "super_admin") return false;
+const isSubscriptionExpired = computed(() => isSubscriptionExpiredCheck(restaurant.value));
 
-  const endDate =
-    restaurant.value.subscription_end_date ||
-    restaurant.value.subscription_ends_at ||
-    restaurant.value.trial_end_date ||
-    restaurant.value.trial_ends_at ||
-    restaurant.value.trial_end ||
-    restaurant.value.expires_at ||
-    restaurant.value.end_date;
-
-  if (!endDate) return false;
-
-  let s = String(endDate).trim();
-  if (s.includes(" ") && !s.includes("T")) {
-    s = s.replace(" ", "T");
-  }
-  s = s.replace(/([+-]\d{2})$/, "$1:00");
-  const timestamp = new Date(s).getTime();
-  if (isNaN(timestamp)) {
-    const fallback = new Date(endDate).getTime();
-    if (isNaN(fallback)) return false;
-    return fallback < Date.now();
-  }
-  return timestamp < Date.now();
-});
+const activePlanId = computed(() => resolvePlanId(restaurant.value));
 
 // Ordering enabled toggle from restaurant settings
 const isWhatsappOrderingAllowed = computed(() => {
   if (!restaurant.value) return false;
   const p = restaurant.value;
-  const planId = p.plan?.id || p.plans?.id || p.plan_id || p.plan_type || "free";
-  const allowsWhatsapp = p.plans?.allow_whatsapp_orders ?? p.plan?.allow_whatsapp_orders ?? (planId === "pro");
+  const allowsWhatsapp = p.plans?.allow_whatsapp_orders ?? p.plan?.allow_whatsapp_orders ?? (activePlanId.value === "pro");
   return Boolean(allowsWhatsapp) && p.whatsapp_ordering_enabled !== false;
 });
 
 // Electronic payments allowed only for Pro plan
 const isElectronicPaymentAllowed = computed(() => {
-  if (!restaurant.value) return false;
-  const p = restaurant.value;
-  const planId = p.plan?.id || p.plans?.id || p.plan_id || p.plan_type || "free";
-  return planId === "pro";
+  return Boolean(restaurant.value) && activePlanId.value === "pro";
 });
 
 // Announcement banner allowed and enabled (Pro plan only)
 const showAnnouncement = computed(() => {
   if (!restaurant.value) return false;
   const p = restaurant.value;
-  const planId = p.plan?.id || p.plans?.id || p.plan_id || p.plan_type || "free";
-  const isPro = planId === "pro";
   return Boolean(
-    isPro &&
+    activePlanId.value === "pro" &&
     p.announcement_enabled &&
     p.announcement_text &&
     p.announcement_text.trim().length > 0
@@ -529,8 +498,7 @@ const showBioHub = ref(true);
 const isBioHubAllowed = computed(() => {
   if (!restaurant.value) return false;
   const p = restaurant.value;
-  const planId = p.plan?.id || p.plans?.id || p.plan_id || p.plan_type || "free";
-  const allowsBio = p.plans?.allow_bio_hub ?? p.plan?.allow_bio_hub ?? (planId === "pro");
+  const allowsBio = p.plans?.allow_bio_hub ?? p.plan?.allow_bio_hub ?? (activePlanId.value === "pro");
   return Boolean(allowsBio) && p.bio_hub_enabled === true;
 });
 
@@ -580,7 +548,7 @@ const openItemModal = (item) => {
 const activeCategory = ref("");
 const searchQuery = ref("");
 
-// Arabic text normalizer (e.g. قهوة === قهوه, أ/إ/آ -> ا, remove diacritics/tatweel)
+// Arabic text normalizer (normalize alef variants and strip diacritics/tatweel)
 const normalizeArabic = (text) => {
   if (!text) return "";
   return text
