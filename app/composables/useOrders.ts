@@ -1,7 +1,8 @@
 import type { Order, OrderStatus } from "~/types";
 
-// Named constant instead of magic number
+// Named constants instead of magic numbers
 const CLEANUP_DAYS_THRESHOLD = 7;
+const WHATSAPP_AUTO_COMPLETE_HOURS = 24;
 
 export const useOrders = () => {
   const client = useSupabaseClient<any>();
@@ -120,6 +121,18 @@ export const useOrders = () => {
   const autoArchiveOldOrders = async (userId: string, days = CLEANUP_DAYS_THRESHOLD) => {
     if (!userId) return;
     try {
+      const whatsappCutoff = new Date(
+        Date.now() - WHATSAPP_AUTO_COMPLETE_HOURS * 60 * 60 * 1000,
+      ).toISOString();
+
+      await client
+        .from("orders")
+        .update({ status: "completed" })
+        .eq("user_id", userId)
+        .eq("status", "pending")
+        .like("payment_method", "whatsapp%")
+        .lt("created_at", whatsappCutoff);
+
       const cutoffDate = new Date();
       cutoffDate.setDate(cutoffDate.getDate() - days);
 
@@ -176,7 +189,7 @@ export const useOrders = () => {
       realtimeChannel.value = null;
     }
   };
-
+  
   return {
     orders,
     totalOrders,

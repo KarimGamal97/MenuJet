@@ -1,10 +1,10 @@
 <template>
   <footer class="bg-white border-t border-slate-200/80 text-slate-600 select-none" :dir="$i18n.locale === 'ar' ? 'rtl' : 'ltr'">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 lg:pt-16 pb-5">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12">
+      <div class="grid grid-cols-2 lg:grid-cols-5 gap-x-6 gap-y-8 lg:gap-12">
         
         <!-- Brand Info (2 columns on large) -->
-        <div class="lg:col-span-2 space-y-4">
+        <div class="col-span-2 space-y-4">
           <NuxtLink to="/" class="flex items-center group inline-flex">
             <img
               src="~/assets/navbar-logo.png"

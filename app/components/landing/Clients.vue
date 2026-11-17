@@ -11,9 +11,9 @@
         <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-orange-100/80 text-orange-700 text-xs font-black mb-4 shadow-2xs">
           <span>{{ $t('clients.badge') }}</span>
         </div>
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight mb-4">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-[1.45] mb-4">
           {{ $t('clients.title_part1') }} 
-          <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-amber-500">
+          <span class="inline-block py-1 text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-amber-500">
             {{ $t('clients.title_part2') }}
           </span>
         </h2>
@@ -22,38 +22,59 @@
         </p>
       </div>
 
-      <!-- Mobile Slider with Dots -->
+      <!-- Mobile Slider (2 logos per view, seamless infinite loop + arrows) -->
       <div
-        class="sm:hidden relative w-full overflow-hidden py-4"
+        class="sm:hidden relative w-full py-4 px-8"
         dir="ltr"
         @touchstart="onTouchStart"
         @touchend="onTouchEnd"
       >
-        <div
-          class="flex transition-transform duration-500 ease-out"
-          :style="{ transform: `translateX(-${activeSlide * 100}%)` }"
+        <button
+          type="button"
+          @click="prevSlide"
+          aria-label="Previous"
+          class="absolute left-0 top-1/2 -translate-y-7 z-20 w-8 h-8 rounded-full bg-white/90 border border-slate-200/80 shadow-xs text-slate-600 hover:text-orange-600 flex items-center justify-center transition-colors cursor-pointer"
         >
+          <BaseIcon name="chevron-left" class="w-4 h-4 stroke-[2.5]" />
+        </button>
+
+        <div class="overflow-hidden w-full">
           <div
-            v-for="client in clientsList"
-            :key="'m-' + client.slug"
-            class="w-full shrink-0 flex items-center justify-center"
+            :class="['flex', isTransitioning ? 'transition-transform duration-500 ease-out' : 'transition-none']"
+            :style="{ transform: `translateX(-${slideOffset * 50}%)` }"
+            @transitionend="onTrackTransitionEnd"
           >
-            <a
-              :href="client.url"
-              target="_blank"
-              rel="noopener noreferrer"
-              :title="$t(client.nameKey)"
-              class="group flex items-center justify-center transition-transform duration-300 hover:scale-105 cursor-pointer"
+            <div
+              v-for="(client, idx) in mobileTrackClients"
+              :key="'m-' + client.slug + '-' + idx"
+              class="w-1/2 shrink-0 flex items-center justify-center px-2"
             >
-              <img
-                :src="client.logo"
-                :alt="$t(client.nameKey)"
-                class="w-20 h-20 object-contain rounded-2xl transition-transform duration-300"
-                loading="lazy"
-              />
-            </a>
+              <a
+                :href="client.url"
+                target="_blank"
+                rel="noopener noreferrer"
+                :title="$t(client.nameKey)"
+                class="group flex items-center justify-center transition-transform duration-300 hover:scale-105 cursor-pointer"
+              >
+                <img
+                  :src="client.logo"
+                  :alt="$t(client.nameKey)"
+                  class="w-20 h-20 object-contain rounded-2xl transition-transform duration-300"
+                  loading="lazy"
+                />
+              </a>
+            </div>
           </div>
         </div>
+
+        <button
+          type="button"
+          @click="nextSlide"
+          aria-label="Next"
+          class="absolute right-0 top-1/2 -translate-y-7 z-20 w-8 h-8 rounded-full bg-white/90 border border-slate-200/80 shadow-xs text-slate-600 hover:text-orange-600 flex items-center justify-center transition-colors cursor-pointer"
+        >
+          <BaseIcon name="chevron-right" class="w-4 h-4 stroke-[2.5]" />
+        </button>
 
         <!-- Slider Dots -->
         <div class="flex items-center justify-center gap-2 mt-6">
@@ -65,7 +86,7 @@
             :aria-label="$t(client.nameKey)"
             :class="[
               'h-2 rounded-full transition-all duration-300 cursor-pointer',
-              activeSlide === idx
+              activeDotIndex === idx
                 ? 'w-6 bg-orange-500'
                 : 'w-2 bg-slate-300 hover:bg-slate-400'
             ]"
@@ -178,14 +199,54 @@ const clientsList = [
   }
 ]
 
-const activeSlide = ref(0)
+const slideOffset = ref(0)
+const isTransitioning = ref(true)
 let slideTimer = null
 let touchStartX = 0
+
+const mobileTrackClients = computed(() => [...clientsList, ...clientsList])
+const activeDotIndex = computed(() => ((slideOffset.value % clientsList.length) + clientsList.length) % clientsList.length)
+
+const nextSlide = () => {
+  if (!isTransitioning.value) isTransitioning.value = true
+  slideOffset.value += 1
+  startAutoSlide()
+}
+
+const prevSlide = () => {
+  if (slideOffset.value <= 0) {
+    isTransitioning.value = false
+    slideOffset.value = clientsList.length
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        isTransitioning.value = true
+        slideOffset.value = clientsList.length - 1
+      })
+    })
+  } else {
+    isTransitioning.value = true
+    slideOffset.value -= 1
+  }
+  startAutoSlide()
+}
+
+const onTrackTransitionEnd = () => {
+  if (slideOffset.value >= clientsList.length) {
+    isTransitioning.value = false
+    slideOffset.value = slideOffset.value % clientsList.length
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        isTransitioning.value = true
+      })
+    })
+  }
+}
 
 const startAutoSlide = () => {
   stopAutoSlide()
   slideTimer = setInterval(() => {
-    activeSlide.value = (activeSlide.value + 1) % clientsList.length
+    if (!isTransitioning.value) isTransitioning.value = true
+    slideOffset.value += 1
   }, 3000)
 }
 
@@ -197,7 +258,8 @@ const stopAutoSlide = () => {
 }
 
 const goToSlide = (idx) => {
-  activeSlide.value = idx
+  isTransitioning.value = true
+  slideOffset.value = idx
   startAutoSlide()
 }
 
@@ -210,10 +272,11 @@ const onTouchEnd = (e) => {
   const diff = touchStartX - e.changedTouches[0].screenX
   if (Math.abs(diff) > 40) {
     if (diff > 0) {
-      activeSlide.value = (activeSlide.value + 1) % clientsList.length
+      nextSlide()
     } else {
-      activeSlide.value = (activeSlide.value - 1 + clientsList.length) % clientsList.length
+      prevSlide()
     }
+    return
   }
   startAutoSlide()
 }

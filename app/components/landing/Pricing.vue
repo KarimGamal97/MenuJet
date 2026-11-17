@@ -239,30 +239,26 @@ const billingCycle = ref('monthly')
 
 const basicFeatures = [
   'pricing.basic.feat_unlimited',
-  'pricing.basic.feat_qr_fast',
-  'pricing.basic.feat_studio',
-  'pricing.basic.feat_branding',
-  'pricing.basic.feat_out_of_stock',
-  'pricing.basic.feat_auto_archive',
+  'pricing.basic.feat_search',
   'pricing.basic.feat_shifts',
-  'pricing.basic.feat_order_edit',
   'pricing.basic.feat_variants',
-  'pricing.basic.feat_alerts',
-  'pricing.basic.feat_reports',
-  'pricing.basic.feat_languages_reviews',
+  'pricing.basic.feat_out_of_stock',
+  'pricing.basic.feat_branding',
+  'pricing.basic.feat_reports_archive',
+  'pricing.basic.feat_alerts_edit',
+  'pricing.basic.feat_qr_studio',
 ]
 
 const proFeatures = [
-  'pricing.pro.feat_analytics_charts',
-  'pricing.pro.feat_announcement_banner',
   'pricing.pro.feat_bio_hub',
-  'pricing.pro.feat_payments',
-  'pricing.pro.feat_delivery',
-  'pricing.pro.feat_whatsapp',
-  'pricing.pro.feat_tables_queue',
-  'pricing.pro.feat_hours',
+  'pricing.pro.feat_announcement_banner',
   'pricing.pro.feat_staff',
-  'pricing.pro.feat_support',
+  'pricing.pro.feat_whatsapp',
+  'pricing.pro.feat_delivery',
+  'pricing.pro.feat_hours',
+  'pricing.pro.feat_analytics_charts',
+  'pricing.pro.feat_payments',
+  'pricing.pro.feat_tables_queue',
 ]
 
 const pricingData = {

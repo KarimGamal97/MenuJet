@@ -10,7 +10,7 @@
         
         <!-- Text Content -->
         <div class="md:w-1/2 text-center md:text-start text-white">
-          <h2 class="text-4xl md:text-5xl font-black mb-6 leading-tight">{{ $t('contact.title') }}</h2>
+          <h2 class="text-[26px] sm:text-4xl md:text-5xl font-black mb-6 leading-tight whitespace-nowrap sm:whitespace-normal">{{ $t('contact.title') }}</h2>
           <p class="text-xl opacity-90 mb-10">{{ $t('contact.subtitle') }}</p>
           <ul class="space-y-4 opacity-90 hidden md:block text-start">
              <li class="flex items-center gap-4">
@@ -42,7 +42,7 @@
                 <input v-model="form.restaurant" type="text" :placeholder="$t('contact.restaurant_placeholder')" class="w-full p-4 rounded-xl border border-gray-200 text-gray-900 outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all bg-gray-50 hover:bg-white" required>
               </div>
               
-              <PrimaryButton type="submit" class="w-full !py-4 !rounded-xl !text-xl mt-4">
+              <PrimaryButton type="submit" class="w-full !py-4 !px-4 sm:!px-8 !rounded-xl !text-base sm:!text-xl mt-4 whitespace-nowrap">
                 <BaseIcon name="whatsapp" solid class="w-6 h-6" />
                 {{ $t('contact.cta') }}
               </PrimaryButton>
