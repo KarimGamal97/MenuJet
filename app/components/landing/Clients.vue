@@ -13,8 +13,22 @@
         </div>
         <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-[1.45] mb-4">
           {{ $t('clients.title_part1') }} 
-          <span class="inline-block py-1 text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-amber-500">
+          <span class="relative inline-block py-1 text-orange-600">
             {{ $t('clients.title_part2') }}
+            <svg
+              class="absolute -bottom-2 left-0 w-full h-3 text-orange-300 pointer-events-none"
+              viewBox="0 0 200 14"
+              fill="none"
+              preserveAspectRatio="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M3 10.5C52 3.5 142 2.5 197 9.5"
+                stroke="currentColor"
+                stroke-width="4"
+                stroke-linecap="round"
+              />
+            </svg>
           </span>
         </h2>
         <p class="text-slate-600 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto">

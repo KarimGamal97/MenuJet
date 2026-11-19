@@ -24,8 +24,8 @@
     </div>
 
     <div class="container mx-auto px-6 text-center z-10 relative">
-      <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 mb-6 leading-tight max-w-5xl mx-auto drop-shadow-sm">
-        {{ $t('hero.title_part1') }} <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-orange-400">{{ $t('hero.title_part2') }}</span>
+      <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 mb-6 leading-[1.45] max-w-5xl mx-auto drop-shadow-sm">
+        {{ $t('hero.title_part1') }} <span class="whitespace-nowrap inline-block py-2 text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-orange-400">{{ $t('hero.title_part2') }}</span>
       </h1>
       <p class="text-lg md:text-xl text-gray-600 mb-10 max-w-3xl mx-auto font-medium leading-relaxed whitespace-pre-line">
         {{ $t('hero.subtitle') }}
