@@ -35,6 +35,7 @@ export default defineNuxtConfig({
     "@nuxtjs/supabase",
     "@nuxtjs/tailwindcss",
     "@pinia/nuxt",
+    '@vercel/analytics'
     // "@vite-pwa/nuxt",
   ],
 
