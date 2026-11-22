@@ -1,63 +1,13 @@
-import {
-  serverSupabaseServiceRole,
-  serverSupabaseUser,
-} from "#supabase/server";
-
 export default defineEventHandler(async (event) => {
   try {
-    // Only allow authenticated super admins to call this endpoint
-    const requestingUser = await serverSupabaseUser(event);
-    if (!requestingUser) {
-      throw createError({ statusCode: 401, message: "يجب تسجيل الدخول أولاً" });
-    }
+    const {
+      adminClient,
+      callerProfile,
+      effectiveOwnerId,
+    } = await requireRestaurantManager(event);
 
-    // Service role client — bypasses RLS for admin operations
-    const adminClient = serverSupabaseServiceRole(event);
-
-    const userId =
-      requestingUser.id ||
-      (requestingUser as any).sub ||
-      (requestingUser as any).user?.id;
-    if (!userId) {
-      throw createError({
-        statusCode: 401,
-        message: "لم يتم التعرف على هوية المستخدم. الرجاء تسجيل الدخول مجدداً.",
-      });
-    }
-
-    // Fetch the caller's profile to check their role and get restaurant data
-    const { data: callerProfile, error: profileFetchError } = await adminClient
-      .from("profiles")
-      .select(
-        "role, business_name, business_name_ar, business_name_en, slug, logo, whatsapp_number, categories, is_active",
-      )
-      .or(`user_id.eq.${userId},id.eq.${userId}`)
-      .limit(1)
-      .single();
-
-    if (profileFetchError) {
-      console.warn("Could not find caller profile:", profileFetchError.message);
-    }
-
-    const callerRole = (
-      callerProfile?.role ||
-      requestingUser?.user_metadata?.role ||
-      requestingUser?.app_metadata?.role ||
-      ""
-    ).toLowerCase();
-
-    if (callerRole !== "super_admin") {
-      throw createError({
-        statusCode: 403,
-        message: "عذراً، هذه الصلاحية للمدير العام فقط",
-      });
-    }
-
-    const superAdminProfile = callerProfile;
-
-    // Get the new user data from the request body
     const body = await readBody(event);
-    const { email, password, role, full_name } = body;
+    const { email, password, full_name } = body;
 
     if (!email || !password) {
       throw createError({
@@ -66,14 +16,16 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // 1. Create the auth user using service role
+    // Staff created under a restaurant are always assigned 'user'
+    const assignedRole = "user";
+
     const { data: newUser, error: authError } =
       await adminClient.auth.admin.createUser({
         email,
         password,
         email_confirm: true,
         user_metadata: {
-          role: role || "admin",
+          role: assignedRole,
           full_name: full_name?.trim() || null,
         },
       });
@@ -112,25 +64,23 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // 2. Create/Update profile for the new user
     const profilePayload = {
       user_id: newUser.user.id,
       email: email,
       full_name: full_name?.trim() || null,
-      role: role || "admin",
-      owner_id: userId,
-      business_name: superAdminProfile?.business_name || null,
+      role: assignedRole,
+      owner_id: effectiveOwnerId,
+      business_name: callerProfile?.business_name || null,
       business_name_ar:
-        superAdminProfile?.business_name_ar || body.business_name_ar || null,
-      business_name_en: superAdminProfile?.business_name_en || null,
-      slug: null, // Sub-admins don't need the restaurant's unique slug
-      logo: superAdminProfile?.logo || null,
-      whatsapp_number: superAdminProfile?.whatsapp_number || null,
-      categories: superAdminProfile?.categories || null,
-      is_active: superAdminProfile?.is_active ?? true,
+        callerProfile?.business_name_ar || body.business_name_ar || null,
+      business_name_en: callerProfile?.business_name_en || null,
+      slug: null,
+      logo: callerProfile?.logo || null,
+      whatsapp_number: callerProfile?.whatsapp_number || null,
+      categories: callerProfile?.categories || null,
+      is_active: callerProfile?.is_active ?? true,
     };
 
-    // Check if profile was already auto-created by a Supabase trigger
     const { data: existingProfile } = await adminClient
       .from("profiles")
       .select("id")
@@ -153,7 +103,6 @@ export default defineEventHandler(async (event) => {
 
     if (profileError) {
       console.error("Profile Upsert Error:", profileError);
-      // Clean up the auth user if profile creation fails so it doesn't get orphaned
       await adminClient.auth.admin.deleteUser(newUser.user.id);
       throw createError({
         statusCode: 500,

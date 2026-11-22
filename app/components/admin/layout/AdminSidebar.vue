@@ -39,7 +39,7 @@
 
         <!-- Trial Countdown Pill -->
         <div
-          v-if="trialTimeLeft"
+          v-if="trialTimeLeft && !isSuperAdmin"
           @click="emit('openUpgrade')"
           :class="[
             'cursor-pointer transition-all duration-200 active:scale-[0.98] select-none shadow-xs border',
@@ -107,7 +107,7 @@
       <div class="pt-4 border-t mt-2 space-y-2 shrink-0">
         <!-- Unified Plan Card -->
         <div
-          v-if="!isCollapsed"
+          v-if="!isCollapsed && !isSuperAdmin"
           class="mb-2 p-3.5 rounded-2xl border space-y-2.5"
           :class="
             isPro
@@ -165,6 +165,7 @@ const props = defineProps<{
   profileName: string
   userRole: string
   isSuperAdmin: boolean
+  canManageRestaurant: boolean
   isTrial: boolean
   trialTimeLeft: { expired: boolean; days: number } | null
   trialBadgeText: string
@@ -184,27 +185,50 @@ const emit = defineEmits<{
 
 const visibleLinks = computed(() => {
   const links = [
-    { to: '/admin', icon: 'home', labelKey: 'admin.dashboard', exact: true, show: true },
-    { to: '/admin/menu', icon: 'food', labelKey: 'admin.menu', show: true },
-    { to: '/admin/orders', icon: 'cart', labelKey: 'admin.orders', show: true },
+    {
+      to: '/admin',
+      icon: 'home',
+      labelKey: 'admin.dashboard',
+      exact: true,
+      show: true,
+    },
+    {
+      to: '/platform',
+      icon: 'crown',
+      labelKey: 'admin.platform',
+      exact: true,
+      show: props.isSuperAdmin,
+    },
+    {
+      to: '/admin/menu',
+      icon: 'food',
+      labelKey: 'admin.menu',
+      show: !props.isSuperAdmin,
+    },
+    {
+      to: '/admin/orders',
+      icon: 'cart',
+      labelKey: 'admin.orders',
+      show: !props.isSuperAdmin,
+    },
     {
       to: '/admin/sales',
       icon: 'chart',
       labelKey: 'admin.sales',
-      show: props.userRole === 'super_admin',
+      show: props.canManageRestaurant && !props.isSuperAdmin,
       lockBadge: !props.canAllowAnalytics ? 'plans.basic_badge_short' : '',
     },
     {
       to: '/admin/settings',
       icon: 'settings',
       labelKey: 'admin.settings',
-      show: props.userRole === 'super_admin',
+      show: props.canManageRestaurant && !props.isSuperAdmin,
     },
     {
       to: '/admin/users',
       icon: 'users',
       labelKey: 'admin.users',
-      show: props.isSuperAdmin,
+      show: props.canManageRestaurant && !props.isSuperAdmin,
       hoverClass: 'hover:bg-purple-50 text-gray-500',
       activeClass: 'bg-purple-50 text-purple-600 shadow-sm',
       lockBadge: !props.canAllowUsers ? 'plans.pro_badge_short' : '',

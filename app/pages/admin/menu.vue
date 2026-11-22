@@ -202,7 +202,7 @@
             :is-admin="true"
             :user-role="userRole"
             @edit="openEditModal"
-            @delete="userRole === 'super_admin' ? initiateDelete($event) : null"
+            @delete="canManageRestaurantRole(userRole) ? initiateDelete($event) : null"
             class="w-full md:w-[calc(50%-8px)] lg:w-[calc(33.333%-11px)]"
           />
         </div>

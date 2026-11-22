@@ -89,23 +89,8 @@
             <label class="block text-xs font-bold text-gray-700 mb-1.5">
               {{ $t("admin.users_page.role_type") }}
             </label>
-            <div class="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                @click="newUser.role = 'user'"
-                :class="newUser.role === 'user' ? 'border-orange-500 bg-orange-50 text-orange-700 font-black shadow-xs' : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50'"
-                class="p-2.5 rounded-xl border text-xs text-center transition-all cursor-pointer flex items-center justify-center gap-1.5"
-              >
-                <span>{{ $t("admin.users_page.role_user") }}</span>
-              </button>
-              <button
-                type="button"
-                @click="newUser.role = 'admin'"
-                :class="newUser.role === 'admin' ? 'border-orange-500 bg-orange-50 text-orange-700 font-black shadow-xs' : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50'"
-                class="p-2.5 rounded-xl border text-xs text-center transition-all cursor-pointer flex items-center justify-center gap-1.5"
-              >
-                <span>{{ $t("admin.users_page.role_admin") }}</span>
-              </button>
+            <div class="p-2.5 rounded-xl border border-orange-200 bg-orange-50 text-orange-700 font-black text-xs text-center">
+              {{ $t("admin.users_page.role_user") }}
             </div>
           </div>
 

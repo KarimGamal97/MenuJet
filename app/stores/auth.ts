@@ -31,13 +31,27 @@ export const useAuthStore = defineStore("auth", {
   }),
 
   getters: {
-    // Check for super admin privileges
-    isSuperAdmin: (state): boolean => state.profile?.role === "super_admin",
+    // Platform owner only
+    isPlatformOwner: (state): boolean =>
+      isPlatformOwnerRole(state.profile?.role),
+
+    isSuperAdmin: (state): boolean =>
+      isPlatformOwnerRole(state.profile?.role),
+
+    // Restaurant owner (admin without parent owner_id)
+    isRestaurantOwner: (state): boolean =>
+      state.profile?.role === "admin" && !state.profile?.owner_id,
+
+    // Restaurant staff member
+    isStaff: (state): boolean => state.profile?.role === "user",
+
+    // Owner or platform owner with full restaurant management permissions
+    canManageRestaurant: (state): boolean =>
+      canManageRestaurantRole(state.profile?.role),
 
     // Check for any restaurant staff/admin level
     isAdmin: (state): boolean =>
-      state.profile?.role === "admin" ||
-      state.profile?.role === "super_admin" ||
+      canManageRestaurantRole(state.profile?.role) ||
       (state.profile?.role === "user" && !!state.profile?.owner_id),
 
     isLoggedIn: (state): boolean => !!state.user?.value,

@@ -45,5 +45,10 @@ export const useAuthUser = () => {
     ownerId.value = data?.owner_id || uid;
   });
 
-  return { user, userId, ownerId, userRole };
+  const isPlatformOwner = computed(() => isPlatformOwnerRole(userRole.value));
+  const canManageRestaurant = computed(() =>
+    canManageRestaurantRole(userRole.value),
+  );
+
+  return { user, userId, ownerId, userRole, isPlatformOwner, canManageRestaurant };
 };

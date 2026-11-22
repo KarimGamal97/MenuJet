@@ -18,7 +18,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     await authStore.fetchUserProfile();
   }
 
-  if (!authStore.isSuperAdmin) {
-    return navigateTo("/admin/dashboard");
+  if (!authStore.isPlatformOwner) {
+    return navigateTo("/admin");
   }
 });

@@ -58,7 +58,7 @@
       :class="item.available === false && !isAdmin ? 'self-start mt-1' : ''"
     >
       <!-- Admin Mode: Edit/Delete -->
-      <div v-if="userRole === 'super_admin'" class="flex gap-2">
+      <div v-if="canManageRestaurantRole(userRole)" class="flex gap-2">
         <BaseButton
           @click.stop="emit('edit', item)"
           variant="outline"
@@ -143,8 +143,7 @@ const displayPrice = computed(() => {
 
 const handleCardClick = () => {
   if (props.isAdmin) {
-    // Only allow editing if the user is a super_admin
-    if (props.userRole === 'super_admin') {
+    if (canManageRestaurantRole(props.userRole)) {
       emit("edit", props.item);
     }
   } else {

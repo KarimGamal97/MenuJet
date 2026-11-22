@@ -76,6 +76,20 @@ export function isSubscriptionExpiredCheck(
 }
 
 /**
+ * Checks whether a role belongs to the platform owner.
+ */
+export function isPlatformOwnerRole(role?: string | null): boolean {
+  return role === 'super_admin'
+}
+
+/**
+ * Checks whether a role can manage a restaurant (owner or platform owner).
+ */
+export function canManageRestaurantRole(role?: string | null): boolean {
+  return role === 'admin' || role === 'super_admin'
+}
+
+/**
  * Formats an order number with at least 2 digits (e.g. 1 -> 01, 100 -> 100).
  */
 export function formatOrderNumber(num: string | number | null | undefined): string {

@@ -1,5 +1,6 @@
 <template>
-  <div class="space-y-8" dir="rtl">
+  <PlatformOverview v-if="isPlatformOwner" />
+  <div v-else class="space-y-8" dir="rtl">
     <!-- 1. Loading State (Skeleton) -->
     <template v-if="pending">
       <IndexSkeleton />
@@ -68,7 +69,7 @@
 
         <!-- Total Revenue -->
         <NuxtLink
-          v-if="userRole === 'super_admin'"
+          v-if="canManageRestaurant"
           to="/admin/sales"
           class="bg-green-50 p-6 rounded-[2rem] border border-green-100 group hover:shadow-lg transition-all duration-300 block"
         >
@@ -144,7 +145,7 @@
 
 <script setup>
 const client = useSupabaseClient();
-const { ownerId, userRole } = useAuthUser();
+const { ownerId, canManageRestaurant, isPlatformOwner } = useAuthUser();
 const { isPro } = usePlan();
 
 const showUpgradeModal = ref(false);
@@ -153,7 +154,9 @@ const { data: stats, pending } = useAsyncData(
   "admin-stats",
   async () => {
     const uId = ownerId.value;
-    if (!uId) return { items: 0, orders: 0, revenue: 0, recentOrders: [] };
+    if (!uId || isPlatformOwner.value) {
+      return { items: 0, orders: 0, revenue: 0, recentOrders: [] };
+    }
 
     const todayStart = new Date().toISOString().split('T')[0];
 

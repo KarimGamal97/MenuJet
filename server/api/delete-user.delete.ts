@@ -1,36 +1,6 @@
-import {
-  serverSupabaseServiceRole,
-  serverSupabaseUser,
-} from "#supabase/server";
-
 export default defineEventHandler(async (event) => {
-  // Only authenticated super admins can delete users
-  const requestingUser = await serverSupabaseUser(event);
-  if (!requestingUser) {
-    throw createError({ statusCode: 401, message: "Unauthorized" });
-  }
-
-  const userId = requestingUser.id || (requestingUser as any).sub || (requestingUser as any).user?.id;
-  if (!userId) {
-    throw createError({ statusCode: 401, message: "لم يتم التعرف على هوية المستخدم" });
-  }
-
-  // Use service role to bypass RLS + Auth permissions
-  const adminClient = serverSupabaseServiceRole(event);
-
-  // Fetch the caller's profile to check their role
-  const { data: callerProfile } = await adminClient
-    .from("profiles")
-    .select("role")
-    .or(`user_id.eq.${userId},id.eq.${userId}`)
-    .limit(1)
-    .single();
-
-  const callerRole = (callerProfile?.role || requestingUser.user_metadata?.role || requestingUser.app_metadata?.role || "").toLowerCase();
-
-  if (callerRole !== "super_admin") {
-    throw createError({ statusCode: 403, message: "عذراً، هذه الصلاحية للمدير العام فقط" });
-  }
+  const { adminClient, callerRole, effectiveOwnerId } =
+    await requireRestaurantManager(event);
 
   const { profileId } = await readBody(event);
 
@@ -38,20 +8,34 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, message: "profileId is required" });
   }
 
-  // Get the user's auth ID (user_id) from the profile
   const { data: profileData, error: profileError } = await adminClient
     .from("profiles")
-    .select("user_id")
+    .select("user_id, owner_id, role")
     .eq("id", profileId)
     .single();
 
   if (profileError || !profileData?.user_id) {
-    throw createError({ statusCode: 404, message: "Profile or user ID not found" });
+    throw createError({
+      statusCode: 404,
+      message: "Profile or user ID not found",
+    });
   }
 
-  // Delete from auth.users (this will cascade to profiles and menu_items)
+  // Prevent non-platform owners from deleting other restaurants or primary owners
+  if (callerRole !== "super_admin") {
+    if (
+      profileData.owner_id !== effectiveOwnerId ||
+      profileData.role === "super_admin"
+    ) {
+      throw createError({
+        statusCode: 403,
+        message: "غير مصرح لك بحذف هذا الحساب",
+      });
+    }
+  }
+
   const { error: deleteError } = await adminClient.auth.admin.deleteUser(
-    profileData.user_id
+    profileData.user_id,
   );
 
   if (deleteError) {

@@ -21,6 +21,7 @@
       :profileName="profileName"
       :userRole="userRole"
       :isSuperAdmin="isSuperAdmin"
+      :canManageRestaurant="canManageRestaurant"
       :isTrial="isTrial"
       :trialTimeLeft="trialTimeLeft"
       :trialBadgeText="trialBadgeText"
@@ -45,7 +46,7 @@
 
     <!-- Paywall / Expired Subscription Modal -->
     <AdminLayoutExpiredPaywallModal
-      :open="Boolean(trialTimeLeft?.expired)"
+      :open="Boolean(trialTimeLeft?.expired) && !isSuperAdmin"
       :profileName="profileName"
       @logout="handleLogout"
     />
@@ -72,7 +73,7 @@
 <script setup>
 const authStore = useAuthStore();
 const client = useSupabaseClient();
-const { userRole, ownerId } = useAuthUser();
+const { userRole, ownerId, canManageRestaurant } = useAuthUser();
 const { startGlobalOrderListener, stopGlobalOrderListener } = useOrderNotifications();
 const { currentPlan, isFree, isBasic, isPro, can } = usePlan();
 const { t, locale } = useI18n();

@@ -101,7 +101,7 @@
                   <div class="flex items-center gap-3">
                     <div
                       class="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 border shadow-xs"
-                      :class="user.role === 'super_admin' ? 'bg-purple-50 text-purple-600 border-purple-100' : 'bg-orange-50 text-orange-600 border-orange-100'"
+                      :class="canManageRestaurantRole(user.role) ? 'bg-purple-50 text-purple-600 border-purple-100' : 'bg-orange-50 text-orange-600 border-orange-100'"
                     >
                       <BaseIcon name="user" class="w-5 h-5" />
                     </div>
@@ -128,7 +128,7 @@
                 <td class="py-4 pe-4 text-end rounded-e-2xl">
                   <div class="flex justify-end gap-2">
                     <button
-                      v-if="user.role !== 'super_admin'"
+                      v-if="user.owner_id && !isPlatformOwnerRole(user.role)"
                       @click="confirmDeleteUser(user)"
                       class="bg-white text-red-600 border border-red-100 hover:bg-red-50 hover:border-red-200 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shadow-2xs cursor-pointer"
                     >
@@ -176,7 +176,7 @@
 
 <script setup lang="ts">
 definePageMeta({
-  middleware: "superadmin",
+  middleware: "restaurant-admin",
   layout: "admin",
 });
 
@@ -313,7 +313,7 @@ const getRoleClass = (role: string) => {
 
 const getUserDisplayName = (user: any) => {
   if (!user) return "";
-  if (user.role === "super_admin") {
+  if (canManageRestaurantRole(user.role) && !user.owner_id) {
     return (
       user.business_name ||
       user.business_name_ar ||

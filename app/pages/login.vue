@@ -143,12 +143,20 @@ const client = useSupabaseClient();
 const loading = ref(false);
 const user = useSupabaseUser();
 
-// Auto redirect if already logged in or returning from Google OAuth
+const redirectAfterLogin = async (uid) => {
+  const authStore = useAuthStore();
+  if (!authStore.profile) {
+    await authStore.fetchUserProfile(uid);
+  }
+  await navigateTo("/admin");
+};
+
+// Auto redirect if already logged in
 watch(
   user,
   (val) => {
     if (val && route.path.includes("/login")) {
-      navigateTo("/admin");
+      redirectAfterLogin(val.id || val.sub);
     }
   },
   { immediate: true }
@@ -157,22 +165,20 @@ watch(
 let authSubscription = null;
 
 onMounted(async () => {
-  // Listen for OAuth redirect state changes
   const { data } = client.auth.onAuthStateChange((event, session) => {
     if (
       route.path.includes("/login") &&
       session?.user &&
       (event === "SIGNED_IN" || event === "INITIAL_SESSION")
     ) {
-      navigateTo("/admin");
+      redirectAfterLogin(session.user.id);
     }
   });
   authSubscription = data?.subscription;
 
-  // Direct check in case session exists
   const { data: sessionData } = await client.auth.getSession();
   if (sessionData?.session?.user && route.path.includes("/login")) {
-    navigateTo("/admin");
+    redirectAfterLogin(sessionData.session.user.id);
   }
 });
 
@@ -231,14 +237,14 @@ const onSubmit = handleSubmit(async (values) => {
             setTimeout(resolve, 2500);
           });
         }
-        navigateTo("/admin");
+        await redirectAfterLogin(data?.user?.id || user.value?.id);
       } else {
         $toast.success(t("login.signup_email_confirmation"));
         isSignUp.value = false;
       }
     } else {
       // Sign In flow
-      const { error } = await client.auth.signInWithPassword({
+      const { data: signInData, error } = await client.auth.signInWithPassword({
         email: values.email,
         password: values.password,
       });
@@ -259,7 +265,7 @@ const onSubmit = handleSubmit(async (values) => {
             setTimeout(resolve, 3000);
           });
         }
-        navigateTo("/admin");
+        await redirectAfterLogin(signInData?.user?.id || user.value?.id || user.value?.sub);
       }
     }
   } catch (err) {

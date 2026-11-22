@@ -22,7 +22,7 @@
 
         <div class="flex items-center gap-3">
           <BaseButton
-            v-if="userRole === 'super_admin'"
+            v-if="canManageRestaurant"
             variant="ghost"
             icon="trash"
             @click="showCleanupModal = true"
@@ -199,7 +199,7 @@
 <script setup>
 definePageMeta({ layout: "admin", middleware: "auth" });
 
-const { ownerId, userRole } = useAuthUser();
+const { ownerId, canManageRestaurant } = useAuthUser();
 
 // Cleanup State
 const showCleanupModal = ref(false);
