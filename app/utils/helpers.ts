@@ -44,7 +44,11 @@ export function isSubscriptionExpiredCheck(
   profile: Record<string, any> | null | undefined
 ): boolean {
   if (!profile) return false
-  if (profile.role === 'super_admin') return false
+
+  const status = String(profile.subscription_status || '').toLowerCase()
+  if (status === 'expired' || status === 'inactive' || status === 'cancelled') {
+    return true
+  }
 
   const endDate =
     profile.subscription_end_date ||

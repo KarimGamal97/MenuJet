@@ -34,7 +34,7 @@
       </div>
 
       <RestaurantHub
-        v-if="shouldDisplayBioHub"
+        v-else-if="shouldDisplayBioHub"
         :restaurant="restaurant"
         :locale="locale"
         @open-menu="showBioHub = false"
@@ -470,7 +470,7 @@ const activePlanId = computed(() => resolvePlanId(restaurant.value));
 
 // Ordering enabled toggle from restaurant settings
 const isWhatsappOrderingAllowed = computed(() => {
-  if (!restaurant.value) return false;
+  if (!restaurant.value || isSubscriptionExpired.value) return false;
   const p = restaurant.value;
   const allowsWhatsapp = p.plans?.allow_whatsapp_orders ?? p.plan?.allow_whatsapp_orders ?? (activePlanId.value === "pro");
   return Boolean(allowsWhatsapp) && p.whatsapp_ordering_enabled !== false;

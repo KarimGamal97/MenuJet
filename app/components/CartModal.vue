@@ -50,7 +50,7 @@
             <p class="text-gray-400 font-bold">{{ $t("cart.empty") }}</p>
           </div>
 
-          <CartCartItemRow
+          <CartItemRow
             v-for="item in cart"
             :key="item.cartId || item.id"
             :item="item"
