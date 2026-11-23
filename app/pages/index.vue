@@ -1,9 +1,13 @@
 <template>
-  <div class="landing-page" :dir="$i18n.locale === 'ar' ? 'rtl' : 'ltr'">
+  <div
+    class="landing-page bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-300"
+    :dir="$i18n.locale === 'ar' ? 'rtl' : 'ltr'"
+  >
     <LandingTheNavbar />
     <main>
       <LandingHeroSection />
       <LandingClients />
+      <LandingStatsSection />
       <LandingFeatures />
       <!-- <LandingDemoVideo /> -->
       <LandingPricing />

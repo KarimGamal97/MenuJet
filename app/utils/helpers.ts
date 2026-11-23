@@ -1,6 +1,11 @@
 export const SUPPORT_WHATSAPP_NUMBER = '201132234124'
 export const SUPPORT_WHATSAPP_DISPLAY = '01132234124'
 
+export const SOCIAL_LINKS = {
+  facebook: 'https://www.facebook.com/profile.php?id=61594028551451',
+  instagram: 'https://www.instagram.com/menujet_?knvt=MTdwa2JwbDBhdXU3dA%3D%3D',
+} as const
+
 /**
  * Cleans a phone number and builds a valid WhatsApp (wa.me) URL.
  */

@@ -265,7 +265,7 @@
         :isOpen="showItemModal"
         :item="selectedItem"
         :isClosed="!isActuallyOpen"
-        :allowOrdering="canOrder"
+        :allowOrdering="isOrderingEnabled"
         :primaryColor="primaryColor"
         @close="showItemModal = false"
       />

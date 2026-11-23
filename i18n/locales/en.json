@@ -108,12 +108,15 @@
     "title": "Login",
     "subtitle": "Welcome back to the",
     "email_placeholder": "Email address",
+    "email_optional_placeholder": "Email address (optional)",
+    "identifier_placeholder": "Phone number or email",
     "password_placeholder": "Password",
     "submit": "Login",
     "loading": "Verifying..",
     "error_required": "This field is required",
     "error_email": "Invalid email address",
-    "error_credentials": "Invalid email or password",
+    "error_identifier": "Please enter a valid phone number or email",
+    "error_credentials": "Invalid phone/email or password",
     "success": "Welcome back!",
     "signup_title": "Create New Restaurant Account",
     "signup_subtitle": "Start your 14-day free trial now, no credit card required",
@@ -133,7 +136,25 @@
     "signup_email_confirmation": "Account created successfully! Please check your email to confirm registration then log in.",
     "unexpected_error": "An unexpected error occurred, please try again later",
     "error_google_failed": "Google sign-in failed",
-    "error_google_service": "Could not connect to Google service"
+    "error_google_service": "Could not connect to Google service",
+    "step_contact": "Contact",
+    "step_setup": "Menu Setup",
+    "step_account": "Account",
+    "owner_name_placeholder": "Your Name (Owner / Manager)",
+    "whatsapp_placeholder": "Phone / WhatsApp (e.g. 01012345678)",
+    "error_phone_invalid": "Please enter a valid phone / WhatsApp number",
+    "error_password_min": "Password must be at least 6 characters",
+    "next_step": "Next",
+    "prev_step": "Back",
+    "activity_type_label": "Business Type (Starter Categories)",
+    "preset_grill": "Restaurant & Grills",
+    "preset_burger": "Burger & Sandwiches",
+    "preset_cafe": "Cafe & Drinks",
+    "preset_sweets": "Desserts & Bakery",
+    "menu_color_label": "Primary Menu Color",
+    "order_mode_label": "Menu Ordering Mode",
+    "mode_orders": "Accept Orders",
+    "mode_browse": "Browse Only"
   },
   "admin": {
     "dashboard": "Dashboard",
@@ -553,7 +574,9 @@
     "notes_placeholder": "No sugar, extra sauce...",
     "unavailable_title": "Menu Currently Unavailable",
     "unavailable_desc": "Sorry, the digital menu service is temporarily paused for updates. Please contact the restaurant management directly.",
-    "contact_restaurant": "Contact Restaurant"
+    "contact_restaurant": "Contact Restaurant",
+    "closed_ordering_unavailable": "Restaurant is currently closed — Ordering is unavailable",
+    "browse_only_notice": "Menu view only — Order directly inside the restaurant"
   },
   "nav": {
     "features": "How It Works",
@@ -563,7 +586,9 @@
     "login": "Login",
     "start_free": "Start Free Trial",
     "lang_name": "العربية",
-    "clients": "Clients"
+    "clients": "Clients",
+    "theme_dark": "Dark Mode",
+    "theme_light": "Light Mode"
   },
   "faqs": {
     "title": "Frequently Asked Questions",
@@ -881,6 +906,8 @@
     "desc": "The comprehensive platform for restaurants and cafes to convert paper menus into fast, smart digital menus with QR codes and 0% commission.",
     "badge_commission": "0% Commission on Orders",
     "badge_support": "24/7 Technical Support",
+    "social_facebook": "Facebook Page",
+    "social_instagram": "Instagram Profile",
     "col_platform": "Platform",
     "link_features": "Features",
     "link_pricing": "Pricing",
@@ -909,5 +936,31 @@
     "bgo_desc": "Burger & Fast Food",
     "delta_name": "Delta Coffee",
     "delta_desc": "Specialty Coffee & Beverages"
+  },
+  "stats": {
+    "badge": "Numbers That Speak",
+    "title_part1": "Built To",
+    "title_part2": "Grow Your Sales",
+    "subtitle": "Consistent sales growth for partner restaurants and cafes with minimal overhead and zero commissions",
+    "sales": {
+      "unit": "EGP",
+      "title": "Restaurant Sales Processed",
+      "desc": "Direct WhatsApp & cashier orders with zero commission"
+    },
+    "items": {
+      "title": "Active Menu Items",
+      "desc": "Dishes and drinks managed and updated live"
+    },
+    "commission": {
+      "value": "0%",
+      "title": "Order Commission",
+      "desc": "Keep 100% of your restaurant revenue"
+    },
+    "setup": {
+      "unit": "Mins",
+      "title": "To Launch Your Menu",
+      "desc": "Live on mobile & WhatsApp in minutes"
+    },
+    "cta": "Start Your Free Trial Now"
   }
 }

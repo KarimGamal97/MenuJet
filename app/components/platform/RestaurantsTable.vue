@@ -99,6 +99,13 @@
                 <div class="text-xs text-gray-500 font-medium" dir="ltr">
                   {{ r.email || "—" }}
                 </div>
+                <div
+                  v-if="r.full_name && r.full_name !== getDisplayName(r)"
+                  class="text-[11px] font-bold text-gray-600 flex items-center gap-1"
+                >
+                  <BaseIcon name="user" class="w-3.5 h-3.5 text-gray-400" />
+                  <span>{{ r.full_name }}</span>
+                </div>
                 <div v-if="r.whatsapp_number" class="text-[11px] text-emerald-700 font-bold flex items-center gap-1">
                   <BaseIcon name="whatsapp" solid class="w-3.5 h-3.5" />
                   <a

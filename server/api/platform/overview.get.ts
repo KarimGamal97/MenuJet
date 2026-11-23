@@ -42,8 +42,7 @@ export default defineEventHandler(async (event) => {
         .neq("role", "super_admin"),
       adminClient
         .from("orders")
-        .select("user_id, total_price, created_at")
-        .neq("status", "archived"),
+        .select("user_id, total_price, created_at"),
     ]);
 
     if (profilesRes.error) throw profilesRes.error;

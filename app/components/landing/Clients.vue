@@ -1,22 +1,22 @@
 <template>
-  <section id="clients" class="py-16 sm:py-24 bg-slate-50/70 border-y border-slate-200/60 relative overflow-hidden" :dir="$i18n.locale === 'ar' ? 'rtl' : 'ltr'">
+  <section id="clients" class="py-16 sm:py-24 bg-slate-50/70 dark:bg-slate-900 border-y border-slate-200/60 dark:border-slate-800 relative overflow-hidden transition-colors duration-300" :dir="$i18n.locale === 'ar' ? 'rtl' : 'ltr'">
     
     <!-- Decorative background glow -->
-    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-orange-100/40 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-orange-100/40 dark:bg-orange-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
       
       <!-- Section Header -->
       <div class="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
-        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-orange-100/80 text-orange-700 text-xs font-black mb-4 shadow-2xs">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-orange-100/80 dark:bg-orange-500/15 dark:border dark:border-orange-500/25 text-orange-700 dark:text-orange-300 text-xs font-black mb-4 shadow-2xs">
           <span>{{ $t('clients.badge') }}</span>
         </div>
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-[1.45] mb-4">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-[1.45] mb-4">
           {{ $t('clients.title_part1') }} 
-          <span class="relative inline-block py-1 text-orange-600">
+          <span class="relative inline-block py-1 text-orange-600 dark:text-orange-400">
             {{ $t('clients.title_part2') }}
             <svg
-              class="absolute -bottom-2 left-0 w-full h-3 text-orange-300 pointer-events-none"
+              class="absolute -bottom-2 left-0 w-full h-3 text-orange-300 dark:text-orange-500/60 pointer-events-none"
               viewBox="0 0 200 14"
               fill="none"
               preserveAspectRatio="none"
@@ -31,7 +31,7 @@
             </svg>
           </span>
         </h2>
-        <p class="text-slate-600 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto">
+        <p class="text-slate-600 dark:text-slate-300 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto">
           {{ $t('clients.subtitle') }}
         </p>
       </div>
@@ -47,7 +47,7 @@
           type="button"
           @click="prevSlide"
           aria-label="Previous"
-          class="absolute left-0 top-1/2 -translate-y-7 z-20 w-8 h-8 rounded-full bg-white/90 border border-slate-200/80 shadow-xs text-slate-600 hover:text-orange-600 flex items-center justify-center transition-colors cursor-pointer"
+          class="absolute left-0 top-1/2 -translate-y-7 z-20 w-8 h-8 rounded-full bg-white/90 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 shadow-xs text-slate-600 dark:text-slate-200 hover:text-orange-600 dark:hover:text-orange-400 flex items-center justify-center transition-colors cursor-pointer"
         >
           <BaseIcon name="chevron-left" class="w-4 h-4 stroke-[2.5]" />
         </button>
@@ -73,7 +73,7 @@
                 <img
                   :src="client.logo"
                   :alt="$t(client.nameKey)"
-                  class="w-20 h-20 object-contain rounded-2xl transition-transform duration-300"
+                  class="w-20 h-20 object-contain rounded-2xl dark:bg-white/95 dark:p-1.5 dark:shadow-lg dark:shadow-black/30 transition-transform duration-300"
                   loading="lazy"
                 />
               </a>
@@ -85,7 +85,7 @@
           type="button"
           @click="nextSlide"
           aria-label="Next"
-          class="absolute right-0 top-1/2 -translate-y-7 z-20 w-8 h-8 rounded-full bg-white/90 border border-slate-200/80 shadow-xs text-slate-600 hover:text-orange-600 flex items-center justify-center transition-colors cursor-pointer"
+          class="absolute right-0 top-1/2 -translate-y-7 z-20 w-8 h-8 rounded-full bg-white/90 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 shadow-xs text-slate-600 dark:text-slate-200 hover:text-orange-600 dark:hover:text-orange-400 flex items-center justify-center transition-colors cursor-pointer"
         >
           <BaseIcon name="chevron-right" class="w-4 h-4 stroke-[2.5]" />
         </button>
@@ -102,7 +102,7 @@
               'h-2 rounded-full transition-all duration-300 cursor-pointer',
               activeDotIndex === idx
                 ? 'w-6 bg-orange-500'
-                : 'w-2 bg-slate-300 hover:bg-slate-400'
+                : 'w-2 bg-slate-300 dark:bg-slate-700 hover:bg-slate-400 dark:hover:bg-slate-600'
             ]"
           ></button>
         </div>
@@ -122,7 +122,7 @@
           <img
             :src="client.logo"
             :alt="$t(client.nameKey)"
-            class="w-24 h-24 object-contain rounded-2xl transition-transform duration-300 group-hover:scale-105"
+            class="w-24 h-24 object-contain rounded-2xl dark:bg-white/95 dark:p-2 dark:shadow-lg dark:shadow-black/30 transition-transform duration-300 group-hover:scale-105"
             loading="lazy"
           />
         </a>
@@ -132,8 +132,8 @@
       <div v-else class="hidden sm:block relative w-full overflow-hidden py-4">
         
         <!-- Left & Right Fade Masks -->
-        <div class="pointer-events-none absolute inset-y-0 start-0 w-16 sm:w-32 bg-gradient-to-r rtl:bg-gradient-to-l from-slate-50 to-transparent z-10"></div>
-        <div class="pointer-events-none absolute inset-y-0 end-0 w-16 sm:w-32 bg-gradient-to-l rtl:bg-gradient-to-r from-slate-50 to-transparent z-10"></div>
+        <div class="pointer-events-none absolute inset-y-0 start-0 w-16 sm:w-32 bg-gradient-to-r rtl:bg-gradient-to-l from-slate-50 dark:from-slate-900 to-transparent z-10"></div>
+        <div class="pointer-events-none absolute inset-y-0 end-0 w-16 sm:w-32 bg-gradient-to-l rtl:bg-gradient-to-r from-slate-50 dark:from-slate-900 to-transparent z-10"></div>
 
         <div class="ticker-wrapper" dir="ltr">
           <div class="ticker-track">
@@ -151,7 +151,7 @@
                 <img
                   :src="client.logo"
                   :alt="$t(client.nameKey)"
-                  class="w-24 h-24 object-contain rounded-2xl transition-transform duration-300 group-hover:scale-105"
+                  class="w-24 h-24 object-contain rounded-2xl dark:bg-white/95 dark:p-2 dark:shadow-lg dark:shadow-black/30 transition-transform duration-300 group-hover:scale-105"
                   loading="lazy"
                 />
               </a>
@@ -171,7 +171,7 @@
                 <img
                   :src="client.logo"
                   :alt="$t(client.nameKey)"
-                  class="w-24 h-24 object-contain rounded-2xl transition-transform duration-300 group-hover:scale-105"
+                  class="w-24 h-24 object-contain rounded-2xl dark:bg-white/95 dark:p-2 dark:shadow-lg dark:shadow-black/30 transition-transform duration-300 group-hover:scale-105"
                   loading="lazy"
                 />
               </a>

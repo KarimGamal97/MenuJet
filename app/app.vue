@@ -1,5 +1,6 @@
 <script setup>
 const { locale } = useI18n();
+const { isDark } = useTheme();
 
 const localeDir = computed(() => (locale.value === "ar" ? "rtl" : "ltr"));
 
@@ -7,7 +8,13 @@ useHead({
   htmlAttrs: {
     dir: localeDir,
     lang: locale,
+    class: computed(() => ({ dark: isDark.value })),
   },
+});
+
+onMounted(() => {
+  document.documentElement.classList.toggle("dark", isDark.value);
+  document.documentElement.style.colorScheme = isDark.value ? "dark" : "light";
 });
 </script>
 

@@ -54,7 +54,7 @@
 
             <!-- Quantity -->
             <div
-              v-if="allowOrdering"
+              v-if="canPlaceOrder"
               class="flex items-center justify-between bg-gray-50 rounded-2xl p-3"
             >
               <span class="text-sm font-bold text-gray-500">{{
@@ -197,7 +197,7 @@
             </div>
 
             <!-- Notes -->
-            <div v-if="allowOrdering" class="bg-gray-50 rounded-2xl p-3">
+            <div v-if="canPlaceOrder" class="bg-gray-50 rounded-2xl p-3">
               <button 
                 @click="showNotes = !showNotes"
                 class="flex items-center justify-between w-full focus:outline-none"
@@ -238,7 +238,7 @@
               class="bg-orange-50 rounded-2xl p-3 border border-orange-100 flex items-center justify-between"
             >
               <p class="text-sm font-bold text-orange-400">
-                {{ allowOrdering ? $t("common.total") : ($i18n.locale === 'ar' ? 'السعر' : 'Price') }}
+                {{ canPlaceOrder ? $t("common.total") : $t("common.price") }}
               </p>
               <p class="text-xl font-black text-orange-600">
                 {{ total }} {{ $t("admin.currency") }}
@@ -247,20 +247,26 @@
 
             <!-- Add to Cart Button or Closed Notice or Browse Only Notice -->
             <button
-              v-if="allowOrdering && !isClosed"
+              v-if="canPlaceOrder"
               @click="handleAdd"
               class="w-full py-4 bg-orange-600 text-white font-black rounded-2xl text-sm hover:bg-orange-700 active:scale-[0.98] transition-all shadow-lg shadow-orange-200 flex items-center justify-center gap-2"
             >
               <BaseIcon name="plus" class="w-4 h-4" />
               {{ $t("admin.add_to_cart") }}
             </button>
-            <div v-else-if="!allowOrdering" class="w-full py-3.5 bg-gray-50 text-gray-500 font-bold rounded-2xl text-xs text-center border border-gray-100 flex items-center justify-center gap-2">
-              <span>📖</span>
-              <span>{{ $i18n.locale === 'ar' ? 'تصفح فقط - الطلب متاح مع الويتر' : 'Browse only - Order with your waiter' }}</span>
+            <div
+              v-else-if="isClosed"
+              class="w-full py-4 bg-gray-100 text-gray-500 font-bold rounded-2xl text-sm text-center border-2 border-dashed border-gray-200 flex items-center justify-center gap-2"
+            >
+              <BaseIcon name="lock" class="w-4 h-4 shrink-0" />
+              <span>{{ $t("menu.closed_ordering_unavailable") }}</span>
             </div>
-            <div v-else class="w-full py-4 bg-gray-100 text-gray-400 font-bold rounded-2xl text-sm text-center border-2 border-dashed border-gray-200 flex items-center justify-center gap-1.5">
-              <BaseIcon name="lock" class="w-4 h-4" />
-              <span>{{ $t('admin.status_closed') }}</span>
+            <div
+              v-else
+              class="w-full py-3.5 bg-gray-50 text-gray-500 font-bold rounded-2xl text-xs text-center border border-gray-100 flex items-center justify-center gap-2"
+            >
+              <BaseIcon name="journal" class="w-4 h-4 shrink-0 text-gray-400" />
+              <span>{{ $t("menu.browse_only_notice") }}</span>
             </div>
           </div>
         </div>
@@ -279,6 +285,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["close", "added"]);
+const canPlaceOrder = computed(() => props.allowOrdering && !props.isClosed);
 const { addToCart } = useCart();
 const qty = ref(1);
 const selectedSize = ref("sm");

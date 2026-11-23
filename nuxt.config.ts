@@ -38,6 +38,11 @@ export default defineNuxtConfig({
     '@vercel/analytics'
     // "@vite-pwa/nuxt",
   ],
+  tailwindcss: {
+    config: {
+      darkMode: "class",
+    },
+  },
 
   pwa: {
     registerType: "autoUpdate",

@@ -8,7 +8,7 @@
       <div class="text-center mb-5">
         <NuxtLink to="/" class="inline-block mb-2">
           <img
-            src="~/assets/navbar-logo.png"
+            src="~/assets/navbar-logo.svg"
             alt="MenuJet"
             class="h-20 sm:h-24 w-auto object-contain mix-blend-multiply mx-auto"
           />
@@ -49,24 +49,21 @@
         </button>
       </div>
 
-      <form @submit.prevent="onSubmit" class="space-y-4">
-        <!-- Business Name Field (Sign Up Only) -->
-        <div v-if="isSignUp">
-          <BaseInput
-            v-model="businessName"
-            type="text"
-            :placeholder="$t('login.business_name_placeholder')"
-            :error="errors.businessName"
-            class="bg-white"
-          />
-        </div>
+      <!-- Sign Up Stepper -->
+      <AuthSignupStepper
+        v-if="isSignUp"
+        :loading="loading"
+        @submit="handleSignupSubmit"
+      />
 
+      <!-- Sign In Form -->
+      <form v-else @submit.prevent="onSubmit" class="space-y-4">
         <BaseInput
-          v-model="email"
-          type="email"
-          :placeholder="$t('login.email_placeholder')"
-          :error="errors.email"
-          class="bg-white"
+          v-model="identifier"
+          type="text"
+          :placeholder="$t('login.identifier_placeholder')"
+          :error="errors.identifier"
+          :class="['bg-white', locale === 'ar' ? 'text-right' : 'text-left']"
         />
 
         <BaseInput
@@ -88,7 +85,7 @@
             {{ $t("login.loading") }}
           </template>
           <template v-else>
-            {{ isSignUp ? $t("login.signup_submit") : $t("login.submit") }}
+            {{ $t("login.submit") }}
           </template>
         </BaseButton>
       </form>
@@ -133,22 +130,35 @@ const route = useRoute();
 const isSignUp = ref(route.query.mode === "signup");
 
 defineRule("required", (val) => !!val || t("login.error_required"));
-defineRule(
-  "email",
-  (val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val) || t("login.error_email"),
-);
+defineRule("identifier", (val) => {
+  const value = String(val || "").trim();
+  if (!value) return t("login.error_required");
+  if (value.includes("@")) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) || t("login.error_identifier");
+  }
+  const cleanPhone = value.replace(/[\s()-]/g, "");
+  return /^\+?\d{10,15}$/.test(cleanPhone) || t("login.error_identifier");
+});
 
 const { $toast } = useNuxtApp();
 const client = useSupabaseClient();
 const loading = ref(false);
 const user = useSupabaseUser();
 
+let isRedirecting = false;
 const redirectAfterLogin = async (uid) => {
-  const authStore = useAuthStore();
-  if (!authStore.profile) {
-    await authStore.fetchUserProfile(uid);
+  if (isRedirecting || !uid) return;
+  isRedirecting = true;
+  try {
+    const authStore = useAuthStore();
+    if (!authStore.profile || authStore.profile.user_id !== uid) {
+      await authStore.fetchUserProfile(uid);
+    }
+    await navigateTo("/admin");
+  } catch (err) {
+    isRedirecting = false;
+    throw err;
   }
-  await navigateTo("/admin");
 };
 
 // Auto redirect if already logged in
@@ -187,90 +197,78 @@ onUnmounted(() => {
 });
 
 const { handleSubmit, errors, resetForm } = useForm();
-const { value: email } = useField("email", "required|email");
+const { value: identifier } = useField("identifier", "required|identifier");
 const { value: password } = useField("password", "required");
-const { value: businessName } = useField("businessName", (val) => {
-  if (isSignUp.value && !val) return t("login.error_business_name_required");
-  return true;
-});
 
 watch(isSignUp, () => {
   resetForm();
 });
 
+const signInAndRedirect = async (loginIdentifier, rawPassword) => {
+  const sessionRes = await $fetch("/api/auth/login", {
+    method: "POST",
+    body: {
+      identifier: loginIdentifier,
+      password: rawPassword,
+    },
+  });
+
+  await client.auth.setSession({
+    access_token: sessionRes.access_token,
+    refresh_token: sessionRes.refresh_token,
+  });
+
+  const supaUser = useSupabaseUser();
+  if (!supaUser.value) {
+    await new Promise((resolve) => {
+      const stop = watch(supaUser, (val) => {
+        if (val) {
+          stop();
+          resolve();
+        }
+      });
+      setTimeout(resolve, 2500);
+    });
+  }
+
+  await redirectAfterLogin(
+    sessionRes.user_id || supaUser.value?.id || supaUser.value?.sub,
+  );
+};
+
+const handleSignupSubmit = async (payload) => {
+  loading.value = true;
+  try {
+    const signupRes = await $fetch("/api/auth/signup", {
+      method: "POST",
+      body: payload,
+    });
+
+    $toast.success(t("login.signup_success"));
+    await signInAndRedirect(
+      signupRes.loginIdentifier || payload.email || payload.whatsappNumber,
+      payload.password,
+    );
+  } catch (err) {
+    const msg =
+      err?.data?.message ||
+      err?.statusMessage ||
+      err?.message ||
+      t("login.error_signup_generic");
+    $toast.error(msg);
+  } finally {
+    loading.value = false;
+  }
+};
+
 const onSubmit = handleSubmit(async (values) => {
   loading.value = true;
 
   try {
-    if (isSignUp.value) {
-      // Sign Up flow (Self-service onboarding)
-      const { data, error } = await client.auth.signUp({
-        email: values.email,
-        password: values.password,
-        options: {
-          data: {
-            business_name: values.businessName?.trim() || t("login.default_business_name"),
-          },
-        },
-      });
-
-      if (error) {
-        $toast.error(error.message || t("login.error_signup_generic"));
-        loading.value = false;
-        return;
-      }
-
-      // Check if session exists (auto-confirmed or confirmation disabled)
-      if (data?.session || data?.user) {
-        $toast.success(t("login.signup_success"));
-        
-        // Wait for Supabase user sync
-        const user = useSupabaseUser();
-        if (!user.value) {
-          await new Promise((resolve) => {
-            const stop = watch(user, (val) => {
-              if (val) {
-                stop();
-                resolve();
-              }
-            });
-            setTimeout(resolve, 2500);
-          });
-        }
-        await redirectAfterLogin(data?.user?.id || user.value?.id);
-      } else {
-        $toast.success(t("login.signup_email_confirmation"));
-        isSignUp.value = false;
-      }
-    } else {
-      // Sign In flow
-      const { data: signInData, error } = await client.auth.signInWithPassword({
-        email: values.email,
-        password: values.password,
-      });
-
-      if (error) {
-        $toast.error(t("login.error_credentials"));
-      } else {
-        $toast.success(t("login.success"));
-        const user = useSupabaseUser();
-        if (!user.value) {
-          await new Promise((resolve) => {
-            const stop = watch(user, (val) => {
-              if (val) {
-                stop();
-                resolve();
-              }
-            });
-            setTimeout(resolve, 3000);
-          });
-        }
-        await redirectAfterLogin(signInData?.user?.id || user.value?.id || user.value?.sub);
-      }
-    }
+    await signInAndRedirect(values.identifier, values.password);
+    $toast.success(t("login.success"));
   } catch (err) {
-    console.error("Auth error:", err);
-    $toast.error(t("login.unexpected_error"));
+    $toast.error(t("login.error_credentials"));
   } finally {
     loading.value = false;
   }

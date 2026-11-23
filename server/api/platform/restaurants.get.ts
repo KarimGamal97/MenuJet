@@ -31,7 +31,6 @@ export default defineEventHandler(async (event) => {
             .from("orders")
             .select("user_id")
             .in("user_id", ownerIds)
-            .neq("status", "archived")
         : Promise.resolve({ data: [] }),
     ]);
 
