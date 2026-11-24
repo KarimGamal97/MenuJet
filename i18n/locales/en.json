@@ -8,6 +8,7 @@
     "last_updated": "Last updated: November 2026"
   },
   "hero": {
+    "eyebrow": "Smart QR Menu • 0% Commission",
     "title_part1": "Smart QR Menu That Boosts Orders",
     "title_part2": "With 0% Commission",
     "subtitle": "Save printing costs, update prices in seconds, and receive orders via WhatsApp and Cashier with ease.",
@@ -18,6 +19,31 @@
       "setup": "Setup in minutes",
       "ui_friendly": "Smooth & friendly UI",
       "support": "24/7 Support"
+    },
+    "showcase": {
+      "restaurant_name": "Burger House",
+      "open_now": "Open Now",
+      "search_placeholder": "Search menu items",
+      "cat_all": "All",
+      "cat_burger": "Burgers",
+      "cat_pizza": "Pizza",
+      "cat_coffee": "Coffee",
+      "currency": "EGP",
+      "item1_name": "Classic Burger",
+      "item1_desc": "Grilled beef, cheddar, lettuce",
+      "item2_name": "Pepperoni Pizza",
+      "item2_desc": "Melted mozzarella, house sauce",
+      "item3_name": "Crispy Fries",
+      "item3_desc": "Spiced fries with cheddar dip",
+      "item4_name": "Iced Latte",
+      "item4_desc": "Roasted espresso, chilled milk",
+      "nav_orders": "Orders",
+      "nav_cart": "Cart",
+      "nav_about": "About",
+      "notif1_title": "New WhatsApp Order",
+      "notif1_sub": "Table 4 • 0% Commission",
+      "notif2_title": "Table QR Ready",
+      "notif2_sub": "Instant Price Updates"
     }
   },
   "features": {
@@ -468,7 +494,16 @@
     "view_all": "View All",
     "no_renewals_due": "All subscriptions are currently active",
     "remind": "Remind",
-    "renewal_whatsapp_msg": "Hello {name}, this is a quick reminder regarding your MenuJet subscription renewal."
+    "renewal_whatsapp_msg": "Hello {name}, this is a quick reminder regarding your MenuJet subscription renewal.",
+    "renewal_whatsapp_msg_days": "Hello {name}, this is a quick reminder that your MenuJet subscription expires in {daysText}. Please renew to avoid service interruption.",
+    "renewal_whatsapp_msg_today": "Hello {name}, this is a quick reminder that your MenuJet subscription expires today. Please renew to avoid service interruption.",
+    "renewal_whatsapp_msg_expired": "Hello {name}, your MenuJet subscription has expired. Please renew to reactivate your service.",
+    "renewal_days_one": "1 day",
+    "renewal_days_two": "2 days",
+    "renewal_days_few": "{days} days",
+    "renewal_days_many": "{days} days",
+    "renewal_payment_paid": "Plan: {plan}\nMonthly Renewal: {price} {currency}\n\nPayment & Transfer Details:\n- InstaPay or Vodafone Cash to: {phone}\n- After transferring, please send the receipt screenshot here for immediate renewal.",
+    "renewal_payment_free": "Available Plans to Subscribe / Upgrade:\n- Basic Plan: {basicPrice} {currency}/month\n- Pro Plan: {proPrice} {currency}/month\n\nPayment & Transfer Details:\n- InstaPay or Vodafone Cash to: {phone}\n- After transferring, please send the receipt screenshot here for immediate activation."
   },
   "cart": {
     "title": "Your Order",
@@ -600,7 +635,13 @@
     "q3": "Can I update prices and items myself?",
     "a3": "Yes, easily! Through a simple dashboard from your phone or computer, you can update prices, add new items, or hide sold-out dishes in seconds.",
     "q4": "Do you charge any commission on sales or orders?",
-    "a4": "No, MenuJet charges 0% commission on your orders. You keep 100% of your earnings with zero hidden fees."
+    "a4": "No, MenuJet charges 0% commission on your orders. You keep 100% of your earnings with zero hidden fees.",
+    "q5": "Is there a free plan or free trial before subscribing?",
+    "a5": "Yes! Every new account starts with a full-featured 14-day free trial with no credit card required, plus a free plan supporting up to 5 categories and 20 items with a QR code.",
+    "q6": "Do I need technical experience or have to enter the menu myself?",
+    "a6": "Not at all. Your dashboard works easily from your phone or computer, and the MenuJet team also helps set up and enter your entire initial menu for free so you can launch in minutes.",
+    "q7": "What happens after the 14-day free trial ends?",
+    "a7": "There is no automatic charge; your menu simply moves to the free plan (up to 5 categories and 20 items), while all remaining items and data stay safely saved and return immediately once you subscribe."
   },
   "plans": {
     "free_name": "Free Plan",
@@ -890,7 +931,7 @@
     "q4_q": "What if an item runs out of stock during service?",
     "q4_a": "With a single click from your dashboard, you can mark the item as \"Out of Stock\". It will immediately be displayed as unavailable, preventing orders until you re-enable it.",
     "q5_q": "How do I obtain and print my QR code?",
-    "q5_a": "MenuJet provides an integrated \"QR Print Studio\" in your dashboard. With one click, customize stands with your logo, name, and promotional hooks, ready to print as compact table stands or wall posters in high resolution.",
+    "q5_a": "MenuJet provides an integrated \"QR Print Studio\" in your dashboard. With one click, customize stands with your logo, name, and promotional hooks, ready to print as compact table stands or wall posters in high resolution. And if you update prices or items later, you never need to reprint the code.",
     "q6_q": "How does the restaurant receive customer orders?",
     "q6_a": "The platform supports two convenient channels:\n1. Direct WhatsApp messaging formatted with item details, total price, table/queue number, address, and payment method.\n2. Direct reception via the Cashier Orders dashboard with real-time sound and vibration alerts.",
     "q7_q": "Can customers edit their order after submitting?",
@@ -900,7 +941,15 @@
     "q9_q": "Can I test the platform for free before paying?",
     "q9_a": "Yes, we provide a 14-day full-featured free trial. Additionally, our support team can assist you in inputting your initial menu free of charge.",
     "q10_q": "What payment methods are supported for subscriptions?",
-    "q10_a": "We accept credit/debit cards (Visa, MasterCard), mobile wallets (Vodafone Cash, Orange, Etisalat, WE Pay), and InstaPay instant transfers."
+    "q10_a": "We accept credit/debit cards (Visa, MasterCard), mobile wallets (Vodafone Cash, Orange, Etisalat, WE Pay), and InstaPay instant transfers.",
+    "q11_q": "What happens after the 14-day free trial ends?",
+    "q11_a": "There is no automatic charge; your menu moves to the free plan (up to 5 categories and 20 items), while all of your remaining items and settings stay safely stored and reappear immediately upon upgrading.",
+    "q12_q": "Do I need special POS hardware or an app to manage my restaurant?",
+    "q12_a": "No. The menu opens directly in your customer's phone browser with no app required, and both the dashboard and live cashier screen run in any phone, tablet, or desktop browser with instant receipt printing.",
+    "q13_q": "My staff aren't tech-savvy—can they use the system easily?",
+    "q13_a": "Yes. Starting from the Pro plan, you can create dedicated staff accounts with cashier-only permissions away from admin settings, featuring a clean Arabic/English interface and instant audio alerts for new orders.",
+    "q14_q": "Does MenuJet fit businesses other than restaurants (cafes, bakeries, weight-based)?",
+    "q14_a": "Yes. It fits cafes, dessert shops, bakeries, cloud kitchens, and any business with a price list, supporting fixed pricing, sizes (Small/Medium/Large), or weight and quantity options."
   },
   "landing_footer": {
     "desc": "The comprehensive platform for restaurants and cafes to convert paper menus into fast, smart digital menus with QR codes and 0% commission.",
@@ -962,5 +1011,10 @@
       "desc": "Live on mobile & WhatsApp in minutes"
     },
     "cta": "Start Your Free Trial Now"
+  },
+  "floating": {
+    "whatsapp_label": "Chat with us on WhatsApp",
+    "whatsapp_message": "Hello MenuJet team, I would like to inquire about the digital menu.",
+    "back_to_top": "Back to top"
   }
 }

@@ -177,7 +177,11 @@ const questionsList = [
   { id: 7, category: 'orders', qKey: 'faq_page.q7_q', aKey: 'faq_page.q7_a' },
   { id: 8, category: 'pricing', qKey: 'faq_page.q8_q', aKey: 'faq_page.q8_a' },
   { id: 9, category: 'pricing', qKey: 'faq_page.q9_q', aKey: 'faq_page.q9_a' },
-  { id: 10, category: 'pricing', qKey: 'faq_page.q10_q', aKey: 'faq_page.q10_a' }
+  { id: 10, category: 'pricing', qKey: 'faq_page.q10_q', aKey: 'faq_page.q10_a' },
+  { id: 11, category: 'pricing', qKey: 'faq_page.q11_q', aKey: 'faq_page.q11_a' },
+  { id: 12, category: 'start', qKey: 'faq_page.q12_q', aKey: 'faq_page.q12_a' },
+  { id: 13, category: 'orders', qKey: 'faq_page.q13_q', aKey: 'faq_page.q13_a' },
+  { id: 14, category: 'menu', qKey: 'faq_page.q14_q', aKey: 'faq_page.q14_a' }
 ]
 
 const filteredQuestions = computed(() => {

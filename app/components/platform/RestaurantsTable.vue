@@ -111,6 +111,7 @@
                   <a
                     :href="buildWhatsAppUrl(r.whatsapp_number)"
                     target="_blank"
+                    rel="noopener noreferrer"
                     dir="ltr"
                     class="hover:underline"
                   >

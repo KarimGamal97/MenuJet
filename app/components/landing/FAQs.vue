@@ -55,12 +55,10 @@ import { ref } from 'vue'
 
 const openIndex = ref(0)
 
-const faqList = [
-  { qKey: 'faqs.q1', aKey: 'faqs.a1' },
-  { qKey: 'faqs.q2', aKey: 'faqs.a2' },
-  { qKey: 'faqs.q3', aKey: 'faqs.a3' },
-  { qKey: 'faqs.q4', aKey: 'faqs.a4' },
-]
+const faqList = [1, 2, 3, 4, 5, 6, 7].map((i) => ({
+  qKey: `faqs.q${i}`,
+  aKey: `faqs.a${i}`,
+}))
 
 const toggleFaq = (idx) => {
   openIndex.value = openIndex.value === idx ? -1 : idx

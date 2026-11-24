@@ -203,6 +203,8 @@
 </template>
 
 <script setup>
+import { buildWhatsAppUrl } from "~/utils/helpers";
+
 const props = defineProps({
   isOpen: { type: Boolean, default: false },
   restaurant: { type: Object, default: () => ({}) },
@@ -221,8 +223,7 @@ const phoneNumber = computed(() => {
 });
 
 const whatsappHref = computed(() => {
-  const num = String(props.restaurant?.whatsapp_number || "").replace(/[^0-9]/g, "");
-  return num ? `https://wa.me/${num}` : "#";
+  return buildWhatsAppUrl(props.restaurant?.whatsapp_number) || "#";
 });
 
 const deliveryAreasList = computed(() => {

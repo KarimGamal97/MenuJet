@@ -9,7 +9,7 @@
       <div class="flex items-center justify-start flex-1 min-w-0">
         <NuxtLink to="/" class="flex items-center group shrink-0">
           <img
-            :src="isDark ? navbarLogoDark : navbarLogoLight"
+            :src="navbarLogo"
             alt="MenuJet"
             :class="[
               'h-12 sm:h-14 w-auto object-contain group-hover:scale-105 transition-transform',
@@ -115,7 +115,7 @@
             <BaseIcon name="globe" class="w-5 h-5 text-slate-500 dark:text-slate-400 shrink-0 stroke-[2]" />
 
             <!-- Current Active Language (AR / EN) -->
-            <span class="text-sm font-bold tracking-wide uppercase">
+            <span class="text-sm font-bold tracking-wide uppercase leading-none">
               {{ locale === 'ar' ? 'AR' : 'EN' }}
             </span>
 
@@ -205,7 +205,7 @@
             :title="locale === 'ar' ? 'تغيير اللغة' : 'Change Language'"
           >
             <BaseIcon name="globe" class="w-4 h-4 text-slate-500 dark:text-slate-400 shrink-0 stroke-[2]" />
-            <span class="text-xs font-bold tracking-wide uppercase">{{ locale === 'ar' ? 'AR' : 'EN' }}</span>
+            <span class="text-xs font-bold tracking-wide uppercase leading-none">{{ locale === 'ar' ? 'AR' : 'EN' }}</span>
             <BaseIcon
               name="chevron-down"
               :class="['w-3 h-3 text-slate-500 dark:text-slate-400 shrink-0 transition-transform duration-200 stroke-[2.5]', isLangDropdownOpen ? 'rotate-180' : '']"
@@ -334,8 +334,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import navbarLogoLight from '~/assets/navbar-logo.svg'
-import navbarLogoDark from '~/assets/navbar-logo-white.svg'
+import navbarLogo from '~/assets/navbar-logo.svg'
 
 const { locale, setLocale, t } = useI18n()
 const { isDark, toggleTheme } = useTheme()

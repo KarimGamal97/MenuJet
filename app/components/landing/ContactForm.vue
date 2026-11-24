@@ -30,7 +30,7 @@
 
         <!-- Form Card -->
         <div class="md:w-1/2 w-full">
-          <div class="bg-white dark:bg-slate-900 dark:border dark:border-slate-800 rounded-[2rem] shadow-2xl p-8 md:p-10 transform hover:scale-[1.02] transition-transform duration-300">
+          <div class="bg-white dark:bg-slate-900 dark:border dark:border-slate-800 rounded-[2rem] shadow-2xl p-8 md:p-10">
             <form @submit.prevent="sendWhatsApp" class="space-y-6">
               <div>
                 <label class="block text-gray-700 dark:text-slate-200 font-bold mb-2 text-start">{{ $t('contact.name_placeholder') }}</label>
@@ -57,10 +57,11 @@
                 :href="SOCIAL_LINKS.facebook"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="w-full flex items-center justify-center gap-3 py-3.5 px-4 rounded-xl bg-blue-50 dark:bg-blue-500/15 text-blue-600 dark:text-blue-300 hover:bg-blue-600 hover:text-white font-bold transition-all duration-300 border border-blue-100 dark:border-blue-500/30 shadow-sm cursor-pointer"
+                class="group relative overflow-hidden w-full flex items-center justify-center gap-3 py-3.5 px-4 rounded-xl bg-blue-50 dark:bg-blue-500/15 text-blue-600 dark:text-blue-300 hover:bg-blue-600 dark:hover:bg-blue-600 hover:text-white dark:hover:text-white hover:border-blue-600 dark:hover:border-blue-500 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-500/30 font-bold transition-all duration-300 border border-blue-100 dark:border-blue-500/30 shadow-sm cursor-pointer"
               >
-                <BaseIcon name="facebook" solid class="w-5 h-5" />
-                <span>{{ $i18n.locale === 'ar' ? 'صفحتنا على فيسبوك' : 'Our Facebook Page' }}</span>
+                <div class="absolute inset-0 bg-white/20 group-hover:translate-x-full transition-transform duration-500 ease-out -skew-x-12 -ml-4 w-1/4 pointer-events-none"></div>
+                <BaseIcon name="facebook" solid class="w-5 h-5 shrink-0 relative z-10" />
+                <span class="relative z-10 leading-none">{{ $t('landing_footer.social_facebook') }}</span>
               </a>
             </form>
           </div>

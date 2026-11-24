@@ -1,9 +1,8 @@
 <template>
-  <section 
-    class="relative h-[100vh] pt-40 pb-20 flex flex-col justify-center items-center bg-gradient-to-br from-orange-50/40 via-white to-orange-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 w-full transition-colors duration-300"
+  <section
+    class="relative min-h-[calc(100vh-1rem)] pt-28 pb-16 lg:pt-32 lg:pb-20 flex items-center bg-gradient-to-br from-orange-50/40 via-white to-orange-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 w-full overflow-hidden transition-colors duration-300"
     @mousemove="onMouseMove"
   >
-    
     <!-- WhatsApp-style Subtle Animated Food Pattern -->
     <div class="food-doodle-bg absolute inset-0 z-0 opacity-[.1] dark:opacity-[0.1] pointer-events-none"></div>
 
@@ -23,49 +22,56 @@
       </div>
     </div>
 
-    <div class="container mx-auto px-6 text-center z-10 relative">
-      <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 dark:text-white mb-6 leading-[1.45] max-w-5xl mx-auto drop-shadow-sm">
-        {{ $t('hero.title_part1') }} <span class="whitespace-nowrap inline-block py-2 text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-orange-400">{{ $t('hero.title_part2') }}</span>
-      </h1>
-      <p class="text-lg md:text-xl text-gray-600 dark:text-slate-300 mb-10 max-w-3xl mx-auto font-medium leading-relaxed whitespace-pre-line">
-        {{ $t('hero.subtitle') }}
-      </p>
-      <div class="flex flex-col md:flex-row gap-6 justify-center items-center">
-        <PrimaryButton href="#contact" @click.prevent="scrollToSection('contact')" class="!px-10 !py-4">
-          {{ $t('hero.cta_start') }}
-        </PrimaryButton>
-        <SecondaryButton href="#features" @click.prevent="scrollToSection('features')" class="!px-10 !py-4">
-          <BaseIcon name="play-circle" class="h-6 w-6 text-orange-500 group-hover:scale-110 transition-transform" />
-          {{ $t('hero.cta_demo') }}
-        </SecondaryButton>
-        <!-- <button
-          v-if="isInstallable"
-          @click="triggerInstall"
-          class="bg-gray-900 text-white px-10 py-4 rounded-2xl text-lg font-bold shadow-lg hover:-translate-y-1 hover:shadow-xl transition-all duration-300 flex items-center gap-2 justify-center"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-          </svg>
-          {{ $t('hero.cta_download') }}
-        </button> -->
-      </div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full z-10 relative">
+      <div class="grid grid-cols-1 lg:grid-cols-12 items-center gap-10 lg:gap-8">
+        <!-- Content Column (Start / Right in RTL, Left in LTR) -->
+        <div class="lg:col-span-6 text-center lg:text-start">
+          <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 dark:bg-slate-900/90 border border-orange-200/80 dark:border-slate-700 shadow-xs text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 mb-5">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span>{{ $t('hero.eyebrow') }}</span>
+          </div>
 
-      <!-- Trust Badges -->
-      <div class="mt-8 flex flex-wrap justify-center items-center gap-6 text-sm sm:text-base text-gray-600 dark:text-slate-300 font-medium">
-        <!-- Badge 1 -->
-        <div class="flex items-center gap-2">
-          <BaseIcon name="check-circle" solid viewBox="0 0 20 20" class="w-5 h-5 text-orange-500" />
-          <span>{{ $t('hero.badges.setup') }}</span>
+          <h1 class="text-3xl sm:text-4xl md:text-5xl xl:text-[3.35rem] font-extrabold text-gray-900 dark:text-white mb-5 leading-[1.35] drop-shadow-sm">
+            {{ $t('hero.title_part1') }}
+            <span class="whitespace-nowrap inline-block py-1 text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-orange-400">
+              {{ $t('hero.title_part2') }}
+            </span>
+          </h1>
+
+          <p class="text-base sm:text-lg md:text-xl text-gray-600 dark:text-slate-300 mb-8 max-w-2xl mx-auto lg:mx-0 font-medium leading-relaxed whitespace-pre-line">
+            {{ $t('hero.subtitle') }}
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center">
+            <PrimaryButton href="#contact" @click.prevent="scrollToSection('contact')" class="w-full sm:w-auto !px-8 !py-3.5">
+              {{ $t('hero.cta_start') }}
+            </PrimaryButton>
+            <SecondaryButton href="#features" @click.prevent="scrollToSection('features')" class="w-full sm:w-auto !px-8 !py-3.5">
+              <BaseIcon name="play-circle" class="h-6 w-6 text-orange-500 group-hover:scale-110 transition-transform" />
+              {{ $t('hero.cta_demo') }}
+            </SecondaryButton>
+          </div>
+
+          <!-- Trust Badges -->
+          <div class="mt-8 flex flex-wrap justify-center lg:justify-start items-center gap-5 sm:gap-6 text-sm sm:text-base text-gray-600 dark:text-slate-300 font-medium">
+            <div class="flex items-center gap-2">
+              <BaseIcon name="check-circle" solid class="w-5 h-5 text-orange-500 shrink-0" />
+              <span class="leading-none">{{ $t('hero.badges.setup') }}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <BaseIcon name="check-circle" solid class="w-5 h-5 text-orange-500 shrink-0" />
+              <span class="leading-none">{{ $t('hero.badges.ui_friendly') }}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <BaseIcon name="check-circle" solid class="w-5 h-5 text-orange-500 shrink-0" />
+              <span class="leading-none">{{ $t('hero.badges.support') }}</span>
+            </div>
+          </div>
         </div>
-        <!-- Badge 2 -->
-        <div class="flex items-center gap-2">
-          <BaseIcon name="check-circle" solid viewBox="0 0 20 20" class="w-5 h-5 text-orange-500" />
-          <span>{{ $t('hero.badges.ui_friendly') }}</span>
-        </div>
-        <!-- Badge 3 -->
-        <div class="flex items-center gap-2">
-          <BaseIcon name="check-circle" solid viewBox="0 0 20 20" class="w-5 h-5 text-orange-500" />
-          <span>{{ $t('hero.badges.support') }}</span>
+
+        <!-- Interactive Visual Column (End / Left in RTL, Right in LTR) -->
+        <div class="lg:col-span-6 w-full">
+          <LandingHeroShowcase :mouse-x="mouseX" :mouse-y="mouseY" />
         </div>
       </div>
     </div>

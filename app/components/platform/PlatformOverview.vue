@@ -243,9 +243,10 @@
 
               <div class="flex items-center gap-2 shrink-0">
                 <a
-                  v-if="r.whatsapp_number"
-                  :href="buildWhatsAppUrl(r.whatsapp_number, $t('platform.renewal_whatsapp_msg', { name: r.name }))"
+                  v-if="buildWhatsAppUrl(r.whatsapp_number)"
+                  :href="buildWhatsAppUrl(r.whatsapp_number, getRenewalMessage(r))"
                   target="_blank"
+                  rel="noopener noreferrer"
                   class="px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-black inline-flex items-center gap-1.5 transition-colors"
                 >
                   <BaseIcon name="whatsapp" solid class="w-3.5 h-3.5" />
@@ -267,7 +268,11 @@
 </template>
 
 <script setup lang="ts">
-import { buildWhatsAppUrl } from "~/utils/helpers";
+import {
+  PLAN_MONTHLY_EGP,
+  RENEWAL_PAYMENT_PHONE,
+  buildWhatsAppUrl,
+} from "~/utils/helpers";
 
 const { t } = useI18n();
 
@@ -307,6 +312,63 @@ const { data: overview, pending } = useAsyncData<OverviewResponse>(
   () => $fetch<OverviewResponse>("/api/platform/overview"),
   { lazy: true },
 );
+
+const formatRemainingDays = (days: number): string => {
+  if (days === 1) return t("platform.renewal_days_one");
+  if (days === 2) return t("platform.renewal_days_two");
+  const mod100 = days % 100;
+  if (mod100 >= 3 && mod100 <= 10) {
+    return t("platform.renewal_days_few", { days });
+  }
+  return t("platform.renewal_days_many", { days });
+};
+
+const getPlanName = (planId: string): string => {
+  if (planId === "pro") return t("plans.pro_name");
+  if (planId === "basic") return t("plans.basic_name");
+  return t("plans.free_name");
+};
+
+const getRenewalPaymentDetails = (planId: string): string => {
+  const normalizedPlan = String(planId || "free").toLowerCase();
+  const price = PLAN_MONTHLY_EGP[normalizedPlan] ?? 0;
+  const currency = t("admin.currency");
+
+  if (price > 0) {
+    return t("platform.renewal_payment_paid", {
+      plan: getPlanName(normalizedPlan),
+      price,
+      currency,
+      phone: RENEWAL_PAYMENT_PHONE,
+    });
+  }
+
+  return t("platform.renewal_payment_free", {
+    basicPrice: PLAN_MONTHLY_EGP.basic,
+    proPrice: PLAN_MONTHLY_EGP.pro,
+    currency,
+    phone: RENEWAL_PAYMENT_PHONE,
+  });
+};
+
+const getRenewalMessage = (r: OverviewResponse["renewalsDue"][number]): string => {
+  let intro: string;
+  if (r.expired) {
+    intro = t("platform.renewal_whatsapp_msg_expired", { name: r.name });
+  } else if (typeof r.daysRemaining === "number") {
+    intro =
+      r.daysRemaining <= 0
+        ? t("platform.renewal_whatsapp_msg_today", { name: r.name })
+        : t("platform.renewal_whatsapp_msg_days", {
+            name: r.name,
+            daysText: formatRemainingDays(r.daysRemaining),
+          });
+  } else {
+    intro = t("platform.renewal_whatsapp_msg", { name: r.name });
+  }
+
+  return `${intro}\n\n${getRenewalPaymentDetails(r.planId)}`;
+};
 
 const planCards = computed(() => {
   const total = overview.value?.totalClients || 0;

@@ -246,6 +246,7 @@
 <script setup>
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { buildWhatsAppUrl } from '~/utils/helpers';
 
 const props = defineProps({
   restaurant: {
@@ -305,10 +306,7 @@ const formatSocialUrl = (platform, value) => {
 
 const whatsappUrl = computed(() => {
   const number = props.restaurant?.whatsapp_number || props.restaurant?.social_phone;
-  if (!number) return null;
-  const digits = number.replace(/\D/g, '');
-  if (!digits) return null;
-  return `https://wa.me/${digits}`;
+  return buildWhatsAppUrl(number) || null;
 });
 
 const hasAnySocial = computed(() => {

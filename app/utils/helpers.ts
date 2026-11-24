@@ -1,10 +1,41 @@
 export const SUPPORT_WHATSAPP_NUMBER = '201132234124'
 export const SUPPORT_WHATSAPP_DISPLAY = '01132234124'
+export const RENEWAL_PAYMENT_PHONE = '01094123678'
+
+export const PLAN_MONTHLY_EGP: Record<string, number> = {
+  free: 0,
+  basic: 250,
+  pro: 500,
+}
 
 export const SOCIAL_LINKS = {
   facebook: 'https://www.facebook.com/profile.php?id=61594028551451',
   instagram: 'https://www.instagram.com/menujet_?knvt=MTdwa2JwbDBhdXU3dA%3D%3D',
 } as const
+
+/**
+ * Normalizes Arabic/Persian numerals to ASCII digits and formats phone numbers
+ * for WhatsApp wa.me links (auto-prefixing Egypt country code `2` on `01xxxxxxxxx`).
+ */
+function normalizeWhatsAppDigits(phone: string | number | null | undefined): string {
+  const ascii = String(phone || '').replace(/[٠-٩۰-۹]/g, (d) => {
+    const code = d.charCodeAt(0)
+    return String(code >= 0x06f0 ? code - 0x06f0 : code - 0x0660)
+  })
+  let digits = ascii.replace(/\D/g, '')
+  if (!digits) return ''
+
+  if (digits.startsWith('00')) {
+    digits = digits.slice(2)
+  }
+  if (/^0201[0125]\d{8}$/.test(digits)) {
+    digits = digits.slice(1)
+  } else if (/^01[0125]\d{8}$/.test(digits)) {
+    digits = `2${digits}`
+  }
+
+  return digits
+}
 
 /**
  * Cleans a phone number and builds a valid WhatsApp (wa.me) URL.
@@ -13,7 +44,7 @@ export function buildWhatsAppUrl(
   phone: string | number | null | undefined,
   message?: string
 ): string {
-  const digits = String(phone || '').replace(/[^0-9]/g, '')
+  const digits = normalizeWhatsAppDigits(phone)
   if (!digits) return ''
   const base = `https://wa.me/${digits}`
   return message ? `${base}?text=${encodeURIComponent(message)}` : base

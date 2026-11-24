@@ -414,11 +414,7 @@ export function useCartCheckout(props: CheckoutProps, onClose: () => void) {
       msgText += `\n💳 طريقة الدفع: *${selectedPaymentMethodDetails.value.name}* (مرفق إشعار التحويل)`
     }
 
-    let phoneStr = props.whatsappNumber || ''
-    if (phoneStr.startsWith('0') && phoneStr.length === 11) {
-      phoneStr = '2' + phoneStr
-    }
-    return buildWhatsAppUrl(phoneStr, msgText)
+    return buildWhatsAppUrl(props.whatsappNumber, msgText)
   })
 
   const handleWhatsappOrderFinal = async () => {

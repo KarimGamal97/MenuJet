@@ -24,9 +24,10 @@
           {{ $t('menu.unavailable_desc') }}
         </p>
         <a
-          v-if="restaurant?.whatsapp_number"
-          :href="`https://wa.me/${String(restaurant.whatsapp_number).replace(/[^0-9]/g, '')}`"
+          v-if="buildWhatsAppUrl(restaurant?.whatsapp_number)"
+          :href="buildWhatsAppUrl(restaurant?.whatsapp_number)"
           target="_blank"
+          rel="noopener noreferrer"
           class="py-3.5 px-6 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-2xl shadow-lg shadow-orange-500/25 transition-all active:scale-95"
         >
           {{ $t('menu.contact_restaurant') }}
@@ -333,6 +334,8 @@
 </template>
 
 <script setup>
+import { buildWhatsAppUrl } from "~/utils/helpers";
+
 const { locale } = useI18n();
 const route = useRoute();
 const client = useSupabaseClient();

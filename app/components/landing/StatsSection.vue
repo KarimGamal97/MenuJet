@@ -78,12 +78,12 @@
         <a
           href="#pricing"
           @click.prevent="scrollToPricing"
-          class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white text-sm font-black shadow-lg shadow-orange-500/25 hover:-translate-y-0.5 transition-all duration-200"
+          class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white text-sm font-black shadow-lg shadow-orange-500/25 hover:-translate-y-0.5 transition-all duration-200 whitespace-nowrap"
         >
-          <span>{{ $t("stats.cta") }}</span>
+          <span class="leading-none">{{ $t("stats.cta") }}</span>
           <BaseIcon
             :name="locale === 'ar' ? 'chevron-left' : 'chevron-right'"
-            class="w-4 h-4"
+            class="w-4 h-4 shrink-0"
           />
         </a>
       </div>

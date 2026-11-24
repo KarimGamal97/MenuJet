@@ -7,7 +7,7 @@
         <div class="col-span-2 space-y-4">
           <NuxtLink to="/" class="flex items-center group inline-flex">
             <img
-              :src="isDark ? navbarLogoDark : navbarLogoLight"
+              :src="navbarLogo"
               alt="MenuJet"
               :class="[
                 'h-20 sm:h-24 w-auto object-contain group-hover:scale-105 transition-transform',
@@ -213,8 +213,7 @@
 </template>
 
 <script setup>
-import navbarLogoLight from '~/assets/navbar-logo.svg'
-import navbarLogoDark from '~/assets/navbar-logo-white.svg'
+import navbarLogo from '~/assets/navbar-logo.svg'
 
 const route = useRoute()
 const { t } = useI18n()

@@ -16,6 +16,7 @@
     </main>
 
     <LandingTheFooter />
+    <LandingFloatingActions />
   </div>
 </template>
 
