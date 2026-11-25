@@ -253,6 +253,14 @@
     "settings_subtitle": "إدارة بيانات مطعمك وأقسام المنيو",
     "restaurant_name_placeholder": "مثال: مطعم الحمد",
     "whatsapp_placeholder": "مثال: 201234567890",
+    "additional_phones_title": "أرقام تواصل إضافية",
+    "additional_phones_add": "إضافة رقم",
+    "additional_phones_hint": "أضف حتى 5 أرقام إضافية (دليفري، فرع آخر، شكاوى) لتظهر بشكل منظم في صفحة الروابط وعن المطعم.",
+    "additional_phones_locked_hint": "إضافة أرقام تواصل متعددة للفرع أو الدليفري متاحة في الباقة الاحترافية فقط.",
+    "additional_phones_pro_msg": "اشترك في الباقة الاحترافية لإضافة أرقام تواصل متعددة لمطعمك (دليفري، فروع، شكاوى) وعرضها بشكل احترافي لعملائك.",
+    "additional_phone_label_placeholder": "التسمية (مثال: الدليفري، فرع 2)",
+    "additional_phone_number_placeholder": "رقم الهاتف (مثال: 01012345678)",
+    "additional_phone_whatsapp": "واتساب",
     "sections_count": "أقسام",
     "delivery_areas_title": "مناطق التوصيل وأسعارها",
     "area_name_placeholder": "اسم المنطقة (مثال: قويسنا)",
@@ -819,6 +827,8 @@
     "location": "موقعنا على الخريطة",
     "location_desc": "افتح في Google Maps للوصول المباشر إلينا",
     "call_us": "اتصل بنا هاتفياً",
+    "contact_numbers": "أرقام التواصل والطلبات",
+    "main_number": "الرقم الرئيسي",
     "whatsapp": "تواصل عبر واتساب",
     "whatsapp_desc": "للطلبات والاستفسارات السريعة",
     "follow_us": "تابعنا على منصات التواصل",
@@ -957,6 +967,7 @@
     "badge_support": "دعم فني 24/7",
     "social_facebook": "صفحتنا على فيسبوك",
     "social_instagram": "حسابنا على إنستجرام",
+    "call_phone": "اتصل بنا: {phone}",
     "col_platform": "المنصة",
     "link_features": "المميزات",
     "link_pricing": "الباقات والأسعار",
@@ -1016,5 +1027,13 @@
     "whatsapp_label": "تواصل معنا عبر واتساب",
     "whatsapp_message": "مرحباً فريق MenuJet، أود الاستفسار عن المنيو الرقمي للمطعم.",
     "back_to_top": "العودة للأعلى"
+  },
+  "demo_video": {
+    "badge": "فيديو تعريفي سريع",
+    "title_part1": "شاهد",
+    "title_highlight": "MenuJet",
+    "title_part2": "في دقيقة",
+    "subtitle": "تجربة كاملة توضح كيف ينشئ مطعمك المنيو الرقمي ويستقبل الطلبات عبر QR والواتساب في خطوات بسيطة.",
+    "unsupported": "متصفحك لا يدعم تشغيل الفيديو."
   }
 }

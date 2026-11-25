@@ -105,6 +105,7 @@ export function useSettingsForm() {
     business_name: '',
     slug: '',
     whatsapp_number: '',
+    additional_phones: [] as Array<{ label: string; number: string; has_whatsapp: boolean }>,
     categories: [] as string[],
     delivery_areas: [] as Array<{ name: string; price: number }>,
     logo: '',
@@ -146,6 +147,13 @@ export function useSettingsForm() {
             business_name: data.business_name || '',
             slug: data.slug || '',
             whatsapp_number: data.whatsapp_number || '',
+            additional_phones: Array.isArray(data.additional_phones)
+              ? data.additional_phones.map((p: any) => ({
+                  label: String(p?.label || ''),
+                  number: String(p?.number || ''),
+                  has_whatsapp: p?.has_whatsapp !== false,
+                }))
+              : [],
             categories: data.categories || [],
             delivery_areas: data.delivery_areas || [],
             logo: data.logo || '',
@@ -361,6 +369,18 @@ export function useSettingsForm() {
         .replace(/[^a-z0-9]/g, '-')
         .replace(/-+/g, '-'),
       whatsapp_number: form.value.whatsapp_number,
+      ...(isPro.value
+        ? {
+            additional_phones: (form.value.additional_phones || [])
+              .map((p) => ({
+                label: String(p?.label || '').trim(),
+                number: String(p?.number || '').trim(),
+                has_whatsapp: p?.has_whatsapp !== false,
+              }))
+              .filter((p) => p.number.length > 0)
+              .slice(0, 5),
+          }
+        : {}),
       categories: [...form.value.categories],
       delivery_areas: form.value.delivery_areas ? [...form.value.delivery_areas] : [],
       logo: form.value.logo,

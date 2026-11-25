@@ -33,8 +33,8 @@
               v-for="social in socialButtons"
               :key="social.key"
               :href="social.href"
-              target="_blank"
-              rel="noopener noreferrer"
+              :target="social.external ? '_blank' : undefined"
+              :rel="social.external ? 'noopener noreferrer' : undefined"
               :aria-label="social.label"
               :title="social.label"
               :class="[
@@ -214,6 +214,12 @@
 
 <script setup>
 import navbarLogo from '~/assets/navbar-logo.svg'
+import {
+  SOCIAL_LINKS,
+  SUPPORT_WHATSAPP_DISPLAY,
+  SUPPORT_WHATSAPP_NUMBER,
+  getSupportWhatsAppUrl,
+} from '~/utils/helpers'
 
 const route = useRoute()
 const { t } = useI18n()
@@ -224,6 +230,7 @@ const socialButtons = computed(() => [
     key: 'facebook',
     icon: 'facebook',
     href: SOCIAL_LINKS.facebook,
+    external: true,
     label: t('landing_footer.social_facebook'),
     hoverClass: 'hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-200 dark:hover:border-blue-500/40 hover:bg-blue-50 dark:hover:bg-blue-500/15',
   },
@@ -231,8 +238,17 @@ const socialButtons = computed(() => [
     key: 'instagram',
     icon: 'instagram',
     href: SOCIAL_LINKS.instagram,
+    external: true,
     label: t('landing_footer.social_instagram'),
     hoverClass: 'hover:text-pink-600 dark:hover:text-pink-400 hover:border-pink-200 dark:hover:border-pink-500/40 hover:bg-pink-50 dark:hover:bg-pink-500/15',
+  },
+  {
+    key: 'phone',
+    icon: 'phone-call',
+    href: `tel:+${SUPPORT_WHATSAPP_NUMBER}`,
+    external: false,
+    label: t('landing_footer.call_phone', { phone: SUPPORT_WHATSAPP_DISPLAY }),
+    hoverClass: 'hover:text-orange-600 dark:hover:text-orange-400 hover:border-orange-200 dark:hover:border-orange-500/40 hover:bg-orange-50 dark:hover:bg-orange-500/15',
   },
 ])
 

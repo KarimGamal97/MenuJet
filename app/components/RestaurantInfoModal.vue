@@ -120,9 +120,55 @@
               :href="`tel:${phoneNumber}`"
               class="flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-gray-900 hover:bg-black text-white font-black text-xs transition-all shadow-md active:scale-95"
             >
-              <BaseIcon name="phone" class="w-4 h-4" />
+              <BaseIcon name="phone-call" class="w-4 h-4" />
               <span>{{ $t("menu.call_us") }}</span>
             </a>
+          </div>
+
+          <!-- Additional Contact Numbers (Pro) -->
+          <div
+            v-if="additionalPhonesList.length > 0"
+            class="bg-gray-50 rounded-2xl p-3.5 border border-gray-100 space-y-2"
+          >
+            <div class="text-[11px] font-black text-gray-600 flex items-center gap-1.5">
+              <BaseIcon name="phone-call" class="w-3.5 h-3.5 text-orange-600" />
+              <span>{{ $t("bio_hub.contact_numbers") }}</span>
+            </div>
+            <div class="divide-y divide-gray-200/70">
+              <div
+                v-for="(item, idx) in additionalPhonesList"
+                :key="idx"
+                class="py-2 first:pt-0.5 last:pb-0 flex items-center justify-between gap-2"
+              >
+                <div class="min-w-0">
+                  <div v-if="item.label" class="text-xs font-extrabold text-gray-800 truncate">
+                    {{ item.label }}
+                  </div>
+                  <div class="text-[11px] font-bold text-gray-500 dir-ltr text-right">
+                    {{ item.number }}
+                  </div>
+                </div>
+                <div class="flex items-center gap-1.5 shrink-0">
+                  <a
+                    :href="`tel:${item.number}`"
+                    class="w-8 h-8 rounded-xl bg-gray-900 hover:bg-black text-white flex items-center justify-center transition-all active:scale-95"
+                    :title="$t('menu.call_us')"
+                  >
+                    <BaseIcon name="phone-call" class="w-3.5 h-3.5" />
+                  </a>
+                  <a
+                    v-if="item.whatsappHref"
+                    :href="item.whatsappHref"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="w-8 h-8 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center transition-all active:scale-95"
+                    :title="$t('menu.whatsapp_chat')"
+                  >
+                    <BaseIcon name="whatsapp" solid class="w-3.5 h-3.5" />
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Bio Hub Button (if allowed & enabled) -->
@@ -224,6 +270,22 @@ const phoneNumber = computed(() => {
 
 const whatsappHref = computed(() => {
   return buildWhatsAppUrl(props.restaurant?.whatsapp_number) || "#";
+});
+
+const additionalPhonesList = computed(() => {
+  const raw = props.restaurant?.additional_phones;
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .map((item) => {
+      const number = String(item?.number || "").trim();
+      if (!number) return null;
+      return {
+        label: String(item?.label || "").trim(),
+        number,
+        whatsappHref: item?.has_whatsapp !== false ? buildWhatsAppUrl(number) : "",
+      };
+    })
+    .filter(Boolean);
 });
 
 const deliveryAreasList = computed(() => {

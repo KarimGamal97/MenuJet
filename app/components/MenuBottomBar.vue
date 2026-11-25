@@ -1,6 +1,7 @@
 <template>
   <div
-    class="fixed inset-x-3 max-w-md mx-auto z-50 select-none pointer-events-auto"
+    class="fixed inset-x-3 max-w-md mx-auto z-50 select-none transition-all duration-300 ease-out"
+    :class="isVisible ? 'translate-y-0 opacity-100 pointer-events-auto' : 'translate-y-28 opacity-0 pointer-events-none'"
     :style="{ bottom: `${bottomOffset}px` }"
     dir="rtl"
   >
@@ -153,9 +154,33 @@ const getActiveBg = (tab) => {
 };
 
 const bottomOffset = ref(12);
+const isVisible = ref(true);
+let lastScrollY = 0;
+
+watch(
+  () => props.cartCount,
+  (newVal, oldVal) => {
+    if (newVal > oldVal) {
+      isVisible.value = true;
+    }
+  }
+);
 
 const updatePosition = () => {
   if (typeof window === "undefined") return;
+
+  const currentY = Math.max(window.scrollY || 0, 0);
+  if (currentY <= 40) {
+    isVisible.value = true;
+    lastScrollY = currentY;
+  } else if (currentY > lastScrollY + 10 && currentY > 80) {
+    isVisible.value = false;
+    lastScrollY = currentY;
+  } else if (currentY < lastScrollY - 10) {
+    isVisible.value = true;
+    lastScrollY = currentY;
+  }
+
   const footer = document.querySelector("footer");
   if (!footer) {
     bottomOffset.value = 12;

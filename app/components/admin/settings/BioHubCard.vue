@@ -57,6 +57,72 @@
               class="bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-xs font-bold text-gray-800 outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all text-left"
             />
           </div>
+
+          <!-- Additional Contact Numbers (Pro / Bio Hub) -->
+          <div class="md:col-span-2 pt-3 border-t border-gray-100 space-y-3">
+            <div class="flex items-center justify-between gap-2 flex-wrap">
+              <div>
+                <span class="text-xs font-black text-gray-800 flex items-center gap-1.5">
+                  <BaseIcon name="phone-call" class="w-3.5 h-3.5 text-orange-600" />
+                  <span>{{ $t("admin.additional_phones_title") }}</span>
+                </span>
+                <p class="text-[10px] font-semibold text-gray-400 mt-0.5">
+                  {{ $t("admin.additional_phones_hint") }}
+                </p>
+              </div>
+
+              <button
+                type="button"
+                @click="addPhone"
+                :disabled="additionalPhones.length >= MAX_ADDITIONAL_PHONES"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-orange-50 hover:bg-orange-100 text-orange-700 border border-orange-200/80 text-xs font-black transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <BaseIcon name="plus" class="w-3.5 h-3.5" />
+                <span>{{ $t("admin.additional_phones_add") }}</span>
+              </button>
+            </div>
+
+            <div v-if="additionalPhones.length > 0" class="space-y-2.5">
+              <div
+                v-for="(item, idx) in additionalPhones"
+                :key="idx"
+                class="bg-gray-50/80 rounded-2xl border border-gray-200/80 p-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5"
+              >
+                <input
+                  v-model="item.label"
+                  type="text"
+                  :placeholder="$t('admin.additional_phone_label_placeholder')"
+                  class="flex-1 min-w-0 px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs font-bold text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-400"
+                />
+                <input
+                  v-model="item.number"
+                  type="tel"
+                  dir="ltr"
+                  :placeholder="$t('admin.additional_phone_number_placeholder')"
+                  class="flex-1 min-w-0 px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs font-bold text-gray-800 placeholder:text-gray-400 text-end focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-400"
+                />
+                <div class="flex items-center justify-between sm:justify-end gap-2 shrink-0">
+                  <label class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200/70 text-[11px] font-bold text-emerald-700 cursor-pointer select-none">
+                    <input
+                      v-model="item.has_whatsapp"
+                      type="checkbox"
+                      class="accent-emerald-600 rounded cursor-pointer"
+                    />
+                    <BaseIcon name="whatsapp" solid class="w-3.5 h-3.5" />
+                    <span>{{ $t("admin.additional_phone_whatsapp") }}</span>
+                  </label>
+                  <button
+                    type="button"
+                    @click="removePhone(idx)"
+                    class="w-8 h-8 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition-colors cursor-pointer shrink-0"
+                    :title="$t('admin.delete')"
+                  >
+                    <BaseIcon name="trash" class="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -64,7 +130,12 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{
+import { computed } from 'vue'
+import type { AdditionalPhone } from '~/types'
+
+const MAX_ADDITIONAL_PHONES = 5
+
+const props = defineProps<{
   form: Record<string, any>
   canAllowBioHub: boolean
 }>()
@@ -72,6 +143,22 @@ defineProps<{
 const emit = defineEmits<{
   openUpgrade: [featureName: string, badge: string, customMsg: string]
 }>()
+
+const additionalPhones = computed<AdditionalPhone[]>(() => {
+  if (!Array.isArray(props.form.additional_phones)) {
+    props.form.additional_phones = []
+  }
+  return props.form.additional_phones
+})
+
+const addPhone = () => {
+  if (additionalPhones.value.length >= MAX_ADDITIONAL_PHONES) return
+  additionalPhones.value.push({ label: '', number: '', has_whatsapp: true })
+}
+
+const removePhone = (index: number) => {
+  additionalPhones.value.splice(index, 1)
+}
 
 const socialFields = [
   {

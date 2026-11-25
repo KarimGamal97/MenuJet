@@ -82,6 +82,12 @@ export interface Plan {
   allow_bio_hub?: boolean;
 }
 
+export interface AdditionalPhone {
+  label: string;
+  number: string;
+  has_whatsapp: boolean;
+}
+
 export interface Profile {
   user_id: string;
   business_name?: string;
@@ -89,6 +95,7 @@ export interface Profile {
   slug?: string;
   logo?: string | null;
   whatsapp_number?: string;
+  additional_phones?: AdditionalPhone[];
   categories?: string[];
   is_active?: boolean;
   plan_type?: "free" | "basic" | "pro" | "unlimited" | string;

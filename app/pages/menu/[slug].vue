@@ -1,6 +1,6 @@
 <template>
   <div
-    class="min-h-screen bg-gray-50 flex flex-col max-w-full overflow-x-hidden"
+    class="min-h-screen bg-gray-50 flex flex-col max-w-full overflow-x-clip"
     :style="{ '--p-color': primaryColor }"
     dir="rtl"
   >
@@ -74,7 +74,7 @@
       </div>
       
       <nav
-        class="sticky top-20 z-40 backdrop-blur-md border-b border-white/10 flex flex-col shadow-md transition-all duration-300"
+        class="sticky top-0 z-40 backdrop-blur-md border-b border-white/10 flex flex-col shadow-md transition-all duration-300"
         :style="{ backgroundColor: primaryColor }"
       >
         <div class="max-w-3xl mx-auto w-full px-4 flex flex-col gap-3 py-3">

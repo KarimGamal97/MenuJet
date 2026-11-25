@@ -1,6 +1,6 @@
 <template>
   <header
-    class="sticky top-0 z-50 bg-orange-600 backdrop-blur-xl transition-all duration-300 h-20"
+    class="relative z-50 bg-orange-600 backdrop-blur-xl transition-all duration-300 h-20"
     :style="restaurant?.primary_color ? { backgroundColor: restaurant.primary_color } : {}"
   >
     <div

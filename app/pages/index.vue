@@ -9,12 +9,11 @@
       <LandingClients />
       <LandingStatsSection />
       <LandingFeatures />
-      <!-- <LandingDemoVideo /> -->
+      <LandingDemoVideo />
       <LandingPricing />
       <LandingFAQs />
       <LandingContactForm />
     </main>
-
     <LandingTheFooter />
     <LandingFloatingActions />
   </div>

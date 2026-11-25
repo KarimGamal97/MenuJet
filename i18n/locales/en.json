@@ -254,6 +254,14 @@
     "settings_subtitle": "Manage your restaurant data and menu sections",
     "restaurant_name_placeholder": "e.g. Al-Hamd Restaurant",
     "whatsapp_placeholder": "e.g. 201234567890",
+    "additional_phones_title": "Additional Contact Numbers",
+    "additional_phones_add": "Add Number",
+    "additional_phones_hint": "Add up to 5 extra numbers (delivery, branch, inquiries) shown neatly on your Bio Hub and About dialog.",
+    "additional_phones_locked_hint": "Adding multiple contact numbers for branches or delivery is available exclusively on the Pro plan.",
+    "additional_phones_pro_msg": "Upgrade to the Pro plan to add multiple phone and WhatsApp numbers for your restaurant and display them cleanly to customers.",
+    "additional_phone_label_placeholder": "Label (e.g. Delivery, Branch 2)",
+    "additional_phone_number_placeholder": "Phone number (e.g. 01012345678)",
+    "additional_phone_whatsapp": "WhatsApp",
     "sections_count": "sections",
     "payment_methods_title": "Electronic Payment Methods",
     "payment_methods_subtitle": "Select available payment methods and transfer details (Vodafone Cash & InstaPay)",
@@ -819,6 +827,8 @@
     "location": "Our Location on Map",
     "location_desc": "Open in Google Maps for direct directions",
     "call_us": "Call Us Directly",
+    "contact_numbers": "Contact & Order Numbers",
+    "main_number": "Main Number",
     "whatsapp": "Contact via WhatsApp",
     "whatsapp_desc": "For direct orders & rapid inquiries",
     "follow_us": "Follow Us on Social Media",
@@ -957,6 +967,7 @@
     "badge_support": "24/7 Technical Support",
     "social_facebook": "Facebook Page",
     "social_instagram": "Instagram Profile",
+    "call_phone": "Call Us: {phone}",
     "col_platform": "Platform",
     "link_features": "Features",
     "link_pricing": "Pricing",
@@ -1016,5 +1027,13 @@
     "whatsapp_label": "Chat with us on WhatsApp",
     "whatsapp_message": "Hello MenuJet team, I would like to inquire about the digital menu.",
     "back_to_top": "Back to top"
+  },
+  "demo_video": {
+    "badge": "Quick Walkthrough",
+    "title_part1": "See",
+    "title_highlight": "MenuJet",
+    "title_part2": "in Action",
+    "subtitle": "Watch the full journey from launching your digital menu to receiving customer orders via QR and WhatsApp.",
+    "unsupported": "Your browser does not support video playback."
   }
 }

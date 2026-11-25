@@ -129,59 +129,146 @@
           />
         </a>
 
-        <!-- Phone Call Card -->
-        <a
-          v-if="restaurant.social_phone"
-          :href="`tel:${restaurant.social_phone}`"
-          class="w-full p-3.5 rounded-2xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 hover:border-white/20 backdrop-blur-md flex items-center justify-between transition-all duration-200 active:scale-[0.98] group"
+        <!-- Unified Contact Numbers Dropdown (when additional phones exist) -->
+        <div
+          v-if="hasAdditionalPhones && contactPhones.length > 0"
+          class="w-full rounded-2xl bg-white/[0.06] border border-white/10 backdrop-blur-md overflow-hidden transition-colors"
+          :class="contactsOpen ? 'border-white/20' : 'hover:border-white/20'"
         >
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-blue-500/15 border border-blue-500/30 text-blue-400 flex items-center justify-center shrink-0">
-              <BaseIcon name="phone" class="w-5 h-5" />
+          <button
+            type="button"
+            @click="contactsOpen = !contactsOpen"
+            class="w-full p-3.5 hover:bg-white/[0.06] flex items-center justify-between gap-3 transition-colors cursor-pointer"
+            :aria-expanded="contactsOpen"
+          >
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-10 h-10 rounded-xl bg-blue-500/15 border border-blue-500/30 text-blue-400 flex items-center justify-center shrink-0">
+                <BaseIcon name="phone-call" class="w-5 h-5" />
+              </div>
+              <div class="flex flex-col min-w-0 text-right" :class="locale === 'en' ? '!text-left' : ''">
+                <span class="text-sm font-bold text-white truncate">
+                  {{ $t('bio_hub.contact_numbers') }}
+                </span>
+                <span class="text-[11px] text-gray-400 font-bold dir-ltr self-start">
+                  {{ contactPhones[0]?.number }}
+                </span>
+              </div>
             </div>
-            <div class="flex flex-col text-right" :class="locale === 'en' ? '!text-left' : ''">
-              <span class="text-sm font-bold text-white group-hover:text-blue-300 transition-colors">
-                {{ $t('bio_hub.call_us') }}
-              </span>
-              <span class="text-[11px] text-gray-400 font-bold dir-ltr self-start">
-                {{ restaurant.social_phone }}
-              </span>
-            </div>
-          </div>
-          <BaseIcon
-            name="arrow-up-right"
-            class="w-4 h-4 text-gray-400 group-hover:text-white transition-colors shrink-0"
-            :class="locale === 'ar' ? '-scale-x-100' : ''"
-          />
-        </a>
 
-        <!-- WhatsApp Direct Card -->
-        <a
-          v-if="whatsappUrl"
-          :href="whatsappUrl"
-          
-          rel="noopener noreferrer"
-          class="w-full p-3.5 rounded-2xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 hover:border-white/20 backdrop-blur-md flex items-center justify-between transition-all duration-200 active:scale-[0.98] group"
-        >
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-green-500/15 border border-green-500/30 text-green-400 flex items-center justify-center shrink-0">
-              <BaseIcon name="whatsapp" class="w-5 h-5 fill-current" />
+            <div class="flex items-center gap-2 shrink-0">
+              <span class="min-w-[24px] h-6 px-2 rounded-full bg-white/10 text-white text-[11px] font-black flex items-center justify-center">
+                {{ contactPhones.length }}
+              </span>
+              <BaseIcon
+                name="chevron-down"
+                class="w-4 h-4 text-gray-300 transition-transform duration-300"
+                :class="contactsOpen ? 'rotate-180' : ''"
+              />
             </div>
-            <div class="flex flex-col text-right" :class="locale === 'en' ? '!text-left' : ''">
-              <span class="text-sm font-bold text-white group-hover:text-green-300 transition-colors">
-                {{ $t('bio_hub.whatsapp') }}
-              </span>
-              <span class="text-[11px] text-gray-400 font-medium">
-                {{ $t('bio_hub.whatsapp_desc') }}
-              </span>
+          </button>
+
+          <div
+            class="grid transition-all duration-300 ease-out"
+            :class="contactsOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'"
+          >
+            <div class="overflow-hidden">
+              <div class="divide-y divide-white/10 border-t border-white/10">
+                <div
+                  v-for="(item, idx) in contactPhones"
+                  :key="idx"
+                  class="px-4 py-3 flex items-center justify-between gap-3"
+                >
+                  <div class="flex flex-col min-w-0 text-right" :class="locale === 'en' ? '!text-left' : ''">
+                    <span class="text-xs font-bold text-white truncate">
+                      {{ item.label }}
+                    </span>
+                    <span class="text-[11px] text-gray-400 font-bold dir-ltr self-start">
+                      {{ item.number }}
+                    </span>
+                  </div>
+                  <div class="flex items-center gap-2 shrink-0">
+                    <a
+                      :href="`tel:${item.number}`"
+                      class="w-9 h-9 rounded-xl bg-blue-500/15 hover:bg-blue-500/30 border border-blue-500/30 text-blue-400 flex items-center justify-center transition-all active:scale-95"
+                      :aria-label="$t('bio_hub.call_us')"
+                      :title="$t('bio_hub.call_us')"
+                    >
+                      <BaseIcon name="phone-call" class="w-4 h-4" />
+                    </a>
+                    <a
+                      v-if="item.whatsappHref"
+                      :href="item.whatsappHref"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="w-9 h-9 rounded-xl bg-green-500/15 hover:bg-green-500/30 border border-green-500/30 text-green-400 flex items-center justify-center transition-all active:scale-95"
+                      :aria-label="$t('bio_hub.whatsapp')"
+                      :title="$t('bio_hub.whatsapp')"
+                    >
+                      <BaseIcon name="whatsapp" solid class="w-4 h-4" />
+                    </a>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-          <BaseIcon
-            name="arrow-up-right"
-            class="w-4 h-4 text-gray-400 group-hover:text-white transition-colors shrink-0"
-            :class="locale === 'ar' ? '-scale-x-100' : ''"
-          />
-        </a>
+        </div>
+
+        <!-- Single-Phone Default Cards (when no additional phones configured) -->
+        <template v-else>
+          <!-- Phone Call Card -->
+          <a
+            v-if="restaurant.social_phone"
+            :href="`tel:${restaurant.social_phone}`"
+            class="w-full p-3.5 rounded-2xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 hover:border-white/20 backdrop-blur-md flex items-center justify-between transition-all duration-200 active:scale-[0.98] group"
+          >
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-blue-500/15 border border-blue-500/30 text-blue-400 flex items-center justify-center shrink-0">
+                <BaseIcon name="phone-call" class="w-5 h-5" />
+              </div>
+              <div class="flex flex-col text-right" :class="locale === 'en' ? '!text-left' : ''">
+                <span class="text-sm font-bold text-white group-hover:text-blue-300 transition-colors">
+                  {{ $t('bio_hub.call_us') }}
+                </span>
+                <span class="text-[11px] text-gray-400 font-bold dir-ltr self-start">
+                  {{ restaurant.social_phone }}
+                </span>
+              </div>
+            </div>
+            <BaseIcon
+              name="arrow-up-right"
+              class="w-4 h-4 text-gray-400 group-hover:text-white transition-colors shrink-0"
+              :class="locale === 'ar' ? '-scale-x-100' : ''"
+            />
+          </a>
+
+          <!-- WhatsApp Direct Card -->
+          <a
+            v-if="whatsappUrl"
+            :href="whatsappUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="w-full p-3.5 rounded-2xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 hover:border-white/20 backdrop-blur-md flex items-center justify-between transition-all duration-200 active:scale-[0.98] group"
+          >
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-green-500/15 border border-green-500/30 text-green-400 flex items-center justify-center shrink-0">
+                <BaseIcon name="whatsapp" solid class="w-5 h-5" />
+              </div>
+              <div class="flex flex-col text-right" :class="locale === 'en' ? '!text-left' : ''">
+                <span class="text-sm font-bold text-white group-hover:text-green-300 transition-colors">
+                  {{ $t('bio_hub.whatsapp') }}
+                </span>
+                <span class="text-[11px] text-gray-400 font-medium">
+                  {{ $t('bio_hub.whatsapp_desc') }}
+                </span>
+              </div>
+            </div>
+            <BaseIcon
+              name="arrow-up-right"
+              class="w-4 h-4 text-gray-400 group-hover:text-white transition-colors shrink-0"
+              :class="locale === 'ar' ? '-scale-x-100' : ''"
+            />
+          </a>
+        </template>
       </div>
 
       <!-- Social Media Section (Instagram, Facebook, TikTok) -->
@@ -244,9 +331,11 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { buildWhatsAppUrl } from '~/utils/helpers';
+
+const contactsOpen = ref(false);
 
 const props = defineProps({
   restaurant: {
@@ -261,7 +350,7 @@ const props = defineProps({
 
 defineEmits(['openMenu']);
 
-const { locale: i18nLocale, setLocale } = useI18n();
+const { t, locale: i18nLocale, setLocale } = useI18n();
 
 const toggleLocale = () => {
   const next = props.locale === 'ar' ? 'en' : 'ar';
@@ -307,6 +396,58 @@ const formatSocialUrl = (platform, value) => {
 const whatsappUrl = computed(() => {
   const number = props.restaurant?.whatsapp_number || props.restaurant?.social_phone;
   return buildWhatsAppUrl(number) || null;
+});
+
+const additionalPhonesNormalized = computed(() => {
+  const raw = props.restaurant?.additional_phones;
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .map((item) => {
+      const number = String(item?.number || '').trim();
+      if (!number) return null;
+      return {
+        label: String(item?.label || '').trim() || t('bio_hub.call_us'),
+        number,
+        whatsappHref: item?.has_whatsapp !== false ? buildWhatsAppUrl(number) : '',
+      };
+    })
+    .filter(Boolean);
+});
+
+const hasAdditionalPhones = computed(() => additionalPhonesNormalized.value.length > 0);
+
+const contactPhones = computed(() => {
+  const list = [];
+  const seen = new Set();
+
+  const pushUnique = (label, number, hasWhatsapp) => {
+    const clean = String(number || '').trim();
+    if (!clean) return;
+    const key = clean.replace(/\D/g, '');
+    if (key && seen.has(key)) return;
+    if (key) seen.add(key);
+    list.push({
+      label,
+      number: clean,
+      whatsappHref: hasWhatsapp ? buildWhatsAppUrl(clean) : '',
+    });
+  };
+
+  const primaryCall = props.restaurant?.social_phone;
+  const primaryWa = props.restaurant?.whatsapp_number;
+
+  if (primaryWa) {
+    pushUnique(t('bio_hub.main_number'), primaryWa, true);
+  }
+  if (primaryCall) {
+    pushUnique(t('bio_hub.call_us'), primaryCall, false);
+  }
+
+  for (const extra of additionalPhonesNormalized.value) {
+    pushUnique(extra.label, extra.number, Boolean(extra.whatsappHref));
+  }
+
+  return list;
 });
 
 const hasAnySocial = computed(() => {
