@@ -122,7 +122,7 @@
             <div class="flex items-center justify-between gap-2">
               <span class="font-bold text-slate-500">{{ $t('plans.current_plan_label') }}:</span>
               <span class="inline-flex items-center gap-1 font-black text-slate-900">
-                {{ $t(isPro ? 'plans.pro_short_name' : isBasic ? 'plans.basic_short_name' : 'plans.free_short_name') }}
+                {{ $t(isTrial ? 'plans.free_trial_badge' : isPro ? 'plans.pro_short_name' : isBasic ? 'plans.basic_short_name' : 'plans.free_short_name') }}
               </span>
             </div>
             <div class="flex items-center justify-between gap-2">
@@ -134,7 +134,7 @@
           </div>
 
           <button
-            v-if="!isPro"
+            v-if="!isPro || isTrial"
             type="button"
             @click="emit('openUpgrade')"
             class="w-full bg-orange-600 hover:bg-orange-500 text-white font-black text-xs py-2.5 px-3 rounded-xl shadow-xs transition-transform active:scale-95 text-center cursor-pointer block"

@@ -1,12 +1,13 @@
 import type { Plan } from "~/types";
+import { isActiveTrialCheck } from "~/utils/helpers";
 
 export const DEFAULT_PLANS: Record<string, Plan> = {
   free: {
     id: "free",
     name_ar: "الباقة المجانية",
     name_en: "Free Plan",
-    max_items: 20,
-    max_categories: 5,
+    max_items: 130,
+    max_categories: -1,
     allow_analytics: false,
     allow_branches: false,
     allow_tables: false,
@@ -23,7 +24,7 @@ export const DEFAULT_PLANS: Record<string, Plan> = {
     id: "basic",
     name_ar: "الباقة الأساسية",
     name_en: "Basic Plan",
-    max_items: -1,
+    max_items: 100,
     max_categories: -1,
     allow_analytics: true,
     allow_branches: false,
@@ -41,7 +42,7 @@ export const DEFAULT_PLANS: Record<string, Plan> = {
     id: "pro",
     name_ar: "الباقة الاحترافية",
     name_en: "Pro Plan",
-    max_items: -1,
+    max_items: 130,
     max_categories: -1,
     allow_analytics: true,
     allow_branches: true,
@@ -70,37 +71,60 @@ export const usePlan = () => {
     );
   });
 
+  const isActiveTrial = computed<boolean>(() =>
+    isActiveTrialCheck(authStore.profile),
+  );
+
+  const effectivePlanId = computed<string>(() =>
+    isActiveTrial.value ? "pro" : currentPlanId.value,
+  );
+
   const currentPlan = computed<Plan>(() => {
-    let planData: Plan = DEFAULT_PLANS[currentPlanId.value] || DEFAULT_PLANS.free;
-    if (authStore.profile?.plan) {
-      planData = { ...planData, ...authStore.profile.plan };
-    } else if (authStore.profile?.plans) {
-      planData = { ...planData, ...authStore.profile.plans };
+    const basePlan: Plan =
+      DEFAULT_PLANS[effectivePlanId.value] || DEFAULT_PLANS.free;
+    let planData: Plan = { ...basePlan };
+
+    if (!isActiveTrial.value) {
+      if (authStore.profile?.plan) {
+        planData = { ...planData, ...authStore.profile.plan };
+      } else if (authStore.profile?.plans) {
+        planData = { ...planData, ...authStore.profile.plans };
+      }
     }
+
+    const hasProTier = effectivePlanId.value === "pro";
+
     return {
       ...planData,
+      max_items: basePlan.max_items,
+      max_categories: basePlan.max_categories,
       allow_shifts: true,
-      allow_users: currentPlanId.value === "pro" || Boolean(planData.allow_users),
-      allow_bio_hub: currentPlanId.value === "pro" || Boolean(planData.allow_bio_hub),
+      allow_users: hasProTier || Boolean(planData.allow_users),
+      allow_bio_hub: hasProTier || Boolean(planData.allow_bio_hub),
     };
   });
 
   const maxItems = computed<number>(() => {
-    if (
-      authStore.profile?.max_items !== undefined &&
-      authStore.profile?.max_items !== null
-    ) {
-      return authStore.profile.max_items;
+    const customMax = authStore.profile?.max_items;
+    if (customMax !== undefined && customMax !== null) {
+      if (isActiveTrial.value && customMax === 20) {
+        return DEFAULT_PLANS.pro.max_items;
+      }
+      if (currentPlanId.value === "free" && customMax === 20) {
+        return DEFAULT_PLANS.free.max_items;
+      }
+      return customMax;
     }
     return currentPlan.value.max_items;
   });
 
   const maxCategories = computed<number>(() => {
-    if (
-      authStore.profile?.max_categories !== undefined &&
-      authStore.profile?.max_categories !== null
-    ) {
-      return authStore.profile.max_categories;
+    const customMax = authStore.profile?.max_categories;
+    if (customMax !== undefined && customMax !== null) {
+      if ((isActiveTrial.value || currentPlanId.value === "free") && customMax === 5) {
+        return -1;
+      }
+      return customMax;
     }
     return currentPlan.value.max_categories;
   });
@@ -117,16 +141,21 @@ export const usePlan = () => {
 
   const can = (featureKey: keyof Plan) => {
     if (featureKey === "allow_shifts") return true;
-    if (featureKey === "allow_bio_hub") return currentPlanId.value === "pro" || Boolean(currentPlan.value.allow_bio_hub);
+    if (isActiveTrial.value) return true;
+    if (featureKey === "allow_bio_hub") {
+      return effectivePlanId.value === "pro" || Boolean(currentPlan.value.allow_bio_hub);
+    }
     return Boolean(currentPlan.value[featureKey]);
   };
 
   const isFree = computed(() => currentPlanId.value === "free");
   const isBasic = computed(() => currentPlanId.value === "basic");
-  const isPro = computed(() => currentPlanId.value === "pro");
+  const isPro = computed(() => currentPlanId.value === "pro" || isActiveTrial.value);
 
   return {
     currentPlanId,
+    effectivePlanId,
+    isActiveTrial,
     currentPlan,
     maxItems,
     maxCategories,

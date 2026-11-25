@@ -469,14 +469,18 @@ const isActuallyOpen = computed(() => {
 // Subscription expiration check
 const isSubscriptionExpired = computed(() => isSubscriptionExpiredCheck(restaurant.value));
 
-const activePlanId = computed(() => resolvePlanId(restaurant.value));
+const activePlanId = computed(() =>
+  isActiveTrialCheck(restaurant.value) ? "pro" : resolvePlanId(restaurant.value)
+);
 
 // Ordering enabled toggle from restaurant settings
 const isWhatsappOrderingAllowed = computed(() => {
   if (!restaurant.value || isSubscriptionExpired.value) return false;
   const p = restaurant.value;
-  const allowsWhatsapp = p.plans?.allow_whatsapp_orders ?? p.plan?.allow_whatsapp_orders ?? (activePlanId.value === "pro");
-  return Boolean(allowsWhatsapp) && p.whatsapp_ordering_enabled !== false;
+  const allowsWhatsapp =
+    activePlanId.value === "pro" ||
+    Boolean(p.plans?.allow_whatsapp_orders ?? p.plan?.allow_whatsapp_orders);
+  return allowsWhatsapp && p.whatsapp_ordering_enabled !== false;
 });
 
 // Electronic payments allowed only for Pro plan
@@ -501,8 +505,10 @@ const showBioHub = ref(true);
 const isBioHubAllowed = computed(() => {
   if (!restaurant.value) return false;
   const p = restaurant.value;
-  const allowsBio = p.plans?.allow_bio_hub ?? p.plan?.allow_bio_hub ?? (activePlanId.value === "pro");
-  return Boolean(allowsBio) && p.bio_hub_enabled === true;
+  const allowsBio =
+    activePlanId.value === "pro" ||
+    Boolean(p.plans?.allow_bio_hub ?? p.plan?.allow_bio_hub);
+  return allowsBio && p.bio_hub_enabled === true;
 });
 
 const shouldDisplayBioHub = computed(() => {

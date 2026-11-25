@@ -112,6 +112,17 @@ export function isSubscriptionExpiredCheck(
 }
 
 /**
+ * Checks whether a restaurant/profile is currently in an active (non-expired) free trial.
+ */
+export function isActiveTrialCheck(
+  profile: Record<string, any> | null | undefined
+): boolean {
+  if (!profile) return false
+  const status = String(profile.subscription_status || '').toLowerCase()
+  return status === 'trial' && !isSubscriptionExpiredCheck(profile)
+}
+
+/**
  * Checks whether a role belongs to the platform owner.
  */
 export function isPlatformOwnerRole(role?: string | null): boolean {

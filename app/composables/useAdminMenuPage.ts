@@ -38,8 +38,9 @@ export function useAdminMenuPage() {
   }
 
   const maxItems = computed(() => {
-    if (profile.value?.max_items !== undefined && profile.value?.max_items !== null) {
-      return profile.value.max_items
+    const customMax = profile.value?.max_items
+    if (customMax !== undefined && customMax !== null && customMax !== 20) {
+      return customMax
     }
     return planMaxItems.value
   })
@@ -239,6 +240,12 @@ export function useAdminMenuPage() {
   const openAddModal = () => {
     if (isItemLimitReached.value) {
       $toast.error(t('plans.items_limit_toast', { max: maxItems.value }))
+      upgradeModalConfig.value = {
+        limitType: 'items',
+        title: t('plans.items_limit_custom_title'),
+        badgeText: t('plans.custom_plan_badge'),
+        message: t('plans.items_limit_custom_msg', { max: maxItems.value }),
+      }
       showUpgradeModal.value = true
       return
     }

@@ -2,9 +2,9 @@ const PLAN_LIMITS: Record<
   string,
   { max_items: number | null; max_categories: number | null }
 > = {
-  free: { max_items: 20, max_categories: 5 },
-  basic: { max_items: null, max_categories: null },
-  pro: { max_items: null, max_categories: null },
+  free: { max_items: 130, max_categories: null },
+  basic: { max_items: 100, max_categories: null },
+  pro: { max_items: 130, max_categories: null },
 };
 
 export default defineEventHandler(async (event) => {

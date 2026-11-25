@@ -20,8 +20,8 @@
           </span>
         </div>
         <p class="text-xs text-gray-500 font-medium mt-1">
-          <template v-if="isFree">
-            {{ $t("plans.allowed_limit", { items: currentPlan.max_items, categories: currentPlan.max_categories }) }}
+          <template v-if="currentPlan.max_items && currentPlan.max_items > 0">
+            {{ $t("plans.items_cap_summary", { items: currentPlan.max_items }) }} • {{ $t("plans.all_features_active") }}
           </template>
           <template v-else>
             {{ $t("plans.unlimited_items_cats") }} • {{ $t("plans.all_features_active") }}
@@ -31,7 +31,7 @@
     </div>
 
     <button
-      v-if="!isPro"
+      v-if="!isPro || isFree"
       type="button"
       @click="emit('openUpgrade', $t('plans.full_upgrade_title'), $t('plans.full_upgrade_badge'), $t('plans.full_upgrade_msg'))"
       class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-500 hover:to-amber-400 text-white font-black text-xs md:text-sm py-2.5 px-5 rounded-xl shadow-md shadow-orange-500/15 transition-transform active:scale-95 cursor-pointer whitespace-nowrap"
