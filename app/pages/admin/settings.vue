@@ -1,13 +1,14 @@
 <template>
-  <div class="max-w-3xl mx-auto py-4 md:py-8" dir="rtl">
+  <div class="max-w-3xl mx-auto py-4 md:py-8 pb-24" dir="rtl">
     <div class="bg-white p-6 md:p-10 rounded-[2.5rem] shadow-sm border border-gray-50">
-      <div class="flex items-center gap-4 mb-8">
-        <div class="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center">
-          <BaseIcon name="settings" class="w-7 h-7 text-orange-600" />
+      <!-- Header -->
+      <div class="flex items-center gap-4 mb-6">
+        <div class="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center shrink-0">
+          <BaseIcon :name="currentSection.icon" class="w-7 h-7 text-orange-600" />
         </div>
         <div>
-          <h2 class="text-2xl font-bold text-gray-800">{{ $t("admin.settings_title") }}</h2>
-          <p class="text-sm text-gray-400 font-bold mt-1">{{ $t("admin.settings_subtitle") }}</p>
+          <h2 class="text-2xl font-bold text-gray-800">{{ $t(currentSection.labelKey) }}</h2>
+          <p class="text-sm text-gray-400 font-bold mt-1">{{ $t(currentSection.subtitleKey) }}</p>
         </div>
       </div>
 
@@ -19,7 +20,8 @@
         @openUpgrade="openUpgradeForFeature"
       />
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Tab 1: Brand & Look -->
+      <div v-show="activeTab === 'identity'" class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <AdminSettingsBasicIdentityCard
           :form="form"
           :logoUploading="logoUploading"
@@ -32,13 +34,15 @@
 
         <AdminSettingsBrandingColorsCard :form="form" />
 
-        <AdminSettingsShiftsCard
-          :shifts="restaurantShiftsList"
-          :newShift="newShiftForm"
-          @add="handleAddNewShift"
-          @remove="handleRemoveShift"
+        <AdminSettingsAnnouncementCard
+          :form="form"
+          :isPro="isPro"
+          @openUpgrade="openUpgradeForFeature"
         />
+      </div>
 
+      <!-- Tab 2: Operations & Orders -->
+      <div v-show="activeTab === 'operations'" class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <AdminSettingsAvailabilityCard
           :form="form"
           :canAllowCustomHours="can('allow_custom_hours')"
@@ -52,36 +56,16 @@
           @openUpgrade="openUpgradeForFeature"
         />
 
-        <AdminSettingsBioHubCard
-          :form="form"
-          :canAllowBioHub="can('allow_bio_hub')"
-          @openUpgrade="openUpgradeForFeature"
+        <AdminSettingsShiftsCard
+          :shifts="restaurantShiftsList"
+          :newShift="newShiftForm"
+          @add="handleAddNewShift"
+          @remove="handleRemoveShift"
         />
+      </div>
 
-        <AdminSettingsAnnouncementCard
-          :form="form"
-          :isPro="isPro"
-          @openUpgrade="openUpgradeForFeature"
-        />
-
-        <AdminSettingsCategoriesCard
-          v-model:newCategory="newCategory"
-          v-model:editingName="editingCategoryName"
-          :categories="form.categories"
-          :maxCategories="maxCategories"
-          :isCategoryLimitReached="isCategoryLimitReached"
-          :isPlanFree="isFree"
-          :loading="profileLoading || !profile"
-          :editingIndex="editingCategoryIndex"
-          @add="addCategory"
-          @move="moveCategory"
-          @startEdit="startEditCategory"
-          @saveEdit="saveCategoryName"
-          @cancelEdit="cancelEditCategory"
-          @remove="initiateRemoveCategory"
-          @openUpgrade="openUpgradeForCategories"
-        />
-
+      <!-- Tab 3: Delivery & Payments -->
+      <div v-show="activeTab === 'delivery'" class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <AdminSettingsDeliveryAreasCard
           v-model:newArea="newDeliveryArea"
           :canAllowBranches="can('allow_branches')"
@@ -100,7 +84,17 @@
         />
       </div>
 
-      <div class="mt-10">
+      <!-- Tab 4: Bio Hub & Contact -->
+      <div v-show="activeTab === 'biohub'" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <AdminSettingsBioHubCard
+          :form="form"
+          :canAllowBioHub="can('allow_bio_hub')"
+          @openUpgrade="openUpgradeForFeature"
+        />
+      </div>
+
+      <!-- Sticky Save Bar -->
+      <div class="sticky bottom-3 z-30 mt-8 bg-white/90 backdrop-blur-md p-2.5 rounded-2xl border border-gray-100 shadow-lg shadow-slate-900/5">
         <BaseButton
           variant="primary"
           size="lg"
@@ -113,29 +107,6 @@
         </BaseButton>
       </div>
     </div>
-
-    <!-- Delete Category Confirmation Modal -->
-    <BaseModal
-      :isOpen="showDeleteCategoryModal"
-      @close="showDeleteCategoryModal = false"
-      :title="$t('admin.delete_category_title')"
-      :subtitle="$t('admin.delete_category_subtitle')"
-      icon="trash"
-      iconColor="bg-red-50 text-red-600"
-      :showClose="false"
-      max-width="max-w-sm"
-    >
-      <template #footer>
-        <div class="flex gap-3">
-          <BaseButton variant="secondary" fullWidth @click="showDeleteCategoryModal = false">
-            {{ $t("common.cancel") }}
-          </BaseButton>
-          <BaseButton variant="danger" fullWidth @click="confirmRemoveCategory">
-            {{ $t("common.confirm_delete") }}
-          </BaseButton>
-        </div>
-      </template>
-    </BaseModal>
 
     <!-- Upgrade Plan Modal -->
     <UpgradeModal
@@ -152,12 +123,49 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 definePageMeta({ layout: "admin", middleware: "auth" });
+
+const route = useRoute();
+
+const settingsTabs = [
+  {
+    key: "identity",
+    icon: "sparkles",
+    labelKey: "admin.settings_tab_identity",
+    subtitleKey: "admin.settings_subtitle_identity",
+  },
+  {
+    key: "operations",
+    icon: "clock",
+    labelKey: "admin.settings_tab_operations",
+    subtitleKey: "admin.settings_subtitle_operations",
+  },
+  {
+    key: "delivery",
+    icon: "wallet",
+    labelKey: "admin.settings_tab_delivery",
+    subtitleKey: "admin.settings_subtitle_delivery",
+  },
+  {
+    key: "biohub",
+    icon: "link",
+    labelKey: "admin.settings_tab_biohub",
+    subtitleKey: "admin.settings_subtitle_biohub",
+  },
+];
+
+const activeTab = computed(() => {
+  const q = typeof route.query.tab === "string" ? route.query.tab : "";
+  return settingsTabs.some((t) => t.key === q) ? q : "identity";
+});
+
+const currentSection = computed(
+  () => settingsTabs.find((t) => t.key === activeTab.value) ?? settingsTabs[0]!
+);
 
 const {
   profile,
-  profileLoading,
   actionLoading,
   logoUploading,
   isFree,
@@ -174,21 +182,8 @@ const {
   saveSettings,
   showUpgradeModal,
   upgradeModalConfig,
-  openUpgradeForCategories,
   openUpgradeForFeature,
   maxCategories,
-  isCategoryLimitReached,
-  newCategory,
-  editingCategoryIndex,
-  editingCategoryName,
-  showDeleteCategoryModal,
-  addCategory,
-  startEditCategory,
-  cancelEditCategory,
-  saveCategoryName,
-  moveCategory,
-  initiateRemoveCategory,
-  confirmRemoveCategory,
   newDeliveryArea,
   addDeliveryArea,
   removeDeliveryArea,

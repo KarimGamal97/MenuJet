@@ -230,7 +230,19 @@ export function useSettingsForm() {
   const showDeleteCategoryModal = ref(false)
   const categoryToDeleteIndex = ref<number | null>(null)
 
-  const addCategory = () => {
+  const persistCategories = async () => {
+    if (!ownerId.value) return
+    const nextCategories = [...form.value.categories]
+    const success = await updateProfile(ownerId.value, { categories: nextCategories })
+    if (success) {
+      const authStore = useAuthStore()
+      if (authStore.profile) {
+        authStore.profile = { ...authStore.profile, categories: nextCategories }
+      }
+    }
+  }
+
+  const addCategory = async () => {
     const cat = newCategory.value.trim()
     if (!cat) return $toast.error(t('admin.error_fields'))
     if (form.value.categories.includes(cat)) return $toast.error(t('admin.category_exists'))
@@ -243,6 +255,7 @@ export function useSettingsForm() {
 
     form.value.categories.push(cat)
     newCategory.value = ''
+    await persistCategories()
   }
 
   const startEditCategory = (index: number) => {
@@ -276,9 +289,10 @@ export function useSettingsForm() {
     if (ownerId.value && oldName) {
       await updateItemsCategory(oldName, newName, ownerId.value)
     }
+    await persistCategories()
   }
 
-  const moveCategory = (index: number, direction: number) => {
+  const moveCategory = async (index: number, direction: number) => {
     const newIndex = index + direction
     if (newIndex < 0 || newIndex >= form.value.categories.length) return
 
@@ -287,6 +301,7 @@ export function useSettingsForm() {
     cats[index] = cats[newIndex]!
     cats[newIndex] = temp!
     form.value.categories = cats
+    await persistCategories()
   }
 
   const initiateRemoveCategory = (index: number) => {
@@ -310,6 +325,7 @@ export function useSettingsForm() {
     }
     categoryToDeleteIndex.value = null
     showDeleteCategoryModal.value = false
+    await persistCategories()
   }
 
   // Delivery areas actions

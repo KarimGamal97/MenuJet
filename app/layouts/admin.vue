@@ -63,7 +63,7 @@
         <span class="font-black text-orange-600">MenuJet</span>
       </header>
 
-      <main dir="ltr" class="flex-1 p-4 md:p-10 overflow-y-auto">
+      <main dir="ltr" class="flex-1 p-4 md:p-10 overflow-y-auto custom-scrollbar">
         <slot />
       </main>
     </div>
