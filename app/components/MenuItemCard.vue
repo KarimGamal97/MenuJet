@@ -17,19 +17,33 @@
     </span>
 
     <div class="flex items-center gap-4 text-right min-w-0 flex-1">
-      <div class="relative shrink-0">
-        <img
-          v-if="item.image && !imageError"
-          :src="item.image"
-          @error="imageError = true"
-          class="w-16 h-16 rounded-2xl object-cover bg-gray-100 shadow-sm transition-transform group-hover:scale-105 border border-gray-50 shrink-0"
-        />
+      <div
+        v-if="item.image && !imageError"
+        class="relative w-16 h-16 rounded-2xl overflow-hidden bg-gray-100 shadow-sm border border-gray-50 shrink-0"
+      >
         <div
-          v-else
-          class="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-300 border border-gray-100 shrink-0"
+          v-if="!imageLoaded"
+          class="absolute inset-0 bg-gradient-to-br from-gray-200 via-gray-100 to-gray-200 animate-pulse flex items-center justify-center z-10"
         >
-          <BaseIcon name="photo" class="w-8 h-8 text-gray-300" />
+          <BaseIcon name="photo" class="w-6 h-6 text-gray-300/80" />
         </div>
+        <img
+          ref="imgRef"
+          :src="item.image"
+          :alt="item.name"
+          loading="lazy"
+          decoding="async"
+          @load="imageLoaded = true"
+          @error="imageError = true; imageLoaded = true"
+          class="w-full h-full object-cover transition-all duration-300 group-hover:scale-105"
+          :class="imageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-95'"
+        />
+      </div>
+      <div
+        v-else
+        class="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-300 border border-gray-100 shrink-0"
+      >
+        <BaseIcon name="photo" class="w-8 h-8 text-gray-300" />
       </div>
 
       <div class="min-w-0 flex-1">
@@ -105,7 +119,20 @@
 
 <script setup>
 const { addToCart } = useCart();
+const imgRef = ref(null);
 const imageError = ref(false);
+const imageLoaded = ref(false);
+
+const syncImageState = () => {
+  const el = imgRef.value;
+  if (el && el.complete && el.naturalWidth > 0) {
+    imageLoaded.value = true;
+  }
+};
+
+onMounted(() => {
+  syncImageState();
+});
 
 const props = defineProps({
   item: {
@@ -127,6 +154,15 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["edit", "delete", "select"]);
+
+watch(
+  () => props.item.image,
+  () => {
+    imageError.value = false;
+    imageLoaded.value = false;
+    nextTick(syncImageState);
+  }
+);
 
 const displayPrice = computed(() => {
   if (props.item.prices && typeof props.item.prices === 'object') {

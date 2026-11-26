@@ -144,19 +144,13 @@
                 @click="selectCategory(cat, $event)"
                 :style="activeCategory === cat ? { backgroundColor: 'white', color: primaryColor } : { backgroundColor: 'rgba(255,255,255,0.22)', color: 'white' }"
                 :class="[
-                  'px-5 py-2 rounded-2xl font-black whitespace-nowrap text-xs sm:text-sm transition-all duration-300 shrink-0 flex items-center gap-2 border border-white/20 active:scale-95 cursor-pointer',
+                  'h-9 px-5 rounded-2xl font-black whitespace-nowrap text-xs sm:text-sm transition-all duration-300 shrink-0 inline-flex items-center justify-center leading-none border border-white/20 active:scale-95 cursor-pointer',
                   activeCategory === cat
                     ? 'shadow-lg shadow-black/10 -translate-y-0.5'
                     : 'hover:bg-white/30 backdrop-blur-sm',
                 ]"
               >
-                <BaseIcon 
-                  v-if="activeCategory === cat" 
-                  name="check" 
-                  class="w-3.5 h-3.5 animate-in zoom-in duration-200" 
-                  :style="{ color: primaryColor }"
-                />
-                {{ cat }}
+                <span class="inline-block leading-none translate-y-[1px]">{{ cat }}</span>
               </button>
             </div>
 
@@ -222,19 +216,39 @@
           </div>
         </div>
 
-        <!-- 2. Items List -->
+        <!-- 2. Items List (Progressive 5 + 4 smooth reveal on scroll) -->
         <section
           v-else-if="filteredItems.length > 0"
           key="items-list"
           class="flex flex-col gap-3 pb-32"
         >
-          <MenuItemCard
-            v-for="item in filteredItems"
-            :key="item.id"
-            :item="item"
-            :allowOrdering="canOrder"
-            @select="openItemModal"
-          />
+          <div
+            v-for="(item, idx) in displayedItems"
+            :key="`${activeCategory}-${item.id}`"
+            class="menu-card-reveal"
+            :style="{ animationDelay: `${(idx >= 5 ? (idx - 5) % 4 : idx) * 45}ms` }"
+          >
+            <MenuItemCard
+              :item="item"
+              :allowOrdering="canOrder"
+              @select="openItemModal"
+            />
+          </div>
+
+          <!-- Scroll sentinel for progressive 4-by-4 loading -->
+          <div
+            v-if="hasMoreItems"
+            ref="loadMoreTrigger"
+            class="bg-white/70 p-4 rounded-[2rem] border border-gray-100/80 flex items-center gap-4 animate-pulse"
+            aria-hidden="true"
+          >
+            <div class="w-16 h-16 rounded-2xl bg-gray-100 shrink-0"></div>
+            <div class="flex-1 space-y-2.5">
+              <div class="w-1/2 h-4 bg-gray-100 rounded-lg"></div>
+              <div class="w-3/4 h-3 bg-gray-50 rounded-lg"></div>
+              <div class="w-1/4 h-4 bg-gray-100 rounded-lg"></div>
+            </div>
+          </div>
         </section>
 
         <!-- 3. No Results -->
@@ -606,10 +620,14 @@ onMounted(() => {
 });
 
 let categoriesObserver = null;
+let loadMoreObserver = null;
+let loadMoreTimer = null;
 
 onUnmounted(() => {
   if (placeholderTimer) clearInterval(placeholderTimer);
+  if (loadMoreTimer) clearTimeout(loadMoreTimer);
   if (categoriesObserver) categoriesObserver.disconnect();
+  if (loadMoreObserver) loadMoreObserver.disconnect();
   if (process.client) {
     window.removeEventListener("resize", checkCategoryScroll);
   }
@@ -699,6 +717,9 @@ const selectCategory = (cat, event) => {
       block: 'nearest',
     });
   }
+  if (process.client && window.scrollY > 90) {
+    window.scrollTo({ top: 80, behavior: 'smooth' });
+  }
   setTimeout(checkCategoryScroll, 350);
 };
 
@@ -753,6 +774,63 @@ const filteredItems = computed(() => {
 
   return items;
 });
+
+const INITIAL_VISIBLE_COUNT = 5;
+const LOAD_MORE_STEP = 4;
+const visibleCount = ref(INITIAL_VISIBLE_COUNT);
+const loadMoreTrigger = ref(null);
+let isSentinelVisible = false;
+
+const hasMoreItems = computed(() => visibleCount.value < filteredItems.value.length);
+
+const displayedItems = computed(() =>
+  filteredItems.value.slice(0, visibleCount.value)
+);
+
+const loadNextBatch = () => {
+  if (!hasMoreItems.value) return;
+  visibleCount.value = Math.min(
+    visibleCount.value + LOAD_MORE_STEP,
+    filteredItems.value.length
+  );
+  if (process.client) {
+    nextTick(() => {
+      if (isSentinelVisible && hasMoreItems.value && loadMoreTrigger.value) {
+        const rect = loadMoreTrigger.value.getBoundingClientRect();
+        if (rect.top <= window.innerHeight + 80) {
+          if (loadMoreTimer) clearTimeout(loadMoreTimer);
+          loadMoreTimer = setTimeout(loadNextBatch, 140);
+        }
+      }
+    });
+  }
+};
+
+watch(loadMoreTrigger, (newEl, oldEl) => {
+  if (oldEl && loadMoreObserver) {
+    loadMoreObserver.disconnect();
+  }
+  isSentinelVisible = false;
+  if (newEl && process.client && typeof IntersectionObserver !== "undefined") {
+    loadMoreObserver = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (!entry) return;
+        isSentinelVisible = entry.isIntersecting;
+        if (entry.isIntersecting) {
+          loadNextBatch();
+        }
+      },
+      { root: null, rootMargin: "80px 0px", threshold: 0.05 }
+    );
+    loadMoreObserver.observe(newEl);
+  }
+});
+
+watch([activeCategory, searchQuery], () => {
+  if (loadMoreTimer) clearTimeout(loadMoreTimer);
+  visibleCount.value = INITIAL_VISIBLE_COUNT;
+});
 </script>
 
 <style scoped>
@@ -799,6 +877,21 @@ const filteredItems = computed(() => {
   white-space: nowrap;
   animation: marquee-scroll 24s linear infinite;
   will-change: transform;
+}
+
+@keyframes menu-card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.menu-card-reveal {
+  animation: menu-card-enter 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 </style>
 

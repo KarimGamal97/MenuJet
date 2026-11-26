@@ -19,11 +19,24 @@
         >
           <!-- Item Image / Header -->
           <div class="relative h-52 bg-gray-100 overflow-hidden">
-            <img
-              v-if="item.image"
-              :src="item.image"
-              class="w-full h-full object-cover"
-            />
+            <template v-if="item.image && !modalImgError">
+              <div
+                v-if="!modalImgLoaded"
+                class="absolute inset-0 bg-gradient-to-br from-gray-200 via-gray-100 to-gray-200 animate-pulse flex items-center justify-center z-10"
+              >
+                <BaseIcon name="photo" class="w-12 h-12 text-gray-300/80" />
+              </div>
+              <img
+                ref="modalImgRef"
+                :src="item.image"
+                :alt="item.name"
+                decoding="async"
+                @load="modalImgLoaded = true"
+                @error="modalImgError = true; modalImgLoaded = true"
+                class="w-full h-full object-cover transition-opacity duration-300"
+                :class="modalImgLoaded ? 'opacity-100' : 'opacity-0'"
+              />
+            </template>
             <div
               v-else
               class="w-full h-full flex items-center justify-center bg-gradient-to-br from-orange-50 to-gray-50"
@@ -295,6 +308,16 @@ const notes = ref("");
 const showNotes = ref(false);
 const showExtras = ref(false);
 const selectedExtras = ref([]);
+const modalImgRef = ref(null);
+const modalImgLoaded = ref(false);
+const modalImgError = ref(false);
+
+const syncModalImage = () => {
+  const el = modalImgRef.value;
+  if (el && el.complete && el.naturalWidth > 0) {
+    modalImgLoaded.value = true;
+  }
+};
 
 const toggleExtra = (extra) => {
   const index = selectedExtras.value.findIndex(e => e.name === extra.name);
@@ -346,6 +369,9 @@ watch(
   () => props.isOpen,
   (val) => {
     if (val) {
+      modalImgError.value = false;
+      modalImgLoaded.value = false;
+      nextTick(syncModalImage);
       qty.value = 1;
       notes.value = "";
       showNotes.value = false;

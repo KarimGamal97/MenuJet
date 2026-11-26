@@ -32,9 +32,9 @@
           <!-- Status Badge below Logo -->
           <div
             v-if="isOpen !== false"
-            class="flex items-center gap-1.5 bg-green-50 px-2 py-0.5 rounded-full"
+            class="inline-flex items-center gap-1.5 bg-green-50 h-5 px-2.5 rounded-full leading-none"
           >
-            <span class="relative flex h-1.5 w-1.5">
+            <span class="relative flex h-1.5 w-1.5 shrink-0">
               <span
                 class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"
               ></span>
@@ -43,18 +43,18 @@
               ></span>
             </span>
             <span
-              class="text-[9px] font-black text-green-600 whitespace-nowrap uppercase tracking-tight"
+              class="text-[10px] leading-none translate-y-[1px] font-black text-green-600 whitespace-nowrap uppercase tracking-tight"
             >
               {{ $t("admin.status_available") }}
             </span>
           </div>
           <div
             v-else
-            class="flex items-center gap-1.5 bg-gray-50 px-2 py-0.5 rounded-full opacity-70"
+            class="inline-flex items-center gap-1.5 bg-gray-50 h-5 px-2.5 rounded-full leading-none opacity-70"
           >
-            <span class="inline-flex rounded-full h-1.5 w-1.5 bg-gray-300"></span>
+            <span class="inline-flex rounded-full h-1.5 w-1.5 bg-gray-300 shrink-0"></span>
             <span
-              class="text-[9px] font-black text-gray-400 whitespace-nowrap uppercase tracking-tight"
+              class="text-[10px] leading-none translate-y-[1px] font-black text-gray-400 whitespace-nowrap uppercase tracking-tight"
             >
               {{ $t("admin.status_closed") }}
             </span>

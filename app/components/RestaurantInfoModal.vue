@@ -64,17 +64,17 @@
             <!-- Status Badge -->
             <div
               v-if="isOpenNow"
-              class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-black border border-emerald-100 mt-1"
+              class="inline-flex items-center gap-1.5 h-6 px-3 rounded-full leading-none bg-emerald-50 text-emerald-700 text-xs font-black border border-emerald-100 mt-1"
             >
-              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span>{{ $t("menu.open_now") }}</span>
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+              <span class="leading-none translate-y-[1px]">{{ $t("menu.open_now") }}</span>
             </div>
             <div
               v-else
-              class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-black border border-gray-200 mt-1"
+              class="inline-flex items-center gap-1.5 h-6 px-3 rounded-full leading-none bg-gray-100 text-gray-600 text-xs font-black border border-gray-200 mt-1"
             >
-              <span class="w-2 h-2 rounded-full bg-gray-400"></span>
-              <span>{{ $t("menu.closed_now") }}</span>
+              <span class="w-2 h-2 rounded-full bg-gray-400 shrink-0"></span>
+              <span class="leading-none translate-y-[1px]">{{ $t("menu.closed_now") }}</span>
             </div>
 
             <p
