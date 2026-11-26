@@ -38,7 +38,7 @@
         v-else-if="shouldDisplayBioHub"
         :restaurant="restaurant"
         :locale="locale"
-        @open-menu="showBioHub = false"
+        @open-menu="handleEnterMenu"
       />
 
       <template v-else>
@@ -319,7 +319,7 @@
         :restaurant="restaurant"
         :primaryColor="primaryColor"
         :isBioHubAllowed="isBioHubAllowed"
-        @open-bio-hub="showBioHub = true; showInfoModal = false"
+        @open-bio-hub="handleOpenBioHub"
         @close="showInfoModal = false"
       />
 
@@ -350,11 +350,11 @@
 <script setup>
 import { buildWhatsAppUrl } from "~/utils/helpers";
 
-const { locale } = useI18n();
+const { locale, t } = useI18n();
 const route = useRoute();
 const client = useSupabaseClient();
 const { $toast } = useNuxtApp();
-const { cartCount, totalPrice, startEditingOrder } = useCart();
+const { cartCount, totalPrice, startEditingOrder, initCartForRestaurant } = useCart();
 
 const restaurantIdentifier = computed(
   () => restaurant.value?.user_id || restaurant.value?.id || String(route.params.slug || "")
@@ -433,6 +433,26 @@ const currentTimeStr = ref("");
 onMounted(() => {
   if (process.client) {
     loadHistory();
+    const slug = String(route.params.slug || "");
+    const hadSavedCart = initCartForRestaurant(slug);
+    if (hadSavedCart) {
+      showBioHub.value = false;
+      try {
+        sessionStorage.setItem(`menujet_menu_active_${slug}`, "1");
+      } catch {}
+      if ($toast) {
+        $toast(t("cart.continue_order"), {
+          id: "restore-cart",
+          duration: 4500,
+          action: {
+            label: t("cart.title"),
+            onClick: () => {
+              showCart.value = true;
+            },
+          },
+        });
+      }
+    }
   }
   const updateTime = () => {
     const now = new Date();
@@ -515,7 +535,54 @@ const showAnnouncement = computed(() => {
 });
 
 // Bio / Welcome Hub allowed and enabled
+const hasInitialMenuSession = () => {
+  if (typeof window === "undefined") return false;
+  try {
+    const slug = String(route.params.slug || "");
+    if (!slug) return false;
+    if (sessionStorage.getItem(`menujet_menu_active_${slug}`) === "1") return true;
+    const raw = localStorage.getItem(`menujet_cart_${slug}`);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (
+        parsed?.updatedAt &&
+        Date.now() - Number(parsed.updatedAt) <= 2 * 60 * 60 * 1000 &&
+        Array.isArray(parsed.items) &&
+        parsed.items.length > 0
+      ) {
+        return true;
+      }
+    }
+  } catch {}
+  return false;
+};
+
 const showBioHub = ref(true);
+
+onMounted(() => {
+  if (hasInitialMenuSession()) {
+    showBioHub.value = false;
+  }
+});
+
+const handleEnterMenu = () => {
+  showBioHub.value = false;
+  if (typeof window !== "undefined") {
+    try {
+      sessionStorage.setItem(`menujet_menu_active_${String(route.params.slug || "")}`, "1");
+    } catch {}
+  }
+};
+
+const handleOpenBioHub = () => {
+  showBioHub.value = true;
+  showInfoModal.value = false;
+  if (typeof window !== "undefined") {
+    try {
+      sessionStorage.removeItem(`menujet_menu_active_${String(route.params.slug || "")}`);
+    } catch {}
+  }
+};
 const isBioHubAllowed = computed(() => {
   if (!restaurant.value) return false;
   const p = restaurant.value;

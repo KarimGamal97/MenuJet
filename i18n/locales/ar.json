@@ -530,6 +530,8 @@
   "cart": {
     "title": "طلبك",
     "empty": "سلة الطلبات فارغة",
+    "continue_order": "استكمال الطلب",
+    "clear_cart": "تفريغ السلة",
     "order_whatsapp": "اطلب عبر واتساب",
     "order_cashier": "اطلب عند الكاشير",
     "whatsapp_msg_header": "طلب جديد",

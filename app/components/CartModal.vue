@@ -19,12 +19,23 @@
             <span v-if="editingOrder">{{ locale === 'ar' ? `تعديل الطلب #${editingOrder.id}` : `Edit Order #${editingOrder.id}` }}</span>
             <span v-else>{{ $t("cart.title") }}</span>
           </h2>
-          <button
-            @click="handleCloseCart"
-            class="w-9 h-9 flex items-center justify-center rounded-2xl bg-gray-100 text-gray-400 hover:bg-gray-200 transition-colors font-bold text-lg cursor-pointer"
-          >
-            <BaseIcon name="close" class="w-5 h-5" />
-          </button>
+          <div class="flex items-center gap-2">
+            <button
+              v-if="cart.length > 0 && !editingOrder"
+              type="button"
+              @click="clearCart()"
+              class="inline-flex items-center gap-1 px-2.5 h-9 rounded-2xl bg-red-50 text-red-600 hover:bg-red-100 transition-colors text-xs font-black cursor-pointer"
+            >
+              <BaseIcon name="trash" class="w-4 h-4 shrink-0" />
+              <span>{{ $t("cart.clear_cart") }}</span>
+            </button>
+            <button
+              @click="handleCloseCart"
+              class="w-9 h-9 flex items-center justify-center rounded-2xl bg-gray-100 text-gray-400 hover:bg-gray-200 transition-colors font-bold text-lg cursor-pointer"
+            >
+              <BaseIcon name="close" class="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         <!-- Banner when editing existing order -->

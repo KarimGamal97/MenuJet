@@ -530,6 +530,8 @@
   "cart": {
     "title": "Your Order",
     "empty": "Your cart is empty",
+    "continue_order": "Continue Order",
+    "clear_cart": "Clear Cart",
     "order_whatsapp": "Order via WhatsApp",
     "order_cashier": "Order at Cashier",
     "whatsapp_msg_header": "New Order",
