@@ -1,10 +1,10 @@
 <template>
   <div
-    class="min-h-screen flex items-center justify-center bg-gray-50 px-6 py-6"
+    class="min-h-screen flex flex-col items-center bg-gray-50 px-6 py-6"
     :class="locale === 'ar' ? 'text-right' : 'text-left'"
     :dir="locale === 'ar' ? 'rtl' : 'ltr'"
   >
-    <div class="max-w-md w-full">
+    <div class="max-w-md w-full my-auto">
       <div class="text-center mb-5">
         <NuxtLink to="/" class="inline-block mb-2">
           <img
@@ -105,19 +105,19 @@
         </button>
       </div>
 
-      <div class="mt-6 text-center">
-        <p class="text-[10px] text-gray-300 uppercase tracking-widest font-bold">
-          Created by
-          <a
-            href="https://kariim-portfolio.vercel.app/"
-            target="_blank"
-            class="text-orange-600 hover:text-orange-400 transition-colors"
-          >
-            Kariim
-          </a>
-        </p>
-      </div>
     </div>
+
+    <footer class="pt-6 text-center">
+      <p class="text-[10px] text-gray-400 tracking-widest font-bold">
+        Powered by
+        <NuxtLink
+          to="/"
+          class="text-orange-600 hover:text-orange-400 transition-colors"
+        >
+          MenuJet
+        </NuxtLink>
+      </p>
+    </footer>
   </div>
 </template>
 
