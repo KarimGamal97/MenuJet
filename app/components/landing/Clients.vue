@@ -1,5 +1,5 @@
 <template>
-  <section id="clients" class="py-16 sm:py-24 bg-slate-50/70 dark:bg-slate-900 border-y border-slate-200/60 dark:border-slate-800 relative overflow-hidden transition-colors duration-300" :dir="$i18n.locale === 'ar' ? 'rtl' : 'ltr'">
+  <section v-if="clientsList.length > 0" id="clients" class="py-16 sm:py-24 bg-slate-50/70 dark:bg-slate-900 border-y border-slate-200/60 dark:border-slate-800 relative overflow-hidden transition-colors duration-300" :dir="$i18n.locale === 'ar' ? 'rtl' : 'ltr'">
     
     <!-- Decorative background glow -->
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-orange-100/40 dark:bg-orange-500/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -36,8 +36,31 @@
         </p>
       </div>
 
-      <!-- Mobile Slider (2 logos per view, seamless infinite loop + arrows) -->
+      <!-- Mobile Slider (2 logos per view when >1, centered single when 1) -->
       <div
+        v-if="clientsList.length === 1"
+        class="sm:hidden flex items-center justify-center py-4"
+      >
+        <a
+          :href="getClientUrl(clientsList[0].slug)"
+          target="_blank"
+          rel="noopener noreferrer"
+          :title="getClientName(clientsList[0])"
+          class="flex items-center justify-center cursor-pointer"
+        >
+          <img
+            :src="clientsList[0].logo"
+            :alt="getClientName(clientsList[0])"
+            width="80"
+            height="80"
+            class="w-20 h-20 object-contain rounded-2xl dark:bg-white/95 dark:p-1.5 dark:shadow-lg dark:shadow-black/30"
+            loading="lazy"
+          />
+        </a>
+      </div>
+
+      <div
+        v-else
         class="sm:hidden relative w-full py-4 px-8"
         dir="ltr"
         @touchstart="onTouchStart"
@@ -64,16 +87,18 @@
               class="w-1/2 shrink-0 flex items-center justify-center px-2"
             >
               <a
-                :href="client.url"
+                :href="getClientUrl(client.slug)"
                 target="_blank"
                 rel="noopener noreferrer"
-                :title="$t(client.nameKey)"
-                class="group flex items-center justify-center transition-transform duration-300 hover:scale-105 cursor-pointer"
+                :title="getClientName(client)"
+                class="flex items-center justify-center cursor-pointer"
               >
                 <img
                   :src="client.logo"
-                  :alt="$t(client.nameKey)"
-                  class="w-20 h-20 object-contain rounded-2xl dark:bg-white/95 dark:p-1.5 dark:shadow-lg dark:shadow-black/30 transition-transform duration-300"
+                  :alt="getClientName(client)"
+                  width="80"
+                  height="80"
+                  class="w-20 h-20 object-contain rounded-2xl dark:bg-white/95 dark:p-1.5 dark:shadow-lg dark:shadow-black/30"
                   loading="lazy"
                 />
               </a>
@@ -97,7 +122,7 @@
             :key="'dot-' + client.slug"
             type="button"
             @click="goToSlide(idx)"
-            :aria-label="$t(client.nameKey)"
+            :aria-label="getClientName(client)"
             class="p-2 flex items-center justify-center cursor-pointer"
           >
             <span
@@ -112,33 +137,30 @@
         </div>
       </div>
 
-      <!-- Desktop Case 1: Less than 4 logos -> Centered in one clean row -->
-      <div v-if="clientsList.length < 4" class="hidden sm:flex items-center justify-center gap-14 lg:gap-20 py-4">
+      <!-- Desktop Case 1: Up to 4 logos -> Centered in one clean row -->
+      <div v-if="clientsList.length <= 4" class="hidden sm:flex items-center justify-center gap-14 lg:gap-20 py-4">
         <a
           v-for="client in clientsList"
           :key="client.slug"
-          :href="client.url"
+          :href="getClientUrl(client.slug)"
           target="_blank"
           rel="noopener noreferrer"
-          :title="$t(client.nameKey)"
-          class="group flex items-center justify-center transition-transform duration-300 hover:scale-110 cursor-pointer"
+          :title="getClientName(client)"
+          class="flex items-center justify-center cursor-pointer"
         >
           <img
             :src="client.logo"
-            :alt="$t(client.nameKey)"
-            class="w-24 h-24 object-contain rounded-2xl dark:bg-white/95 dark:p-2 dark:shadow-lg dark:shadow-black/30 transition-transform duration-300 group-hover:scale-105"
+            :alt="getClientName(client)"
+            width="96"
+            height="96"
+            class="w-24 h-24 object-contain rounded-2xl dark:bg-white/95 dark:p-2 dark:shadow-lg dark:shadow-black/30"
             loading="lazy"
           />
         </a>
       </div>
 
-      <!-- Desktop Case 2: 4 or more logos -> Infinite moving Carousel / Marquee -->
+      <!-- Desktop Case 2: More than 4 logos -> Infinite moving Carousel / Marquee -->
       <div v-else class="hidden sm:block relative w-full overflow-hidden py-4">
-        
-        <!-- Left & Right Fade Masks -->
-        <div class="pointer-events-none absolute inset-y-0 start-0 w-16 sm:w-32 bg-gradient-to-r rtl:bg-gradient-to-l from-slate-50 dark:from-slate-900 to-transparent z-10"></div>
-        <div class="pointer-events-none absolute inset-y-0 end-0 w-16 sm:w-32 bg-gradient-to-l rtl:bg-gradient-to-r from-slate-50 dark:from-slate-900 to-transparent z-10"></div>
-
         <div class="ticker-wrapper" dir="ltr">
           <div class="ticker-track">
             
@@ -146,16 +168,18 @@
               <a
                 v-for="(client, idx) in repeatedClients"
                 :key="'c1-' + idx"
-                :href="client.url"
+                :href="getClientUrl(client.slug)"
                 target="_blank"
                 rel="noopener noreferrer"
-                :title="$t(client.nameKey)"
-                class="group flex items-center justify-center transition-transform duration-300 hover:scale-110 cursor-pointer"
+                :title="getClientName(client)"
+                class="flex items-center justify-center cursor-pointer"
               >
                 <img
                   :src="client.logo"
-                  :alt="$t(client.nameKey)"
-                  class="w-24 h-24 object-contain rounded-2xl dark:bg-white/95 dark:p-2 dark:shadow-lg dark:shadow-black/30 transition-transform duration-300 group-hover:scale-105"
+                  :alt="getClientName(client)"
+                  width="96"
+                  height="96"
+                  class="w-24 h-24 object-contain rounded-2xl dark:bg-white/95 dark:p-2 dark:shadow-lg dark:shadow-black/30"
                   loading="lazy"
                 />
               </a>
@@ -165,17 +189,19 @@
               <a
                 v-for="(client, idx) in repeatedClients"
                 :key="'c2-' + idx"
-                :href="client.url"
+                :href="getClientUrl(client.slug)"
                 target="_blank"
                 rel="noopener noreferrer"
-                :title="$t(client.nameKey)"
+                :title="getClientName(client)"
                 tabindex="-1"
-                class="group flex items-center justify-center transition-transform duration-300 hover:scale-110 cursor-pointer"
+                class="flex items-center justify-center cursor-pointer"
               >
                 <img
                   :src="client.logo"
-                  :alt="$t(client.nameKey)"
-                  class="w-24 h-24 object-contain rounded-2xl dark:bg-white/95 dark:p-2 dark:shadow-lg dark:shadow-black/30 transition-transform duration-300 group-hover:scale-105"
+                  :alt="getClientName(client)"
+                  width="96"
+                  height="96"
+                  class="w-24 h-24 object-contain rounded-2xl dark:bg-white/95 dark:p-2 dark:shadow-lg dark:shadow-black/30"
                   loading="lazy"
                 />
               </a>
@@ -191,54 +217,56 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
-import bgoLogo from '~/assets/logos/bgo.png'
-import deltaLogo from '~/assets/logos/deltacoffee.jpg'
-import tamimLogo from '~/assets/logos/tamim.jpg'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 
-const clientsList = [
-  {
-    slug: 'tamim',
-    nameKey: 'clients.tamim_name',
-    logo: tamimLogo,
-    url: 'https://getmenujet.com/menu/tamim'
-  },
-  {
-    slug: 'bgo',
-    nameKey: 'clients.bgo_name',
-    logo: bgoLogo,
-    url: 'https://getmenujet.com/menu/bgo'
-  },
-  {
-    slug: 'delta-coffee',
-    nameKey: 'clients.delta_name',
-    logo: deltaLogo,
-    url: 'https://getmenujet.com/menu/delta-coffee'
-  }
-]
+const { locale } = useI18n()
+const localePath = useLocalePath()
+
+const { data: clientsData } = await useFetch('/api/public/clients')
+
+const clientsList = computed(() => clientsData.value?.clients || [])
+
+const getClientName = (client) => {
+  if (!client) return ''
+  return locale.value === 'en'
+    ? client.nameEn || client.name || client.nameAr || client.slug
+    : client.nameAr || client.name || client.nameEn || client.slug
+}
+
+const getClientUrl = (slug) => localePath(`/menu/${encodeURIComponent(slug)}`)
 
 const slideOffset = ref(0)
 const isTransitioning = ref(true)
 let slideTimer = null
 let touchStartX = 0
 
-const mobileTrackClients = computed(() => [...clientsList, ...clientsList])
-const activeDotIndex = computed(() => ((slideOffset.value % clientsList.length) + clientsList.length) % clientsList.length)
+const mobileTrackClients = computed(() =>
+  clientsList.value.length > 0 ? [...clientsList.value, ...clientsList.value] : []
+)
+
+const activeDotIndex = computed(() => {
+  const len = clientsList.value.length
+  if (len === 0) return 0
+  return ((slideOffset.value % len) + len) % len
+})
 
 const nextSlide = () => {
+  if (clientsList.value.length <= 1) return
   if (!isTransitioning.value) isTransitioning.value = true
   slideOffset.value += 1
   startAutoSlide()
 }
 
 const prevSlide = () => {
+  const len = clientsList.value.length
+  if (len <= 1) return
   if (slideOffset.value <= 0) {
     isTransitioning.value = false
-    slideOffset.value = clientsList.length
+    slideOffset.value = len
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         isTransitioning.value = true
-        slideOffset.value = clientsList.length - 1
+        slideOffset.value = len - 1
       })
     })
   } else {
@@ -249,9 +277,10 @@ const prevSlide = () => {
 }
 
 const onTrackTransitionEnd = () => {
-  if (slideOffset.value >= clientsList.length) {
+  const len = clientsList.value.length
+  if (len > 0 && slideOffset.value >= len) {
     isTransitioning.value = false
-    slideOffset.value = slideOffset.value % clientsList.length
+    slideOffset.value = slideOffset.value % len
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         isTransitioning.value = true
@@ -262,6 +291,7 @@ const onTrackTransitionEnd = () => {
 
 const startAutoSlide = () => {
   stopAutoSlide()
+  if (clientsList.value.length <= 1) return
   slideTimer = setInterval(() => {
     if (!isTransitioning.value) isTransitioning.value = true
     slideOffset.value += 1
@@ -299,6 +329,18 @@ const onTouchEnd = (e) => {
   startAutoSlide()
 }
 
+watch(
+  () => clientsList.value.length,
+  (len) => {
+    if (len === 0 || slideOffset.value >= len) {
+      slideOffset.value = 0
+    }
+    if (process.client) {
+      startAutoSlide()
+    }
+  }
+)
+
 onMounted(() => {
   startAutoSlide()
 })
@@ -307,10 +349,10 @@ onUnmounted(() => {
   stopAutoSlide()
 })
 
-// Used only if clients count >= 4 on desktop
+// Used only if clients count > 4 on desktop
 const repeatedClients = computed(() => {
-  if (clientsList.length < 4) return []
-  return [...clientsList, ...clientsList]
+  if (clientsList.value.length <= 4) return []
+  return [...clientsList.value, ...clientsList.value]
 })
 </script>
 
@@ -327,10 +369,6 @@ const repeatedClients = computed(() => {
   width: max-content;
   animation: scrollTicker 30s linear infinite;
   will-change: transform;
-}
-
-.ticker-track:hover {
-  animation-play-state: paused;
 }
 
 @keyframes scrollTicker {

@@ -16,6 +16,8 @@ export interface PlatformRestaurant {
   subscription_status: string | null;
   subscription_end_date: string | null;
   is_active: boolean;
+  show_in_clients?: boolean;
+  is_demo?: boolean;
   created_at: string;
   items_count?: number;
   orders_count?: number;
@@ -130,6 +132,8 @@ export const usePlatformRestaurants = () => {
       plan_id?: string;
       subscription_status?: string;
       subscription_end_date?: string | null;
+      show_in_clients?: boolean;
+      is_demo?: boolean;
     },
   ) => {
     saving.value = true;
@@ -164,6 +168,18 @@ export const usePlatformRestaurants = () => {
     return updateSubscription(r.id, { subscription_status: "inactive" });
   };
 
+  const toggleShowInClients = async (r: PlatformRestaurant) => {
+    return updateSubscription(r.id, { show_in_clients: !r.show_in_clients });
+  };
+
+  const toggleIsDemo = async (r: PlatformRestaurant) => {
+    const nextDemo = !r.is_demo;
+    return updateSubscription(r.id, {
+      is_demo: nextDemo,
+      ...(nextDemo ? { show_in_clients: false } : {}),
+    });
+  };
+
   const deleteRestaurant = async (id: string) => {
     deleting.value = true;
     try {
@@ -196,6 +212,8 @@ export const usePlatformRestaurants = () => {
     fetchRestaurants,
     updateSubscription,
     toggleActiveStatus,
+    toggleShowInClients,
+    toggleIsDemo,
     deleteRestaurant,
   };
 };

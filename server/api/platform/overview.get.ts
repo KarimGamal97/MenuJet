@@ -32,24 +32,52 @@ export default defineEventHandler(async (event) => {
     const { adminClient } = await requirePlatformOwner(event);
     const todayStart = new Date().toISOString().split("T")[0];
 
-    const [profilesRes, allOrdersRes] = await Promise.all([
-      adminClient
+    let { data: profilesData, error: profilesError } = await adminClient
+      .from("profiles")
+      .select(
+        "id, user_id, email, full_name, business_name, business_name_ar, business_name_en, slug, whatsapp_number, plan_id, plan_type, subscription_status, subscription_end_date, is_demo",
+      )
+      .is("owner_id", null)
+      .neq("role", "super_admin");
+
+    if (
+      profilesError &&
+      (profilesError.message?.includes("column") ||
+        (profilesError as { code?: string }).code === "PGRST204")
+    ) {
+      const fallback = await adminClient
         .from("profiles")
         .select(
           "id, user_id, email, full_name, business_name, business_name_ar, business_name_en, slug, whatsapp_number, plan_id, plan_type, subscription_status, subscription_end_date",
         )
         .is("owner_id", null)
-        .neq("role", "super_admin"),
-      adminClient
-        .from("orders")
-        .select("user_id, total_price, created_at"),
-    ]);
+        .neq("role", "super_admin");
+      profilesData = fallback.data as typeof profilesData;
+      profilesError = fallback.error;
+    }
 
-    if (profilesRes.error) throw profilesRes.error;
+    const allOrdersRes = await adminClient
+      .from("orders")
+      .select("user_id, total_price, created_at");
+
+    if (profilesError) throw profilesError;
     if (allOrdersRes.error) throw allOrdersRes.error;
 
-    const clients = profilesRes.data || [];
-    const allOrders = allOrdersRes.data || [];
+    const clients = (profilesData || []).filter(
+      (c: Record<string, any>) => !c.is_demo,
+    );
+    const realOwnerIds = new Set(
+      clients
+        .filter(
+          (c: Record<string, any>) =>
+            String(c.subscription_status || "").toLowerCase() !== "trial",
+        )
+        .map((c: Record<string, any>) => c.user_id)
+        .filter(Boolean),
+    );
+    const allOrders = (allOrdersRes.data || []).filter(
+      (o: Record<string, any>) => o.user_id && realOwnerIds.has(o.user_id),
+    );
 
     // Aggregate orders per restaurant user_id
     const ordersByOwner: Record<string, { count: number; revenue: number }> = {};

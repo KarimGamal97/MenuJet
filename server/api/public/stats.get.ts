@@ -5,11 +5,18 @@ interface PublicStatsResponse {
   totalSales: number;
 }
 
+interface StatsProfileRow {
+  user_id: string | null;
+  subscription_status: string | null;
+  is_demo?: boolean | null;
+}
+
 const CACHE_TTL_MS = 5 * 60 * 1000;
 const ORDERS_PAGE_SIZE = 1000;
 
 let cachedStats: PublicStatsResponse | null = null;
 let cachedAt = 0;
+let cachedVersion = 0;
 
 async function fetchTotalOrderSales(
   adminClient: ReturnType<typeof serverSupabaseServiceRole>,
@@ -53,23 +60,47 @@ export default defineEventHandler(
     );
 
     const now = Date.now();
-    if (cachedStats && now - cachedAt < CACHE_TTL_MS) {
+    const version = getPublicDataVersion();
+    if (
+      cachedStats &&
+      cachedVersion === version &&
+      now - cachedAt < CACHE_TTL_MS
+    ) {
       return cachedStats;
     }
 
     try {
       const adminClient = serverSupabaseServiceRole(event);
 
-      const { data: profiles, error: profilesError } = await adminClient
+      let { data: profiles, error: profilesError } = await adminClient
         .from("profiles")
-        .select("user_id")
+        .select("user_id, subscription_status, is_demo")
         .is("owner_id", null)
         .neq("role", "super_admin");
 
+      if (
+        profilesError &&
+        (profilesError.message?.includes("column") ||
+          (profilesError as { code?: string }).code === "PGRST204")
+      ) {
+        const fallback = await adminClient
+          .from("profiles")
+          .select("user_id, subscription_status")
+          .is("owner_id", null)
+          .neq("role", "super_admin");
+        profiles = fallback.data as StatsProfileRow[] | null;
+        profilesError = fallback.error;
+      }
+
       if (profilesError) throw profilesError;
 
-      const ownerIds = (profiles || [])
-        .map((p: { user_id: string | null }) => p.user_id)
+      const ownerIds = ((profiles || []) as StatsProfileRow[])
+        .filter((p) => {
+          if (p.is_demo) return false;
+          const status = String(p.subscription_status || "").trim().toLowerCase();
+          return status !== "trial" && status !== "inactive";
+        })
+        .map((p) => p.user_id)
         .filter((id): id is string => Boolean(id));
 
       if (ownerIds.length === 0) {
@@ -79,6 +110,7 @@ export default defineEventHandler(
         };
         cachedStats = emptyStats;
         cachedAt = now;
+        cachedVersion = version;
         return emptyStats;
       }
 
@@ -98,6 +130,8 @@ export default defineEventHandler(
       };
 
       cachedStats = freshStats;
+      cachedAt = now;
+      cachedVersion = version;
       cachedAt = now;
       return freshStats;
     } catch (error) {

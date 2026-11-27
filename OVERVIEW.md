@@ -38,6 +38,8 @@ Status snapshot of the project. Update this file whenever a task completes, prog
 
 ### Landing & auth
 - Split hero with interactive phone showcase, demo video section, footer call button.
+- Dynamic client logos in `app/components/landing/Clients.vue` via `server/api/public/clients.get.ts` (`/api/public/clients`, 5-minute cache invalidated on platform changes via `server/utils/publicCache.ts`) driven by `profiles.show_in_clients = true` and `is_demo = false` (desktop slider activates when `> 4` clients); removed static `app/assets/logos/` files and added client-side max-400px WebP compression on logo uploads in `app/composables/useSettings.ts`.
+- Platform management (`/platform`): added `show_in_clients` and `is_demo` toggles in `RestaurantsTable.vue` and `RenewSubscriptionModal.vue` (`basic` / `pro` plans only), and excluded `is_demo` / `trial` accounts from public stats (`server/api/public/stats.get.ts`) and platform revenue overview (`server/api/platform/overview.get.ts`).
 - Login page footer: "Powered by MenuJet".
 
 ### Data
@@ -58,15 +60,17 @@ Status snapshot of the project. Update this file whenever a task completes, prog
 - `app/components/landing/DemoVideo.vue`: switched `<video>` to `preload="none"` so the demo MP4 is deferred until playback.
 - `app/components/landing/TheNavbar.vue` & `i18n/locales/*.json`: added localized `aria-label` (`nav.toggle_menu`) and `aria-expanded` to the mobile menu button.
 - `app/components/landing/HeroShowcase.vue` & `Pricing.vue`: improved WCAG text contrast on placeholder search text, 11px price text (`text-orange-700`), and `/ month` / `/ year` labels (`text-slate-600 dark:text-slate-300`).
-- `app/components/landing/Clients.vue` & `TheFooter.vue`: added larger clickable hit area around slider indicator dots and replaced skipped `<h4>` footer column headings with `<p>`.
+- `app/components/landing/Clients.vue` & `TheFooter.vue`: added larger clickable hit area around slider indicator dots, replaced skipped `<h4>` footer column headings with `<p>`, and strengthened footer copyright text contrast (`text-slate-600 dark:text-slate-300`).
+- `nuxt.config.ts`: added `preconnect` for `fonts.googleapis.com` and `fonts.gstatic.com`, switched `Tajawal` Google Fonts `<link>` to non-blocking `media="print"` + `onload` (with `<noscript>` fallback), and deferred `gtag.js` script injection until after `window.load`.
 
 ### Pending / To verify
-- Run `npm run build` locally to confirm full production build passes after performance/accessibility changes.
-- Compress `app/assets/bgo.png` (~1.77 MB) to WebP and optimize Google Fonts loading in `nuxt.config.ts`.
+- Run `npm run build` locally to confirm full production build passes after all changes.
 - Generate/upload dedicated `1200x630` `public/og.png` social preview image (currently referencing `/pwa-512x512.png`).
 - Optional Phase 3 SEO landing pages (`/qr-menu`, `/whatsapp-ordering`, `/cashier-system`, `/cafes`, `/restaurants`, `/blog/*`) — requires adding those routes to `supabase.redirectOptions.exclude` in `nuxt.config.ts`.
 - Test cart persistence on a real phone (add items → refresh → cart restored, toast shown, menu opens directly).
 
 ## Notes
-- DB changes needing manual SQL (already provided): `profiles.additional_phones jsonb`, `check_menu_items_limit()` trigger update.
+- DB changes needing manual SQL:
+  - Previously provided: `profiles.additional_phones jsonb`, `check_menu_items_limit()` trigger update.
+  - New for Solution 2 (`/platform` client/demo flags): `ALTER TABLE profiles ADD COLUMN IF NOT EXISTS show_in_clients boolean NOT NULL DEFAULT false, ADD COLUMN IF NOT EXISTS is_demo boolean NOT NULL DEFAULT false;`.
 - Shell is Windows PowerShell 5.1 — chain commands with `; if ($LASTEXITCODE -eq 0) { ... }` instead of `&&`.

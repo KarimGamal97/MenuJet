@@ -79,11 +79,60 @@ export const useSettings = () => {
     }
   };
 
+  const compressLogoFile = async (file: File, maxDimension = 400): Promise<File> => {
+    if (
+      typeof window === "undefined" ||
+      !file.type.startsWith("image/") ||
+      file.type === "image/svg+xml"
+    ) {
+      return file;
+    }
+
+    try {
+      const bitmap = await createImageBitmap(file);
+      const scale = Math.min(1, maxDimension / Math.max(bitmap.width, bitmap.height));
+      const targetWidth = Math.max(1, Math.round(bitmap.width * scale));
+      const targetHeight = Math.max(1, Math.round(bitmap.height * scale));
+
+      // Skip re-encoding if already small enough
+      if (scale === 1 && file.size <= 80 * 1024) {
+        bitmap.close();
+        return file;
+      }
+
+      const canvas = document.createElement("canvas");
+      canvas.width = targetWidth;
+      canvas.height = targetHeight;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        bitmap.close();
+        return file;
+      }
+
+      ctx.drawImage(bitmap, 0, 0, targetWidth, targetHeight);
+      bitmap.close();
+
+      const blob = await new Promise<Blob | null>((resolve) => {
+        canvas.toBlob((result) => resolve(result), "image/webp", 0.85);
+      });
+
+      if (!blob || blob.size >= file.size) {
+        return file;
+      }
+
+      const baseName = file.name.replace(/\.[^.]+$/, "") || "logo";
+      return new File([blob], `${baseName}.webp`, { type: "image/webp" });
+    } catch {
+      return file;
+    }
+  };
+
   const uploadLogo = async (file: File, userId: string) => {
     if (!file || !userId) return null;
     uploading.value = true;
 
-    const fileExt = file.name.split(".").pop();
+    const preparedFile = await compressLogoFile(file);
+    const fileExt = preparedFile.name.split(".").pop() || "webp";
     const fileName = `${userId}-${Math.random()}.${fileExt}`;
     const filePath = `logos/${fileName}`;
 
@@ -91,7 +140,7 @@ export const useSettings = () => {
       // Try 'menu-images' bucket which is public and standard
       const { error: uploadError } = await client.storage
         .from("menu-images")
-        .upload(filePath, file);
+        .upload(filePath, preparedFile);
 
       if (!uploadError) {
         const { data } = client.storage.from("menu-images").getPublicUrl(filePath);
@@ -101,7 +150,7 @@ export const useSettings = () => {
       // Fallback to 'logos' bucket
       const { error: fallbackError } = await client.storage
         .from("logos")
-        .upload(filePath, file);
+        .upload(filePath, preparedFile);
 
       if (fallbackError) throw fallbackError;
 

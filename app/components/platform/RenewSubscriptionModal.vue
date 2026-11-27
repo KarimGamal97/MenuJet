@@ -14,7 +14,7 @@
         <label class="block text-xs font-black text-gray-700 mb-2">
           {{ $t("platform.select_plan") }}
         </label>
-        <div class="grid grid-cols-3 gap-2">
+        <div class="grid grid-cols-2 gap-2">
           <button
             v-for="plan in planOptions"
             :key="plan.id"
@@ -92,6 +92,39 @@
           class="w-full px-4 py-3 rounded-2xl border border-gray-200 text-sm font-bold text-gray-800 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
         />
       </div>
+
+      <!-- Visibility & Demo Flags -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+        <label
+          :class="[
+            'flex items-center gap-2.5 p-3 rounded-2xl border cursor-pointer transition-colors',
+            form.is_demo ? 'opacity-50 pointer-events-none bg-gray-50 border-gray-200' :
+            form.show_in_clients ? 'border-emerald-500 bg-emerald-50 text-emerald-800' : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50',
+          ]"
+        >
+          <input
+            v-model="form.show_in_clients"
+            type="checkbox"
+            :disabled="form.is_demo"
+            class="w-4 h-4 accent-emerald-600 rounded"
+          />
+          <span class="text-xs font-bold leading-snug">{{ $t("platform.modal_show_in_clients") }}</span>
+        </label>
+
+        <label
+          :class="[
+            'flex items-center gap-2.5 p-3 rounded-2xl border cursor-pointer transition-colors',
+            form.is_demo ? 'border-purple-500 bg-purple-50 text-purple-800' : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50',
+          ]"
+        >
+          <input
+            v-model="form.is_demo"
+            type="checkbox"
+            class="w-4 h-4 accent-purple-600 rounded"
+          />
+          <span class="text-xs font-bold leading-snug">{{ $t("platform.modal_is_demo") }}</span>
+        </label>
+      </div>
     </div>
 
     <template #footer>
@@ -137,18 +170,21 @@ const emit = defineEmits<{
       plan_id: string;
       subscription_status: string;
       subscription_end_date: string | null;
+      show_in_clients: boolean;
+      is_demo: boolean;
     },
   ): void;
 }>();
 
 const form = reactive({
-  plan_id: "free",
+  plan_id: "basic",
   subscription_status: "active",
   endDateInput: "",
+  show_in_clients: false,
+  is_demo: false,
 });
 
 const planOptions = computed(() => [
-  { id: "free", label: t("plans.free_name") },
   { id: "basic", label: t("plans.basic_name") },
   { id: "pro", label: t("plans.pro_name") },
 ]);
@@ -197,8 +233,19 @@ watch(
     form.plan_id = resolvePlanId(r);
     form.subscription_status = r.subscription_status || "active";
     form.endDateInput = toDateInput(r.subscription_end_date);
+    form.show_in_clients = Boolean(r.show_in_clients);
+    form.is_demo = Boolean(r.is_demo);
   },
   { immediate: true },
+);
+
+watch(
+  () => form.is_demo,
+  (isDemo) => {
+    if (isDemo) {
+      form.show_in_clients = false;
+    }
+  },
 );
 
 const applyDuration = (days: number) => {
@@ -221,6 +268,8 @@ const handleSubmit = () => {
     plan_id: form.plan_id,
     subscription_status: form.subscription_status,
     subscription_end_date: endDateIso,
+    show_in_clients: form.is_demo ? false : form.show_in_clients,
+    is_demo: form.is_demo,
   });
 };
 </script>

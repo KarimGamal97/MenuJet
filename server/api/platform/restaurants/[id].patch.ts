@@ -16,7 +16,13 @@ export default defineEventHandler(async (event) => {
   }
 
   const body = await readBody(event);
-  const { plan_id, subscription_status, subscription_end_date } = body;
+  const {
+    plan_id,
+    subscription_status,
+    subscription_end_date,
+    show_in_clients,
+    is_demo,
+  } = body;
 
   const { data: target, error: fetchError } = await adminClient
     .from("profiles")
@@ -55,6 +61,17 @@ export default defineEventHandler(async (event) => {
     patch.subscription_end_date = subscription_end_date || null;
   }
 
+  if (typeof is_demo === "boolean") {
+    patch.is_demo = is_demo;
+    if (is_demo) {
+      patch.show_in_clients = false;
+    }
+  }
+
+  if (typeof show_in_clients === "boolean" && patch.is_demo !== true) {
+    patch.show_in_clients = show_in_clients;
+  }
+
   if (Object.keys(patch).length === 0) {
     throw createError({ statusCode: 400, message: "No valid fields to update" });
   }
@@ -64,13 +81,15 @@ export default defineEventHandler(async (event) => {
     .update(patch)
     .eq("id", id)
     .select(
-      "id, user_id, email, full_name, business_name, business_name_ar, business_name_en, slug, whatsapp_number, role, plan_id, plan_type, max_items, max_categories, subscription_status, subscription_end_date, is_active, created_at",
+      "id, user_id, email, full_name, business_name, business_name_ar, business_name_en, slug, whatsapp_number, role, plan_id, plan_type, max_items, max_categories, subscription_status, subscription_end_date, is_active, show_in_clients, is_demo, created_at",
     )
     .single();
 
   if (updateError) {
     throw createError({ statusCode: 500, message: updateError.message });
   }
+
+  invalidatePublicDataCaches();
 
   return updated;
 });

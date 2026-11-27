@@ -4,15 +4,17 @@ export default defineNuxtConfig({
     head: {
       script: [
         {
-          src: "https://www.googletagmanager.com/gtag/js?id=G-N5QZJH3DJM",
-          async: true,
-        },
-        {
           innerHTML: `
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
             gtag('config', 'G-N5QZJH3DJM');
+            window.addEventListener('load', function () {
+              var s = document.createElement('script');
+              s.async = true;
+              s.src = 'https://www.googletagmanager.com/gtag/js?id=G-N5QZJH3DJM';
+              document.head.appendChild(s);
+            }, { once: true });
           `,
         },
       ],
@@ -23,8 +25,25 @@ export default defineNuxtConfig({
           href: "/favicon.ico",
         },
         {
+          rel: "preconnect",
+          href: "https://fonts.googleapis.com",
+        },
+        {
+          rel: "preconnect",
+          href: "https://fonts.gstatic.com",
+          crossorigin: "",
+        },
+        {
           rel: "stylesheet",
           href: "https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap",
+          media: "print",
+          onload: "this.media='all'",
+        },
+      ],
+      noscript: [
+        {
+          innerHTML:
+            '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap">',
         },
       ],
     },

@@ -203,7 +203,7 @@
       </div>
 
       <!-- Bottom Bar -->
-      <div class="mt-10 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex flex-col sm:flex-row items-center justify-center text-xs font-bold text-slate-400 dark:text-slate-500">
+      <div class="mt-10 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex flex-col sm:flex-row items-center justify-center text-xs font-bold text-slate-600 dark:text-slate-300">
         <div>
           © {{ new Date().getFullYear() }} MenuJet. {{ $t('landing_footer.all_rights') }}
         </div>

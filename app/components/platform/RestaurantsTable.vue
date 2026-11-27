@@ -95,6 +95,18 @@
                     <span>/{{ r.slug }}</span>
                     <BaseIcon name="external-link" class="w-3 h-3" />
                   </NuxtLink>
+                  <span
+                    v-if="r.show_in_clients && !r.is_demo"
+                    class="inline-flex items-center gap-1 text-[10px] font-black text-emerald-700 bg-emerald-50 border border-emerald-200/70 px-2 py-0.5 rounded-full whitespace-nowrap"
+                  >
+                    {{ $t("platform.badge_featured_client") }}
+                  </span>
+                  <span
+                    v-if="r.is_demo"
+                    class="inline-flex items-center gap-1 text-[10px] font-black text-purple-700 bg-purple-50 border border-purple-200/70 px-2 py-0.5 rounded-full whitespace-nowrap"
+                  >
+                    {{ $t("platform.badge_demo") }}
+                  </span>
                 </div>
                 <div class="text-xs text-gray-500 font-medium" dir="ltr">
                   {{ r.email || "—" }}
@@ -161,7 +173,36 @@
 
             <!-- Actions -->
             <td class="py-3.5 pe-4 text-end rounded-e-2xl">
-              <div class="flex items-center justify-end gap-1.5">
+              <div class="flex items-center justify-end gap-1.5 flex-wrap">
+                <button
+                  type="button"
+                  @click="emit('toggle-clients', r)"
+                  :disabled="saving || Boolean(r.is_demo)"
+                  :title="$t('platform.toggle_show_clients_title')"
+                  :class="[
+                    'inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl border text-xs font-bold transition-colors cursor-pointer whitespace-nowrap disabled:opacity-40',
+                    r.show_in_clients && !r.is_demo
+                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
+                      : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50',
+                  ]"
+                >
+                  <BaseIcon :name="r.show_in_clients && !r.is_demo ? 'eye' : 'eye-off'" class="w-3.5 h-3.5" />
+                  <span>{{ $t("platform.btn_show_clients") }}</span>
+                </button>
+                <button
+                  type="button"
+                  @click="emit('toggle-demo', r)"
+                  :disabled="saving"
+                  :title="$t('platform.toggle_demo_title')"
+                  :class="[
+                    'px-2.5 py-1.5 rounded-xl border text-xs font-bold transition-colors cursor-pointer whitespace-nowrap disabled:opacity-50',
+                    r.is_demo
+                      ? 'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100'
+                      : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50',
+                  ]"
+                >
+                  {{ r.is_demo ? $t("platform.btn_demo_on") : $t("platform.btn_demo_off") }}
+                </button>
                 <button
                   type="button"
                   @click="emit('renew', r)"
@@ -231,6 +272,8 @@ const emit = defineEmits<{
   (e: "update:planFilter", value: "all" | "free" | "basic" | "pro"): void;
   (e: "renew", restaurant: PlatformRestaurant): void;
   (e: "toggle-active", restaurant: PlatformRestaurant): void;
+  (e: "toggle-clients", restaurant: PlatformRestaurant): void;
+  (e: "toggle-demo", restaurant: PlatformRestaurant): void;
   (e: "delete", restaurant: PlatformRestaurant): void;
 }>();
 

@@ -2,14 +2,30 @@ export default defineEventHandler(async (event) => {
   try {
     const { adminClient } = await requirePlatformOwner(event);
 
-    const { data: profiles, error } = await adminClient
+    let { data: profiles, error } = await adminClient
       .from("profiles")
       .select(
-        "id, user_id, email, full_name, business_name, business_name_ar, business_name_en, slug, whatsapp_number, role, plan_id, plan_type, max_items, max_categories, subscription_status, subscription_end_date, is_active, created_at",
+        "id, user_id, email, full_name, business_name, business_name_ar, business_name_en, slug, whatsapp_number, role, plan_id, plan_type, max_items, max_categories, subscription_status, subscription_end_date, is_active, show_in_clients, is_demo, created_at",
       )
       .is("owner_id", null)
       .neq("role", "super_admin")
       .order("created_at", { ascending: false });
+
+    if (
+      error &&
+      (error.message?.includes("column") || (error as { code?: string }).code === "PGRST204")
+    ) {
+      const fallback = await adminClient
+        .from("profiles")
+        .select(
+          "id, user_id, email, full_name, business_name, business_name_ar, business_name_en, slug, whatsapp_number, role, plan_id, plan_type, max_items, max_categories, subscription_status, subscription_end_date, is_active, created_at",
+        )
+        .is("owner_id", null)
+        .neq("role", "super_admin")
+        .order("created_at", { ascending: false });
+      profiles = fallback.data as typeof profiles;
+      error = fallback.error;
+    }
 
     if (error) {
       throw error;

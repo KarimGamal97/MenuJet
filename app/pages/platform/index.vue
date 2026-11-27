@@ -46,6 +46,8 @@
       :getDisplayName="getDisplayName"
       @renew="openRenewModal"
       @toggle-active="toggleActiveStatus"
+      @toggle-clients="toggleShowInClients"
+      @toggle-demo="toggleIsDemo"
       @delete="openDeleteModal"
     />
 
@@ -93,6 +95,8 @@ const {
   fetchRestaurants,
   updateSubscription,
   toggleActiveStatus,
+  toggleShowInClients,
+  toggleIsDemo,
   deleteRestaurant,
 } = usePlatformRestaurants();
 
@@ -111,6 +115,8 @@ const handleSaveSubscription = async (payload: {
   plan_id: string;
   subscription_status: string;
   subscription_end_date: string | null;
+  show_in_clients: boolean;
+  is_demo: boolean;
 }) => {
   if (!selectedRestaurant.value) return;
   const ok = await updateSubscription(selectedRestaurant.value.id, payload);
