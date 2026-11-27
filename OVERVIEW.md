@@ -13,18 +13,20 @@ Status snapshot of the project. Update this file whenever a task completes, prog
 - Category pills: removed the check icon (white pill is the active state); text vertically centered for iOS Safari.
 - "Open now" status badge aligned with its dot (`MenuHeader.vue`, `RestaurantInfoModal.vue`).
 - Image skeleton + fade-in while item images load (`MenuItemCard.vue`, `ItemDetailModal.vue`).
+- Splash screen (`SplashScreen.vue`) with animated QR -> scan laser -> MenuJet logo reveal, unified via `app.vue` and synced with `adminSplashPending` and `menuSplashPending` (`app/layouts/admin.vue`, `app/pages/menu/[slug].vue`).
 - Progressive rendering: first 5 items per category, then 4 more per scroll step via `IntersectionObserver`.
 - Cart persistence (`app/composables/useCart.ts`):
   - Saved per restaurant in `localStorage` (`menujet_cart_<slug>`) with a 2-hour TTL.
   - After refresh, the cart is restored, a "Continue Order" toast is shown, and the Bio Hub welcome page is skipped.
   - "Clear Cart" button in `CartModal.vue`.
-- WhatsApp phone normalization in `buildWhatsAppUrl` (Arabic numerals, `00`, Egyptian `01x` → `201x`).
+- WhatsApp phone normalization and safe `api.whatsapp.com/send` URL encoding in `buildWhatsAppUrl`, plus BMP emojis in WhatsApp order messages (`useCartCheckout.ts`).
 
 ### Admin dashboard
+- Admin layout (`app/layouts/admin.vue`): matched `<main>` `dir` to active locale so the page scrollbar sits at the outer edge instead of next to the sidebar.
 - Sidebar (`app/components/admin/layout/AdminSidebar.vue`):
-  - "Menu" dropdown (Items, Menu Categories) and "Settings" dropdown (4 sections).
-  - Sub-items use dots instead of icons, aligned with parent links.
-  - Collapsed mode: centered icons, flyout menus for groups, tooltips for single links.
+  - "Menu" dropdown (Items, Menu Categories) and "Settings" dropdown (4 sections) with accordion behavior.
+  - Sub-items use dots instead of icons, aligned with parent links; `no-scrollbar` on `<nav>` so only the outer page scrollbar shows.
+  - Collapsed mode: centered icons, restaurant logo badge (with first-letter fallback), flyout menus for groups, tooltips for single links.
 - Settings (`app/pages/admin/settings.vue`): split into 4 sections driven by `?tab=` (identity, operations, delivery, biohub), each with its own subtitle; sticky save bar.
 - Categories page (`app/pages/admin/categories.vue`) with instant auto-save.
 - Additional contact numbers (Pro only) in Bio Hub settings, shown in `RestaurantHub.vue` and `RestaurantInfoModal.vue`.
@@ -43,7 +45,17 @@ Status snapshot of the project. Update this file whenever a task completes, prog
 
 ---
 
-## Pending / To verify
+### SEO & indexing
+- `public/robots.txt` blocks `/admin`, `/platform`, `/login`, `/confirm`, `/api/` and points to `/sitemap.xml`.
+- `server/routes/sitemap.xml.ts`: dynamic multilingual XML sitemap covering public pages + active non-expired `/menu/<slug>` pages with `hreflang` (`ar`, `ar-EG`, `ar-SA`, `en`, `x-default`).
+- `app/app.vue`: global dynamic `canonical` and `hreflang` links on public routes; `noindex, nofollow` applied on `admin.vue`, `login.vue`, `confirm.vue`, and expired/missing menus.
+- `app/pages/index.vue`: bilingual `useSeoMeta` + `SoftwareApplication` and `Organization` JSON-LD schemas.
+- `app/components/landing/StatsSection.vue`: removed `lazy: true` from `useFetch` so SSR HTML renders real numbers instead of `0`, while preserving client-side scroll animation.
+- `app/pages/menu/[slug].vue`, `MenuHeader.vue`, `MenuFooter.vue`: removed `lazy: true` for real SSR menu rendering, added `<h1>` + dynamic SEO meta + `Restaurant`/`Menu` JSON-LD + `Powered by MenuJet` backlink on every menu.
+
+### Pending / To verify
+- Generate/upload dedicated `1200x630` `public/og.png` social preview image (currently referencing `/pwa-512x512.png`).
+- Optional Phase 3 SEO landing pages (`/qr-menu`, `/whatsapp-ordering`, `/cashier-system`, `/cafes`, `/restaurants`, `/blog/*`) — requires adding those routes to `supabase.redirectOptions.exclude` in `nuxt.config.ts`.
 - Test cart persistence on a real phone (add items → refresh → cart restored, toast shown, menu opens directly).
 
 ## Notes

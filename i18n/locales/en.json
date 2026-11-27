@@ -1055,5 +1055,17 @@
     "title_part2": "in Action",
     "subtitle": "Watch the full journey from launching your digital menu to receiving customer orders via QR and WhatsApp.",
     "unsupported": "Your browser does not support video playback."
+  },
+  "seo": {
+    "home_title": "MenuJet | Smart QR Menu for Restaurants & Cafes — 0% Commission",
+    "home_desc": "Launch your smart QR digital menu in minutes. Accept dine-in and delivery orders via WhatsApp and Cashier with 0% commission. 14-day free trial.",
+    "basic_plan_name": "Basic Plan",
+    "pro_plan_name": "Pro Plan",
+    "confirm_title": "Confirming Sign In | MenuJet",
+    "menu_unavailable_title": "Menu Currently Unavailable | MenuJet",
+    "menu_title": "{name} Menu | Order Online - MenuJet",
+    "menu_desc_with_cats": "Browse the updated digital menu and prices for {name} ({cats}) powered by MenuJet.",
+    "menu_desc_default": "Browse the updated digital menu and prices for {name} powered by MenuJet.",
+    "menu_items_section": "Menu Items"
   }
 }

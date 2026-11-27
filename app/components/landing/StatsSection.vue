@@ -111,8 +111,7 @@ const SETUP_MINUTES = 5;
 
 const { t, locale } = useI18n();
 
-const { data: stats } = useFetch<PublicStatsResponse>("/api/public/stats", {
-  lazy: true,
+const { data: stats } = await useFetch<PublicStatsResponse>("/api/public/stats", {
   default: () => ({ itemsCount: 0, totalSales: 0 }),
 });
 

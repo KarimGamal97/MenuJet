@@ -129,6 +129,15 @@ const { t, locale } = useI18n();
 const route = useRoute();
 const isSignUp = ref(route.query.mode === "signup");
 
+useSeoMeta({
+  title: computed(() =>
+    isSignUp.value
+      ? `${t("login.signup_title")} | MenuJet`
+      : `${t("login.title")} | MenuJet`
+  ),
+  robots: "noindex, nofollow",
+});
+
 defineRule("required", (val) => !!val || t("login.error_required"));
 defineRule("identifier", (val) => {
   const value = String(val || "").trim();

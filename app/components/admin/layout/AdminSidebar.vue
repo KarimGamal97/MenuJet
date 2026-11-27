@@ -26,10 +26,25 @@
       <!-- Top Section -->
       <div class="shrink-0">
         <div
-          class="bg-gradient-to-l from-orange-600 to-orange-500 rounded-2xl mb-2.5 flex items-center justify-center shadow-lg shadow-orange-100 transition-all duration-300 overflow-hidden"
-          :class="isCollapsed ? 'h-12 w-12 mx-auto' : 'p-3'"
+          @mouseenter="showItemTooltip($event, profileName)"
+          @mouseleave="closeFloating"
+          class="rounded-2xl mb-2.5 flex items-center justify-center transition-all duration-300 overflow-hidden"
+          :class="[
+            isCollapsed ? 'h-12 w-12 mx-auto' : 'p-3',
+            isCollapsed && profileLogo && !logoError
+              ? 'bg-white border border-gray-100 shadow-sm'
+              : 'bg-gradient-to-l from-orange-600 to-orange-500 shadow-lg shadow-orange-100'
+          ]"
         >
+          <img
+            v-if="isCollapsed && profileLogo && !logoError"
+            :src="profileLogo"
+            :alt="profileName"
+            @error="logoError = true"
+            class="w-full h-full object-cover"
+          />
           <h1
+            v-else
             class="font-black text-white leading-tight truncate px-2"
             :class="isCollapsed ? 'text-lg' : 'text-base'"
           >
@@ -79,8 +94,7 @@
       <!-- Nav Links -->
       <nav
         @scroll="closeFloating"
-        class="flex-1 overflow-y-auto min-h-0 space-y-2 custom-scrollbar py-1"
-        :class="isCollapsed ? '' : 'pe-0.5'"
+        class="flex-1 overflow-y-auto min-h-0 space-y-1.5 no-scrollbar py-1"
       >
         <template v-for="link in visibleLinks" :key="link.key || link.to">
           <!-- Dropdown Group (Menu / Settings) -->
@@ -94,7 +108,7 @@
                 'flex items-center rounded-2xl transition-all font-bold overflow-hidden group cursor-pointer',
                 isCollapsed
                   ? 'w-12 h-12 mx-auto justify-center'
-                  : 'w-full justify-between px-3.5 py-3.5',
+                  : 'w-full justify-between px-3.5 py-3',
                 isGroupActive(link) || (isCollapsed && floating?.type === 'group' && floating.group?.key === link.key)
                   ? 'bg-orange-50 text-orange-600 shadow-sm shadow-orange-50 ring-1 ring-orange-200/60'
                   : 'hover:bg-orange-50 hover:text-orange-600 text-gray-500',
@@ -126,7 +140,7 @@
                     v-for="child in link.children"
                     :key="child.to"
                     :to="child.to"
-                    class="flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-sm transition-all group/child"
+                    class="flex items-center gap-3 px-3.5 py-2 rounded-2xl text-sm transition-all group/child"
                     :class="
                       isChildActive(child)
                         ? 'bg-orange-100/70 text-orange-700 font-black'
@@ -161,7 +175,7 @@
               'flex items-center rounded-2xl transition-all font-bold overflow-hidden group',
               isCollapsed
                 ? 'w-12 h-12 mx-auto justify-center'
-                : 'w-full justify-between px-3.5 py-3.5',
+                : 'w-full justify-between px-3.5 py-3',
               link.hoverClass || 'hover:bg-orange-50 hover:text-orange-600 text-gray-500',
             ]"
             :active-class="
@@ -329,6 +343,7 @@ const props = defineProps<{
   isMobileOpen: boolean
   isCollapsed: boolean
   profileName: string
+  profileLogo?: string
   userRole: string
   isSuperAdmin: boolean
   canManageRestaurant: boolean
@@ -348,6 +363,14 @@ const emit = defineEmits<{
   openUpgrade: []
   openLogout: []
 }>()
+
+const logoError = ref(false)
+watch(
+  () => props.profileLogo,
+  () => {
+    logoError.value = false
+  }
+)
 
 interface SidebarChild {
   to: string
@@ -389,9 +412,10 @@ watch(
   (path) => {
     if (isOnMenuSection(path)) {
       openGroups.value['menu-group'] = true
-    }
-    if (isOnSettingsSection(path)) {
+      openGroups.value['settings-group'] = false
+    } else if (isOnSettingsSection(path)) {
       openGroups.value['settings-group'] = true
+      openGroups.value['menu-group'] = false
     }
   }
 )
@@ -507,7 +531,10 @@ const handleGroupClick = (link: SidebarLink, event?: MouseEvent) => {
     return
   }
   if (link.key) {
-    openGroups.value[link.key] = !openGroups.value[link.key]
+    const nextState = !openGroups.value[link.key]
+    for (const k of Object.keys(openGroups.value)) {
+      openGroups.value[k] = k === link.key ? nextState : false
+    }
   }
 }
 

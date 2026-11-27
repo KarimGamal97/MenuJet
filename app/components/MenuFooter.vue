@@ -1,13 +1,14 @@
 <template>
-  <footer
-    class="py-6 text-center relative z-10 select-none"
-  >
+  <footer class="py-6 text-center relative z-10 select-none">
     <div class="flex items-center justify-center gap-1.5 text-xs font-bold text-gray-400">
-      <span>مدعوم بواسطة</span>
-      <a
-        href="/"
-        class="text-orange-600 font-black hover:text-orange-500 transition-colors flex items-center gap-1">
-        <span>MenuJet</span></a>
+      <span>Powered by</span>
+      <NuxtLink
+        to="/"
+        title="MenuJet — Smart QR Menu for Restaurants & Cafes"
+        class="text-orange-600 font-black hover:text-orange-500 transition-colors flex items-center gap-1"
+      >
+        <span>MenuJet</span>
+      </NuxtLink>
     </div>
   </footer>
 </template>

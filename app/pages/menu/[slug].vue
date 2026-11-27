@@ -323,10 +323,7 @@
         @close="showInfoModal = false"
       />
 
-      <MenuFooter
-        v-if="restaurant.whatsapp_number"
-        :whatsappNumber="restaurant.whatsapp_number"
-      />
+      <MenuFooter :whatsappNumber="restaurant.whatsapp_number" />
       </template>
     </template>
 
@@ -393,7 +390,7 @@ const {
   data: restaurant,
   error,
   pending,
-} = useAsyncData(
+} = await useAsyncData(
   `menu-${route.params.slug}`,
   async () => {
     const { data: profile, error: pError } = await client
@@ -411,8 +408,21 @@ const {
 
     return { ...profile, menu_items: items || [] };
   },
-  { lazy: true },
 );
+
+const menuSplashPending = useState("menuSplashPending", () => false);
+
+watch(
+  pending,
+  (val) => {
+    menuSplashPending.value = Boolean(val);
+  },
+  { immediate: true }
+);
+
+onBeforeUnmount(() => {
+  menuSplashPending.value = false;
+});
 
 const primaryColor = computed(
   () => restaurant.value?.primary_color || "#ea580c",
@@ -502,6 +512,91 @@ const isActuallyOpen = computed(() => {
 
 // Subscription expiration check
 const isSubscriptionExpired = computed(() => isSubscriptionExpiredCheck(restaurant.value));
+
+const menuSeoTitle = computed(() => {
+  if (!restaurant.value || isSubscriptionExpired.value) {
+    return t("seo.menu_unavailable_title");
+  }
+  const name = restaurant.value.business_name || String(route.params.slug || "");
+  return t("seo.menu_title", { name });
+});
+
+const menuSeoDescription = computed(() => {
+  if (!restaurant.value || isSubscriptionExpired.value) {
+    return t("menu.unavailable_desc");
+  }
+  const name = restaurant.value.business_name || "";
+  const separator = locale.value === "ar" ? "، " : ", ";
+  const cats = (restaurant.value.categories || []).slice(0, 5).join(separator);
+  return cats
+    ? t("seo.menu_desc_with_cats", { name, cats })
+    : t("seo.menu_desc_default", { name });
+});
+
+useSeoMeta({
+  title: menuSeoTitle,
+  description: menuSeoDescription,
+  ogTitle: menuSeoTitle,
+  ogDescription: menuSeoDescription,
+  ogType: "website",
+  ogImage: computed(
+    () => restaurant.value?.logo || "https://getmenujet.com/pwa-512x512.png"
+  ),
+  twitterCard: "summary_large_image",
+  robots: computed(() =>
+    !restaurant.value || isSubscriptionExpired.value ? "noindex, nofollow" : "index, follow"
+  ),
+});
+
+useHead(() => {
+  const r = restaurant.value;
+  if (!r || isSubscriptionExpired.value) return {};
+  const slug = encodeURIComponent(String(r.slug || route.params.slug || ""));
+  const topItems = (r.menu_items || [])
+    .filter((i) => i?.available !== false && i?.name)
+    .slice(0, 12)
+    .map((i) => ({
+      "@type": "MenuItem",
+      name: i.name,
+      ...(i.description ? { description: i.description } : {}),
+      ...(i.image ? { image: i.image } : {}),
+    }));
+
+  return {
+    script: [
+      {
+        key: "ld-restaurant-menu",
+        type: "application/ld+json",
+        innerHTML: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Restaurant",
+          name: r.business_name,
+          url: `https://getmenujet.com/menu/${slug}`,
+          ...(r.logo ? { image: r.logo } : {}),
+          ...(r.social_phone || r.whatsapp_number
+            ? { telephone: r.social_phone || r.whatsapp_number }
+            : {}),
+          hasMenu: {
+            "@type": "Menu",
+            name: r.business_name,
+            url: `https://getmenujet.com/menu/${slug}`,
+            ...(topItems.length > 0
+              ? {
+                  hasMenuSection: [
+                    {
+                      "@type": "MenuSection",
+                      name: t("seo.menu_items_section"),
+                      hasMenuItem: topItems,
+                    },
+                  ],
+                }
+              : {}),
+          },
+        }),
+      },
+    ],
+  };
+});
 
 const activePlanId = computed(() =>
   isActiveTrialCheck(restaurant.value) ? "pro" : resolvePlanId(restaurant.value)

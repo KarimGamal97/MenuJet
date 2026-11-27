@@ -9,6 +9,13 @@
 </template>
 
 <script setup>
+const { t } = useI18n();
+
+useSeoMeta({
+  title: computed(() => t("seo.confirm_title")),
+  robots: "noindex, nofollow",
+});
+
 const user = useSupabaseUser();
 const client = useSupabaseClient();
 

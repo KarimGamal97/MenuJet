@@ -375,43 +375,47 @@ export function useCartCheckout(props: CheckoutProps, onClose: () => void) {
   }
 
   const whatsappLink = computed(() => {
+    const RTL = '\u200F'
     const items = cart.value
-      .map((i: any, index: number) => {
-        const basePrice = i.basePrice || i.price
-        let text = `${index + 1}. ${i.name} ${i.size ? `(${i.size.replace(/\s*قطعة/g, '').trim()})` : ''} (${basePrice} ${t('currency')}) × ${i.quantity}`
+      .map((i: any) => {
+        const sizeLabel = i.size ? ` (${i.size.replace(/\s*قطعة/g, '').trim()})` : ''
+        const qty = Number(i.quantity) || 1
+        const lineTotal = Number(i.price) * qty
+        const unitNote = qty > 1 ? ` (الواحدة ${i.basePrice || i.price} ${t('currency')})` : ''
+        let text = `${RTL}▪ *${i.name}*${sizeLabel}\n${RTL}   الكمية: *${qty}*${unitNote} — *${lineTotal} ${t('currency')}*`
         if (i.selectedExtras?.length) {
           const extrasText = i.selectedExtras
             .map((e: any) => `${e.name} (+${e.price} ${t('currency')})`)
-            .join(', ')
-          text += `\n    + ${t('cart.whatsapp_extras_prefix')}: ${extrasText}`
+            .join('، ')
+          text += `\n${RTL}   ➕ ${t('cart.whatsapp_extras_prefix')}: ${extrasText}`
         }
-        text += `\n    = ${i.price * i.quantity} ${t('currency')}`
-        if (i.notes) text += `\n  - ملاحظات: ${i.notes}`
+        if (i.notes) text += `\n${RTL}   ✏️ ملاحظات: ${i.notes}`
         return text
       })
-      .join('\n')
+      .join('\n\n')
 
     let header = editingOrder.value
-      ? `*تعديل طلب رقم #${editingOrder.value.id}*`
+      ? `*✏️ تعديل طلب رقم #${editingOrder.value.id}*`
       : t('cart.whatsapp_msg_header')
     if (!header || header === 'cart.whatsapp_msg_header') {
       header = 'طلب جديد'
     }
+    const formattedHeader = header.startsWith('*') ? header : `*✨ ${header}*`
 
-    const phoneLine = props.phoneNumberEnabled ? `الهاتف: ${customerForm.value.phone || 'غير محدد'}\n` : ''
-    let msgText = `${header}\n\nالاسم: ${customerForm.value.name || 'غير محدد'}\n${phoneLine}\nتفاصيل الطلب:\n${items}\n`
+    const phoneLine = props.phoneNumberEnabled ? `${RTL}📞 الهاتف: ${customerForm.value.phone || 'غير محدد'}\n` : ''
+    let msgText = `${RTL}${formattedHeader}\n\n${RTL}👤 الاسم: ${customerForm.value.name || 'غير محدد'}\n${phoneLine}\n${RTL}ℹ️ *تفاصيل الطلب:*\n${items}\n`
 
     const baseTotal = totalPrice.value
     const finalTotalText = `${baseTotal} ${t('admin.currency')}`
 
     if (customerForm.value.method === 'توصيل' && selectedDeliveryArea.value) {
-      msgText += `\n📍 الاستلام: توصيل (${selectedDeliveryArea.value.name})\n🏠 العنوان: ${customerForm.value.addressDetail || 'غير محدد'}\n\n💰 ${t('cart.whatsapp_subtotal')}: ${baseTotal} ${t('admin.currency')}\n🚚 ${t('cart.whatsapp_delivery_cost')}: ${selectedDeliveryArea.value.price} ${t('admin.currency')}\n\n💰 ${t('cart.whatsapp_final_total')}: *${baseTotal + Number(selectedDeliveryArea.value.price)} ${t('admin.currency')}*`
+      msgText += `\n${RTL}📦 الاستلام: توصيل (${selectedDeliveryArea.value.name})\n${RTL}📍 العنوان: ${customerForm.value.addressDetail || 'غير محدد'}\n\n${RTL}💰 ${t('cart.whatsapp_subtotal')}: ${baseTotal} ${t('admin.currency')}\n${RTL}💵 ${t('cart.whatsapp_delivery_cost')}: ${selectedDeliveryArea.value.price} ${t('admin.currency')}\n${RTL}💰 ${t('cart.whatsapp_final_total')}: *${baseTotal + Number(selectedDeliveryArea.value.price)} ${t('admin.currency')}*`
     } else {
-      msgText += `\n📍 الاستلام: ${customerForm.value.method}\n\n💰 الإجمالي: *${finalTotalText}*`
+      msgText += `\n${RTL}📦 الاستلام: ${customerForm.value.method}\n\n${RTL}💰 الإجمالي: *${finalTotalText}*`
     }
 
     if (selectedPaymentMethodDetails.value) {
-      msgText += `\n💳 طريقة الدفع: *${selectedPaymentMethodDetails.value.name}* (مرفق إشعار التحويل)`
+      msgText += `\n${RTL}💳 طريقة الدفع: *${selectedPaymentMethodDetails.value.name}* (مرفق إشعار التحويل)`
     }
 
     return buildWhatsAppUrl(props.whatsappNumber, msgText)

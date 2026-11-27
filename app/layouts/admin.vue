@@ -19,6 +19,7 @@
       :isMobileOpen="isMobileOpen"
       :isCollapsed="isCollapsed"
       :profileName="profileName"
+      :profileLogo="profileLogo"
       :userRole="userRole"
       :isSuperAdmin="isSuperAdmin"
       :canManageRestaurant="canManageRestaurant"
@@ -63,7 +64,7 @@
         <span class="font-black text-orange-600">MenuJet</span>
       </header>
 
-      <main dir="ltr" class="flex-1 p-4 md:p-10 overflow-y-auto custom-scrollbar">
+      <main :dir="locale === 'ar' ? 'rtl' : 'ltr'" class="flex-1 p-4 md:p-10 overflow-y-auto custom-scrollbar">
         <slot />
       </main>
     </div>
@@ -79,17 +80,28 @@ const { currentPlan, isFree, isBasic, isPro, can } = usePlan();
 const { t, locale } = useI18n();
 const { $toast } = useNuxtApp();
 
+useSeoMeta({
+  robots: 'noindex, nofollow',
+});
+
 const isCollapsed = ref(false);
 const isMobileOpen = ref(false);
 const showLogoutModal = ref(false);
 const showUpgradeModal = ref(false);
 const localProfile = ref(null);
+const adminSplashPending = useState('adminSplashPending', () => !authStore.profile);
 
 const profileName = computed(() =>
   authStore.profile?.business_name ||
   authStore.profile?.business_name_ar ||
   authStore.profile?.business_name_en ||
   authStore.profile?.full_name ||
+  ''
+);
+
+const profileLogo = computed(() =>
+  authStore.profile?.logo ||
+  localProfile.value?.logo ||
   ''
 );
 
@@ -218,6 +230,7 @@ const fetchProfile = async (userId) => {
         if (!data.business_name && ownerData.business_name) data.business_name = ownerData.business_name;
         if (!data.business_name_ar && ownerData.business_name_ar) data.business_name_ar = ownerData.business_name_ar;
         if (!data.business_name_en && ownerData.business_name_en) data.business_name_en = ownerData.business_name_en;
+        if (!data.logo && ownerData.logo) data.logo = ownerData.logo;
         if (!data.subscription_end_date && ownerData.subscription_end_date) {
           data.subscription_end_date = ownerData.subscription_end_date;
         }
@@ -230,9 +243,16 @@ const fetchProfile = async (userId) => {
 };
 
 onMounted(async () => {
-  const { data: { user: authUser } } = await client.auth.getUser();
-  if (authUser?.id) {
-    await fetchProfile(authUser.id);
+  try {
+    if (!authStore.profile) {
+      adminSplashPending.value = true;
+    }
+    const { data: { user: authUser } } = await client.auth.getUser();
+    if (authUser?.id) {
+      await fetchProfile(authUser.id);
+    }
+  } finally {
+    adminSplashPending.value = false;
   }
 });
 

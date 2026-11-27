@@ -1,24 +1,95 @@
 <script setup>
 const { locale } = useI18n();
+const route = useRoute();
 const { isDark } = useTheme();
+const isAppBooting = ref(true);
+const adminSplashPending = useState("adminSplashPending", () => false);
+const menuSplashPending = useState("menuSplashPending", () => false);
+const splashAnimDone = ref(false);
+
+const SITE_URL = "https://getmenujet.com";
+
+const showAppSplash = computed(
+  () =>
+    isAppBooting.value ||
+    !splashAnimDone.value ||
+    adminSplashPending.value ||
+    menuSplashPending.value
+);
 
 const localeDir = computed(() => (locale.value === "ar" ? "rtl" : "ltr"));
 
-useHead({
-  htmlAttrs: {
-    dir: localeDir,
-    lang: locale,
-    class: computed(() => ({ dark: isDark.value })),
-  },
+const isPrivateRoute = computed(() =>
+  /^\/(en\/|ar\/)?(admin|platform|login|confirm)(\/|$)/.test(route.path)
+);
+
+const normalizedPublicPath = computed(() => {
+  let p = route.path || "/";
+  if (p === "/en" || p === "/en/" || p === "/ar" || p === "/ar/") return "/";
+  p = p.replace(/^\/(en|ar)(?=\/)/, "");
+  if (p.length > 1 && p.endsWith("/")) p = p.slice(0, -1);
+  return p || "/";
 });
+
+const canonicalUrl = computed(() => {
+  const basePath = normalizedPublicPath.value === "/" ? "" : normalizedPublicPath.value;
+  return locale.value === "en" ? `${SITE_URL}/en${basePath}` : `${SITE_URL}${basePath || "/"}`;
+});
+
+const arAlternateUrl = computed(() => {
+  const basePath = normalizedPublicPath.value === "/" ? "" : normalizedPublicPath.value;
+  return `${SITE_URL}${basePath || "/"}`;
+});
+
+const enAlternateUrl = computed(() => {
+  const basePath = normalizedPublicPath.value === "/" ? "" : normalizedPublicPath.value;
+  return `${SITE_URL}/en${basePath}`;
+});
+
+useHead(() => ({
+  htmlAttrs: {
+    dir: localeDir.value,
+    lang: locale.value === "ar" ? "ar" : "en",
+    class: { dark: isDark.value },
+  },
+  link: isPrivateRoute.value
+    ? []
+    : [
+        { rel: "canonical", href: canonicalUrl.value },
+        { rel: "alternate", hreflang: "ar", href: arAlternateUrl.value },
+        { rel: "alternate", hreflang: "ar-EG", href: arAlternateUrl.value },
+        { rel: "alternate", hreflang: "ar-SA", href: arAlternateUrl.value },
+        { rel: "alternate", hreflang: "en", href: enAlternateUrl.value },
+        { rel: "alternate", hreflang: "x-default", href: arAlternateUrl.value },
+      ],
+  meta: [
+    { property: "og:site_name", content: "MenuJet" },
+    { property: "og:locale", content: locale.value === "ar" ? "ar_EG" : "en_US" },
+  ],
+}));
+
+let safetyTimer = null;
 
 onMounted(() => {
   document.documentElement.classList.toggle("dark", isDark.value);
   document.documentElement.style.colorScheme = isDark.value ? "dark" : "light";
+  isAppBooting.value = false;
+
+  safetyTimer = setTimeout(() => {
+    adminSplashPending.value = false;
+    menuSplashPending.value = false;
+    splashAnimDone.value = true;
+    isAppBooting.value = false;
+  }, 7500);
+});
+
+onBeforeUnmount(() => {
+  if (safetyTimer) clearTimeout(safetyTimer);
 });
 </script>
 
 <template>
+  <SplashScreen :show="showAppSplash" @complete="splashAnimDone = true" />
   <!-- <VitePwaManifest /> -->
   <NuxtLayout>
     <NuxtPage />

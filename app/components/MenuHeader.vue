@@ -24,9 +24,9 @@
           <div
             class="flex items-center justify-center overflow-hidden transition-transform mb-1"
           >
-            <span class="text-white font-black capitalize text-lg sm:text-xl leading-none">
+            <h1 class="text-white font-black capitalize text-lg sm:text-xl leading-none">
               {{ restaurant.business_name }}
-            </span>
+            </h1>
           </div>
 
           <!-- Status Badge below Logo -->

@@ -46,8 +46,9 @@ export function buildWhatsAppUrl(
 ): string {
   const digits = normalizeWhatsAppDigits(phone)
   if (!digits) return ''
-  const base = `https://wa.me/${digits}`
-  return message ? `${base}?text=${encodeURIComponent(message)}` : base
+  return message
+    ? `https://api.whatsapp.com/send?phone=${digits}&text=${encodeURIComponent(message)}`
+    : `https://wa.me/${digits}`
 }
 
 /**
