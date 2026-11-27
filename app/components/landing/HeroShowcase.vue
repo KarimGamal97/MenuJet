@@ -70,9 +70,9 @@
             </div>
 
             <!-- Search Pill -->
-            <div class="bg-white dark:bg-slate-800 rounded-xl px-3 py-1.5 flex items-center justify-between text-[10px] text-slate-400 dark:text-slate-300 shadow-xs">
+            <div class="bg-white dark:bg-slate-800 rounded-xl px-3 py-1.5 flex items-center justify-between text-[10px] text-slate-500 dark:text-slate-300 shadow-xs">
               <span>{{ $t('hero.showcase.search_placeholder') }}</span>
-              <BaseIcon name="search" class="w-3.5 h-3.5 text-slate-400 shrink-0" />
+              <BaseIcon name="search" class="w-3.5 h-3.5 text-slate-500 dark:text-slate-300 shrink-0" />
             </div>
           </div>
 
@@ -112,7 +112,7 @@
                 <p class="text-[9px] font-medium text-slate-500 dark:text-slate-400 truncate mt-0.5">
                   {{ $t(item.descKey) }}
                 </p>
-                <p class="text-[11px] font-black text-orange-600 dark:text-orange-400 mt-1">
+                <p class="text-[11px] font-black text-orange-700 dark:text-orange-400 mt-1">
                   {{ item.price }} {{ $t('hero.showcase.currency') }}
                 </p>
               </div>

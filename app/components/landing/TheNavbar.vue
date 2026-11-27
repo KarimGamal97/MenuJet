@@ -260,6 +260,8 @@
 
         <button 
           type="button"
+          :aria-label="$t('nav.toggle_menu')"
+          :aria-expanded="isMobileMenuOpen"
           @click="toggleMobileMenu" 
           class="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-orange-600 dark:hover:text-orange-400 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none transition-colors cursor-pointer"
         >

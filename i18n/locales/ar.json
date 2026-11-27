@@ -647,7 +647,8 @@
     "lang_name": "English",
     "clients": "عملاؤنا",
     "theme_dark": "الوضع الليلي",
-    "theme_light": "الوضع النهاري"
+    "theme_light": "الوضع النهاري",
+    "toggle_menu": "فتح أو إغلاق القائمة"
   },
   "faqs": {
     "title": "الأسئلة الشائعة",

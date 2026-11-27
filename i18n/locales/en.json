@@ -647,7 +647,8 @@
     "lang_name": "العربية",
     "clients": "Clients",
     "theme_dark": "Dark Mode",
-    "theme_light": "Light Mode"
+    "theme_light": "Light Mode",
+    "toggle_menu": "Toggle navigation menu"
   },
   "faqs": {
     "title": "Frequently Asked Questions",

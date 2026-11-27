@@ -410,20 +410,6 @@ const {
   },
 );
 
-const menuSplashPending = useState("menuSplashPending", () => false);
-
-watch(
-  pending,
-  (val) => {
-    menuSplashPending.value = Boolean(val);
-  },
-  { immediate: true }
-);
-
-onBeforeUnmount(() => {
-  menuSplashPending.value = false;
-});
-
 const primaryColor = computed(
   () => restaurant.value?.primary_color || "#ea580c",
 );

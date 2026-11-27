@@ -2,20 +2,8 @@
 const { locale } = useI18n();
 const route = useRoute();
 const { isDark } = useTheme();
-const isAppBooting = ref(true);
-const adminSplashPending = useState("adminSplashPending", () => false);
-const menuSplashPending = useState("menuSplashPending", () => false);
-const splashAnimDone = ref(false);
 
 const SITE_URL = "https://getmenujet.com";
-
-const showAppSplash = computed(
-  () =>
-    isAppBooting.value ||
-    !splashAnimDone.value ||
-    adminSplashPending.value ||
-    menuSplashPending.value
-);
 
 const localeDir = computed(() => (locale.value === "ar" ? "rtl" : "ltr"));
 
@@ -68,28 +56,13 @@ useHead(() => ({
   ],
 }));
 
-let safetyTimer = null;
-
 onMounted(() => {
   document.documentElement.classList.toggle("dark", isDark.value);
   document.documentElement.style.colorScheme = isDark.value ? "dark" : "light";
-  isAppBooting.value = false;
-
-  safetyTimer = setTimeout(() => {
-    adminSplashPending.value = false;
-    menuSplashPending.value = false;
-    splashAnimDone.value = true;
-    isAppBooting.value = false;
-  }, 7500);
-});
-
-onBeforeUnmount(() => {
-  if (safetyTimer) clearTimeout(safetyTimer);
 });
 </script>
 
 <template>
-  <SplashScreen :show="showAppSplash" @complete="splashAnimDone = true" />
   <!-- <VitePwaManifest /> -->
   <NuxtLayout>
     <NuxtPage />

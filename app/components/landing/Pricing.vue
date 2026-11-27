@@ -115,7 +115,7 @@
                   {{ currentPrices.basic[billingCycle].price.toLocaleString() }}
                 </span>
                 <span class="text-slate-600 dark:text-slate-300 text-base font-bold">{{ currencySymbol }}</span>
-                <span class="text-slate-400 dark:text-slate-500 text-sm font-bold">/ {{ billingCycle === 'yearly' ? $t('pricing.per_year') : $t('pricing.per_month') }}</span>
+                <span class="text-slate-600 dark:text-slate-300 text-sm font-bold">/ {{ billingCycle === 'yearly' ? $t('pricing.per_year') : $t('pricing.per_month') }}</span>
               </div>
               <p v-if="billingCycle === 'yearly'" class="text-xs text-emerald-600 dark:text-emerald-400 font-bold mt-1.5">
                 {{ basicYearlyNote }}
@@ -173,7 +173,7 @@
                   {{ currentPrices.pro[billingCycle].price.toLocaleString() }}
                 </span>
                 <span class="text-slate-600 dark:text-slate-300 text-base font-bold">{{ currencySymbol }}</span>
-                <span class="text-slate-400 dark:text-slate-500 text-sm font-bold">/ {{ billingCycle === 'yearly' ? $t('pricing.per_year') : $t('pricing.per_month') }}</span>
+                <span class="text-slate-600 dark:text-slate-300 text-sm font-bold">/ {{ billingCycle === 'yearly' ? $t('pricing.per_year') : $t('pricing.per_month') }}</span>
               </div>
               <p v-if="billingCycle === 'yearly'" class="text-xs text-emerald-600 dark:text-emerald-400 font-bold mt-1.5">
                 {{ proYearlyNote }}

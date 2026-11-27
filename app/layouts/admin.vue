@@ -1,5 +1,6 @@
 <template>
   <div class="h-screen bg-gray-50 flex overflow-hidden">
+    <SplashScreen :show="adminSplashPending" />
     <!-- Backdrop for mobile -->
     <div
       v-if="isMobileOpen"
@@ -89,7 +90,7 @@ const isMobileOpen = ref(false);
 const showLogoutModal = ref(false);
 const showUpgradeModal = ref(false);
 const localProfile = ref(null);
-const adminSplashPending = useState('adminSplashPending', () => !authStore.profile);
+const adminSplashPending = ref(!authStore.profile);
 
 const profileName = computed(() =>
   authStore.profile?.business_name ||

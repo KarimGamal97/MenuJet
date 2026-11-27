@@ -29,7 +29,7 @@
         <video
           controls
           playsinline
-          preload="metadata"
+          preload="none"
           class="w-full max-h-[560px] aspect-video object-contain bg-slate-950"
         >
           <source :src="demoVideoUrl" type="video/mp4" />

@@ -91,20 +91,24 @@
         </button>
 
         <!-- Slider Dots -->
-        <div class="flex items-center justify-center gap-2 mt-6">
+        <div class="flex items-center justify-center gap-0 mt-4">
           <button
             v-for="(client, idx) in clientsList"
             :key="'dot-' + client.slug"
             type="button"
             @click="goToSlide(idx)"
             :aria-label="$t(client.nameKey)"
-            :class="[
-              'h-2 rounded-full transition-all duration-300 cursor-pointer',
-              activeDotIndex === idx
-                ? 'w-6 bg-orange-500'
-                : 'w-2 bg-slate-300 dark:bg-slate-700 hover:bg-slate-400 dark:hover:bg-slate-600'
-            ]"
-          ></button>
+            class="p-2 flex items-center justify-center cursor-pointer"
+          >
+            <span
+              :class="[
+                'block h-2 rounded-full transition-all duration-300',
+                activeDotIndex === idx
+                  ? 'w-6 bg-orange-500'
+                  : 'w-2 bg-slate-300 dark:bg-slate-700 hover:bg-slate-400 dark:hover:bg-slate-600'
+              ]"
+            ></span>
+          </button>
         </div>
       </div>
 

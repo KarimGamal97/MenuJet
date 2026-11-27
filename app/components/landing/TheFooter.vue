@@ -49,9 +49,9 @@
 
         <!-- Col 1: Platform Links -->
         <div class="space-y-3">
-          <h4 class="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
+          <p class="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
             {{ $t('landing_footer.col_platform') }}
-          </h4>
+          </p>
           <ul class="space-y-1.5 text-xs sm:text-sm">
             <li>
               <NuxtLink
@@ -118,9 +118,9 @@
 
         <!-- Col 2: Legal & Trust -->
         <div class="space-y-3">
-          <h4 class="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
+          <p class="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
             {{ $t('landing_footer.col_legal') }}
-          </h4>
+          </p>
           <ul class="space-y-1.5 text-xs sm:text-sm">
             <li>
               <NuxtLink
@@ -163,9 +163,9 @@
 
         <!-- Col 3: Support & Access -->
         <div class="space-y-3">
-          <h4 class="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
+          <p class="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
             {{ $t('landing_footer.col_support') }}
-          </h4>
+          </p>
           <ul class="space-y-1.5 text-xs sm:text-sm">
             <li>
               <NuxtLink
